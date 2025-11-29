@@ -1,127 +1,3 @@
-// "use client";
-// import { Input } from "antd";
-// import {
-//   PhoneOutlined,
-//   InstagramOutlined,
-//   SearchOutlined,
-// } from "@ant-design/icons";
-// import { useState, useEffect } from "react";
-// import Link from "next/link";
-// import "./Header.scss";
-
-// const { Search } = Input;
-
-// export const Header = () => {
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-//   const [isScrolled, setIsScrolled] = useState(false);
-
-//   useEffect(() => {
-//     const handleScroll = () => {
-//       setIsScrolled(window.scrollY > 20);
-//     };
-
-//     window.addEventListener("scroll", handleScroll);
-//     return () => window.removeEventListener("scroll", handleScroll);
-//   }, []);
-
-//   const onSearch = (value: string) => {
-//     console.log("Search:", value);
-//   };
-
-//   return (
-//     <header className={`header ${isScrolled ? "header--scrolled" : ""}`}>
-//       {/* Верхний ряд с контактами */}
-//       <div className="header__top">
-//         <div className="container">
-//           <div className="header__contacts">
-//             <div className="header__phone">
-//               <PhoneOutlined />
-//               <span>+375 (212) 12-34-56</span>
-//             </div>
-//             <div className="header__social">
-//               <a
-//                 href="https://instagram.com/dynamo_vitebsk"
-//                 target="_blank"
-//                 rel="noopener noreferrer"
-//                 className="header__social-link"
-//               >
-//                 <InstagramOutlined />
-//                 <span>dynamo_vitebsk</span>
-//               </a>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Основной ряд с навигацией */}
-//       <div className="header__main">
-//         <div className="container">
-//           <div className="header__content">
-//             {/* Логотип с анимацией */}
-//             <Link href="/" className="header__logo">
-//               <div className="header__logo-icon">Д</div>
-//               <div className="header__logo-text">
-//                 <h1 className="header__logo-title">Динамо</h1>
-//                 <span className="header__logo-subtitle">Витебск</span>
-//               </div>
-//             </Link>
-
-//             {/* Навигация с красивыми анимациями */}
-//             <nav
-//               className={`header__nav ${isMenuOpen ? "header__nav--open" : ""}`}
-//             >
-//               <Link href="/" className="header__nav-link">
-//                 <span>Главная</span>
-//               </Link>
-//               <Link href="/history" className="header__nav-link">
-//                 <span>История</span>
-//               </Link>
-//               <Link href="/sports" className="header__nav-link">
-//                 <span>Отделения</span>
-//               </Link>
-//               <Link href="/coaches" className="header__nav-link">
-//                 <span>Тренеры</span>
-//               </Link>
-//               <Link href="/achievements" className="header__nav-link">
-//                 <span>Достижения</span>
-//               </Link>
-//               <Link href="/contacts" className="header__nav-link">
-//                 <span>Контакты</span>
-//               </Link>
-//             </nav>
-
-//             {/* Поиск - перемещаем в конец */}
-//             <div className="header__search">
-//               <Search
-//                 placeholder="Поиск..."
-//                 allowClear
-//                 enterButton={<SearchOutlined />}
-//                 size="middle"
-//                 onSearch={onSearch}
-//                 className="header__search-input"
-//               />
-//             </div>
-
-//             {/* Управление */}
-//             <div className="header__controls">
-//               {/* Бургер меню - только для мобильных */}
-//               <button
-//                 className={`header__menu-toggle ${
-//                   isMenuOpen ? "header__menu-toggle--active" : ""
-//                 }`}
-//                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-//                 aria-label="Меню"
-//               >
-//                 <span className="header__menu-icon"></span>
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// };
-
 "use client";
 import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
@@ -146,6 +22,7 @@ const InstagramIcon = () => (
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -159,7 +36,47 @@ export const Header = () => {
 
   const onSearch = (value: string) => {
     console.log("Search:", value);
+    // Закрываем поиск после поиска на мобилке
+    if (window.innerWidth <= 768) {
+      setIsSearchOpen(false);
+    }
   };
+
+  const handleSearchToggle = () => {
+    setIsSearchOpen(!isSearchOpen);
+    // Если открываем поиск, закрываем меню
+    if (!isSearchOpen) {
+      setIsMenuOpen(false);
+    }
+  };
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
+    // Если открываем меню, закрываем поиск
+    if (!isMenuOpen) {
+      setIsSearchOpen(false);
+    }
+  };
+
+  // Закрываем меню и поиск при клике на ссылку
+  const handleNavClick = () => {
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
+  };
+
+  // Закрываем при клике вне области
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const headerElement = document.querySelector(".header");
+      if (headerElement && !headerElement.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className={`header ${isScrolled ? "header--scrolled" : ""}`}>
@@ -191,7 +108,7 @@ export const Header = () => {
         <div className="container">
           <div className="header__content">
             {/* Логотип с анимацией */}
-            <Link href="/" className="header__logo">
+            <Link href="/" className="header__logo" onClick={handleNavClick}>
               <div className="header__logo-icon">Д</div>
               <div className="header__logo-text">
                 <h1 className="header__logo-title">Динамо</h1>
@@ -199,31 +116,53 @@ export const Header = () => {
               </div>
             </Link>
 
-            {/* Навигация с красивыми анимациями */}
-            <nav
-              className={`header__nav ${isMenuOpen ? "header__nav--open" : ""}`}
-            >
-              <Link href="/" className="header__nav-link">
+            {/* Навигация для десктопа */}
+            <nav className="header__nav">
+              <Link
+                href="/"
+                className="header__nav-link"
+                onClick={handleNavClick}
+              >
                 <span>Главная</span>
               </Link>
-              <Link href="/history" className="header__nav-link">
+              <Link
+                href="/history"
+                className="header__nav-link"
+                onClick={handleNavClick}
+              >
                 <span>История</span>
               </Link>
-              <Link href="/sports" className="header__nav-link">
+              <Link
+                href="/sports"
+                className="header__nav-link"
+                onClick={handleNavClick}
+              >
                 <span>Отделения</span>
               </Link>
-              <Link href="/coaches" className="header__nav-link">
+              <Link
+                href="/coaches"
+                className="header__nav-link"
+                onClick={handleNavClick}
+              >
                 <span>Тренеры</span>
               </Link>
-              <Link href="/achievements" className="header__nav-link">
+              <Link
+                href="/achievements"
+                className="header__nav-link"
+                onClick={handleNavClick}
+              >
                 <span>Достижения</span>
               </Link>
-              <Link href="/contacts" className="header__nav-link">
+              <Link
+                href="/contacts"
+                className="header__nav-link"
+                onClick={handleNavClick}
+              >
                 <span>Контакты</span>
               </Link>
             </nav>
 
-            {/* Поиск - перемещаем в конец */}
+            {/* Поиск для десктопа */}
             <div className="header__search">
               <Search
                 placeholder="Поиск..."
@@ -235,19 +174,95 @@ export const Header = () => {
               />
             </div>
 
-            {/* Управление */}
+            {/* Управление для мобильных */}
             <div className="header__controls">
-              {/* Бургер меню - только для мобильных */}
+              {/* Кнопка поиска для мобильных */}
+              <button
+                className="header__search-toggle"
+                onClick={handleSearchToggle}
+                aria-label="Поиск"
+              >
+                <SearchOutlined />
+              </button>
+
+              {/* Бургер меню для мобильных */}
               <button
                 className={`header__menu-toggle ${
                   isMenuOpen ? "header__menu-toggle--active" : ""
                 }`}
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={handleMenuToggle}
                 aria-label="Меню"
               >
                 <span className="header__menu-icon"></span>
               </button>
             </div>
+          </div>
+
+          {/* Мобильная навигация */}
+          <nav
+            className={`header__nav-mobile ${
+              isMenuOpen ? "header__nav-mobile--open" : ""
+            }`}
+          >
+            <Link
+              href="/"
+              className="header__nav-link"
+              onClick={handleNavClick}
+            >
+              <span>Главная</span>
+            </Link>
+            <Link
+              href="/history"
+              className="header__nav-link"
+              onClick={handleNavClick}
+            >
+              <span>История</span>
+            </Link>
+            <Link
+              href="/sports"
+              className="header__nav-link"
+              onClick={handleNavClick}
+            >
+              <span>Отделения</span>
+            </Link>
+            <Link
+              href="/coaches"
+              className="header__nav-link"
+              onClick={handleNavClick}
+            >
+              <span>Тренеры</span>
+            </Link>
+            <Link
+              href="/achievements"
+              className="header__nav-link"
+              onClick={handleNavClick}
+            >
+              <span>Достижения</span>
+            </Link>
+            <Link
+              href="/contacts"
+              className="header__nav-link"
+              onClick={handleNavClick}
+            >
+              <span>Контакты</span>
+            </Link>
+          </nav>
+
+          {/* Мобильный поиск */}
+          <div
+            className={`header__search-mobile ${
+              isSearchOpen ? "header__search-mobile--open" : ""
+            }`}
+          >
+            <Search
+              placeholder="Поиск..."
+              allowClear
+              enterButton={<SearchOutlined />}
+              size="large"
+              onSearch={onSearch}
+              className="header__search-input"
+              autoFocus
+            />
           </div>
         </div>
       </div>
