@@ -1,14 +1,22 @@
-// Анимация логотипа - плавное вращение
-@keyframes logoRotate {
-  from {
-    transform: rotate(0deg);
+// Анимации
+@keyframes logoTopSpin {
+  0% {
+    transform: rotateY(0deg) rotate(0deg);
   }
-  to {
-    transform: rotate(360deg);
+  25% {
+    transform: rotateY(90deg) rotate(90deg);
+  }
+  50% {
+    transform: rotateY(180deg) rotate(180deg);
+  }
+  75% {
+    transform: rotateY(270deg) rotate(270deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotate(360deg);
   }
 }
 
-// Анимации бургера
 @keyframes burgerTop {
   0% {
     transform: translateY(0) rotate(0);
@@ -33,6 +41,7 @@
   }
 }
 
+// Базовые стили хедера
 .header {
   background: var(--bg-overlay);
   backdrop-filter: blur(30px) saturate(180%);
@@ -108,7 +117,7 @@
   gap: 1rem;
 }
 
-// Логотип с бесконечной анимацией
+// Логотип
 .header__logo {
   display: flex;
   align-items: center;
@@ -132,11 +141,15 @@
   box-shadow: var(--shadow-md);
   font-weight: 700;
   font-family: "Space Grotesk", sans-serif;
-  animation: logoRotate 15s linear infinite;
+  animation: logoTopSpin 12s linear infinite;
+  transform-style: preserve-3d;
+  will-change: transform; // ← ДОБАВЛЕНО для оптимизации анимации
 }
 
 .header__logo:hover .header__logo-icon {
-  animation-duration: 5s;
+  animation: logoTopSpin 3s linear infinite;
+  box-shadow: 0 0 20px rgba(0, 102, 204, 0.5), 0 0 40px rgba(0, 102, 204, 0.3),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .header__logo-text {
@@ -163,13 +176,12 @@
   letter-spacing: 0.05em;
 }
 
-// Навигация с красивыми анимациями
+// Навигация для десктопа
 .header__nav {
   display: flex;
   align-items: center;
   gap: clamp(1.5rem, 3vw, 2.5rem);
 
-  // Скрываем навигацию на мобилках
   @media (max-width: 768px) {
     display: none;
   }
@@ -223,12 +235,11 @@
   }
 }
 
-// Поиск - исправленная версия
+// Поиск
 .header__search {
   flex: 0 1 clamp(150px, 20vw, 200px);
   min-width: 120px;
 
-  // Плавное уменьшение на планшетах
   @media (max-width: 940px) {
     flex: 0 1 clamp(100px, 15vw, 150px);
     min-width: 90px;
@@ -252,7 +263,6 @@
     }
   }
 
-  // Скрываем обычный поиск на мобилках
   @media (max-width: 768px) {
     display: none;
   }
@@ -269,7 +279,7 @@
   }
 }
 
-// Бургер меню с анимацией
+// Бургер меню
 .header__menu-toggle {
   display: none;
   background: none;
@@ -284,7 +294,6 @@
   align-items: center;
   justify-content: center;
 
-  // Показываем бургер на мобилках
   @media (max-width: 768px) {
     display: flex;
   }
@@ -349,7 +358,6 @@
   justify-content: center;
   color: var(--text-primary);
 
-  // Показываем на мобилках
   @media (max-width: 768px) {
     display: flex;
   }
@@ -360,7 +368,7 @@
   }
 }
 
-// Мобильная навигация (отдельный блок) - ТЕКСТ ПО ЦЕНТРУ
+// Мобильная навигация
 .header__nav-mobile {
   display: none;
   position: absolute;
@@ -379,7 +387,6 @@
   transition: all 0.3s ease;
   z-index: 1;
 
-  // Показываем на мобилках
   @media (max-width: 768px) {
     display: flex;
   }
@@ -395,10 +402,10 @@
     border-bottom: 1px solid var(--border-light);
     font-size: 1.1rem;
     margin: 0;
-    text-align: center; // ВЫРАВНИВАНИЕ ПО ЦЕНТРУ
+    text-align: center;
     display: flex;
-    justify-content: center; // ВЫРАВНИВАНИЕ ПО ЦЕНТРУ
-    align-items: center; // ВЫРАВНИВАНИЕ ПО ЦЕНТРУ
+    justify-content: center;
+    align-items: center;
 
     &:last-child {
       border-bottom: none;
@@ -413,12 +420,12 @@
     }
 
     span {
-      text-align: center; // ВЫРАВНИВАНИЕ ТЕКСТА ПО ЦЕНТРУ
+      text-align: center;
     }
   }
 }
 
-// Мобильный поиск (отдельный блок)
+// Мобильный поиск
 .header__search-mobile {
   display: none;
   position: absolute;
@@ -436,7 +443,6 @@
   transition: all 0.3s ease;
   z-index: 1;
 
-  // Показываем на мобилках
   @media (max-width: 768px) {
     display: block;
   }
@@ -484,7 +490,7 @@
   }
 }
 
-// Адаптивность для верхнего ряда контактов
+// Адаптивность
 @media (max-width: 768px) {
   .header__top {
     display: none;
@@ -498,7 +504,6 @@
     width: clamp(36px, 8vw, 40px);
     height: clamp(36px, 8vw, 40px);
     font-size: clamp(1.25rem, 4vw, 1.5rem);
-    animation-duration: 12s;
   }
 
   .header__logo-title {
@@ -542,7 +547,7 @@
   }
 }
 
-// Красивые иконки контактов
+// Иконки
 .header__phone,
 .header__social-link {
   svg {
@@ -561,5 +566,5 @@
 }
 
 .header__social-link:hover svg {
-  color: #e1306c; // Цвет Instagram
+  color: #e1306c;
 }
