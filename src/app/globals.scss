@@ -12,6 +12,44 @@ body {
   position: relative;
 }
 
+// ===== STICKY FOOTER LAYOUT =====
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  flex: 1 0 auto;
+}
+
+.main-content {
+  flex: 1 0 auto;
+  padding-top: 140px; // Для двухрядного хедера
+  width: 100%;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    padding-top: 100px; // Для мобильного хедера
+  }
+}
+
 // ===== СУПЕР-СОВРЕМЕННАЯ СИСТЕМА ДИЗАЙНА ДЛЯ ДИНАМО =====
 
 // === ИМПОРТ ШРИФТОВ ===
@@ -26,6 +64,11 @@ body {
   --dynamo-blue-bright: #0099ff;
   --dynamo-gold: #ffd700;
   --dynamo-gold-light: #ffed4e;
+
+  // RGB значения для прозрачности
+  --dynamo-blue-rgb: 0, 85, 183;
+  --accent-purple-rgb: 139, 92, 246;
+  --accent-teal-rgb: 0, 212, 170;
 
   // Акцентные цвета
   --accent-teal: #00d4aa;
@@ -94,17 +137,6 @@ body {
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
-body {
-  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
-    sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  width: 100%;
-  overflow-x: hidden;
-}
-
 // === ТИПОГРАФИКА ===
 h1,
 h2,
@@ -143,13 +175,6 @@ p {
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 clamp(1rem, 3vw, 2rem);
-  width: 100%;
-  overflow: hidden;
-}
-
-.main-content {
-  padding-top: 140px;
-  min-height: 100vh;
   width: 100%;
   overflow: hidden;
 }
