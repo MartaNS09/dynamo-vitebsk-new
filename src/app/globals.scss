@@ -326,3 +326,37 @@ p {
     font-size: 1rem;
   }
 }
+
+// Отступ для мобильной навигации
+@media (max-width: 768px) {
+  .page-wrapper {
+    padding-bottom: 70px; // Высота мобильной навигации
+  }
+}
+
+/* === TOUCH DEVICE OPTIMIZATIONS === */
+@media (hover: none) and (pointer: coarse) {
+  // Уменьшаем или убираем hover эффекты на touch устройствах
+  .button:hover {
+    transform: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  // Делаем тап-области больше для touch
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  // Улучшаем видимость активных состояний
+  a:active,
+  button:active {
+    opacity: 0.7;
+  }
+}

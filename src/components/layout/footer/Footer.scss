@@ -1,5 +1,3 @@
-
-
 .footer {
   background: linear-gradient(
     135deg,
@@ -7,13 +5,14 @@
     rgba(var(--dynamo-blue-rgb, 0, 85, 183), 0.1) 100%
   );
   backdrop-filter: blur(40px) saturate(200%);
-  padding: 2.5rem 0 2rem;
+  padding: 2.5rem 0 6rem;
   position: relative;
   overflow: hidden;
-  flex-shrink: 0; // Важно для sticky footer
-  margin-top: auto; // Пушит футер вниз
+  flex-shrink: 0;
+  margin-top: auto;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.5s ease-out;
 
   [data-theme="light"] & {
     background: linear-gradient(
@@ -45,7 +44,6 @@
     z-index: 2;
   }
 
-  // Новый градиентный фон как в хедере
   &::after {
     content: "";
     position: absolute;
@@ -288,7 +286,6 @@
     }
   }
 
-  // Контакты
   &__contacts-section {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -380,8 +377,8 @@
     font-style: normal;
   }
 
-  // Навигация
-  &__navigation {
+  // Навигация для десктопа
+  &__navigation-desktop {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 4rem;
@@ -389,14 +386,7 @@
     padding: 0 2rem;
 
     @media (max-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2.5rem;
-      padding: 0 0.5rem;
-    }
-
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr;
-      gap: 2rem;
+      display: none;
     }
   }
 
@@ -481,7 +471,93 @@
     }
   }
 
-  // Улучшенный разделитель
+  // Навигация для мобильных (аккордеон)
+  &__navigation-mobile {
+    display: none;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+
+  &__accordion {
+    border-bottom: 1px solid var(--border-light);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__accordion-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1.25rem 0;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: "Space Grotesk", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: var(--dynamo-blue);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__accordion-icon {
+    transition: transform 0.3s ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__accordion-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+
+    &--open {
+      max-height: 500px;
+    }
+  }
+
+  &__mobile-links {
+    list-style: none;
+    padding: 0 0 1.5rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    li {
+      a {
+        display: block;
+        padding: 0.75rem 1rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: var(--bg-secondary);
+          color: var(--text-primary);
+          transform: translateX(5px);
+        }
+      }
+    }
+  }
+
   &__divider {
     height: 1px;
     background: linear-gradient(
@@ -508,7 +584,6 @@
     }
   }
 
-  // Нижняя часть
   &__bottom {
     display: flex;
     justify-content: space-between;
@@ -600,49 +675,268 @@
   }
 }
 
-// Анимации для футера
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+// Липкая навигация для мобильных (таббар) с красивыми иконками
+.footer__mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(30px) saturate(200%);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 0.5rem 0;
+
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
   }
-  to {
-    opacity: 1;
+}
+
+.footer__mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+  flex: 1;
+  padding: 0.5rem 0;
+  position: relative;
+
+  // На мобильных только активное состояние, без ховера
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: var(--text-primary);
+      transform: translateY(-2px);
+
+      .footer__mobile-nav-icon {
+        transform: translateY(-2px) scale(1.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+
+  &:active {
+    color: var(--text-primary);
+
+    .footer__mobile-nav-icon {
+      transform: scale(0.95);
+    }
+  }
+}
+
+.footer__mobile-nav-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: var(--bg-secondary);
+  margin-bottom: 0.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  svg {
+    position: relative;
+    z-index: 1;
+    stroke-width: 1.5;
+    transition: all 0.3s ease;
+  }
+
+  // Цветные иконки по умолчанию
+  &--home svg {
+    stroke: #ff6b6b;
+  }
+
+  &--departments svg {
+    stroke: #4ecdc4;
+  }
+
+  &--sections svg {
+    stroke: #9d50bb;
+  }
+
+  &--subscriptions svg {
+    stroke: #ffd166;
+  }
+}
+
+.footer__mobile-nav-item.active {
+  color: var(--text-primary);
+
+  .footer__mobile-nav-icon {
+    background: var(--bg-overlay);
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+
+    svg {
+      stroke-width: 2;
+    }
+
+    &::before {
+      opacity: 0.1;
+    }
+  }
+
+  span {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  // Активные состояния с градиентами
+  .footer__mobile-nav-icon--home {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 107, 107, 0.1),
+      rgba(255, 142, 83, 0.1)
+    );
+  }
+
+  .footer__mobile-nav-icon--departments {
+    background: linear-gradient(
+      135deg,
+      rgba(78, 205, 196, 0.1),
+      rgba(68, 160, 141, 0.1)
+    );
+  }
+
+  .footer__mobile-nav-icon--sections {
+    background: linear-gradient(
+      135deg,
+      rgba(157, 80, 187, 0.1),
+      rgba(110, 72, 170, 0.1)
+    );
+  }
+
+  .footer__mobile-nav-icon--subscriptions {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 209, 102, 0.1),
+      rgba(255, 179, 71, 0.1)
+    );
+  }
+}
+
+// Стили для текста
+.footer__mobile-nav-item span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+// Отключаем hover эффекты на touch-устройствах
+@media (hover: none) and (pointer: coarse) {
+  .footer__mobile-nav-item {
+    &:hover {
+      color: var(--text-secondary);
+
+      .footer__mobile-nav-icon {
+        background: var(--bg-secondary);
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+// Анимация для активной иконки
+@keyframes iconPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 85, 183, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 85, 183, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 85, 183, 0);
+  }
+}
+
+.footer__mobile-nav-item.active .footer__mobile-nav-icon {
+  animation: iconPulse 1.5s ease-out;
+}
+
+// Анимация "подпрыгивания" для иконок
+@keyframes iconBounce {
+  0%,
+  100% {
     transform: translateY(0);
   }
-}
-
-.footer {
-  animation: slideUp 0.5s ease-out;
-}
-
-// Адаптивность
-@media (max-width: 768px) {
-  .footer {
-    padding: 2rem 0 1.5rem;
-
-    &__top-row {
-      padding-bottom: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    &__contacts-section {
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-    }
-
-    &__navigation {
-      margin-bottom: 2rem;
-    }
-
-    &__divider {
-      margin: 2rem 0.5rem 1.5rem;
-    }
+  50% {
+    transform: translateY(-5px);
   }
 }
 
+.footer__mobile-nav-item:hover .footer__mobile-nav-icon {
+  animation: iconBounce 0.5s ease;
+}
+
+// Адаптивность для маленьких экранов
 @media (max-width: 480px) {
-  .footer {
-    padding: 1.5rem 0 1rem;
+  .footer__mobile-nav {
+    padding: 0.4rem 0;
+  }
+
+  .footer__mobile-nav-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .footer__mobile-nav-item span {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .footer__mobile-nav-icon {
+    width: 38px;
+    height: 38px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .footer__mobile-nav-item span {
+    font-size: 0.6rem;
+  }
+}
+
+// Отключаем hover эффекты на мобильных устройствах
+@media (max-width: 768px) {
+  .footer__mobile-nav-item:hover {
+    transform: none;
+
+    .footer__mobile-nav-icon {
+      transform: none;
+      box-shadow: none;
+      animation: none;
+    }
   }
 }
