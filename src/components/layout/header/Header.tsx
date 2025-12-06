@@ -1,7 +1,7 @@
 "use client";
 import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import "./Header.scss";
 
@@ -99,6 +99,10 @@ export const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // Добавляем ref для меню и кнопки бургера
+  const menuRef = useRef<HTMLDivElement>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -122,8 +126,15 @@ export const Header = () => {
     }
   };
 
-  const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const handleMenuToggle = (e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+
+    // Просто переключаем состояние меню
+    setIsMenuOpen((prev) => !prev);
+
+    // Если открываем меню, закрываем поиск
     if (!isMenuOpen) {
       setIsSearchOpen(false);
     }
@@ -136,15 +147,53 @@ export const Header = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const headerElement = document.querySelector(".header");
-      if (headerElement && !headerElement.contains(event.target as Node)) {
+      const target = event.target as Node;
+
+      // Проверяем, кликнули ли мы вне меню И вне кнопки бургера
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(target) &&
+        burgerRef.current &&
+        !burgerRef.current.contains(target)
+      ) {
+        setIsMenuOpen(false);
+      }
+
+      // Закрываем поиск если кликнули вне него
+      const searchMobile = document.querySelector(".header__search-mobile");
+      const searchToggle = document.querySelector(".header__search-toggle");
+      if (
+        searchMobile &&
+        !searchMobile.contains(target) &&
+        searchToggle &&
+        !searchToggle.contains(target)
+      ) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    // Добавляем обработчик с небольшим таймаутом для предотвращения мгновенного закрытия
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Обработчик для клавиши Escape
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         setIsMenuOpen(false);
         setIsSearchOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
   return (
@@ -289,12 +338,14 @@ export const Header = () => {
               </button>
 
               <button
+                ref={burgerRef}
                 className={`header__menu-toggle ${
                   isMenuOpen ? "header__menu-toggle--active" : ""
                 }`}
                 onClick={handleMenuToggle}
-                aria-label="Открыть меню"
+                aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
                 aria-expanded={isMenuOpen}
+                aria-controls="mobile-menu"
               >
                 <span className="header__menu-icon" aria-hidden="true"></span>
               </button>
@@ -303,6 +354,8 @@ export const Header = () => {
 
           {/* Мобильная навигация */}
           <nav
+            ref={menuRef}
+            id="mobile-menu"
             className={`header__nav-mobile ${
               isMenuOpen ? "header__nav-mobile--open" : ""
             }`}
