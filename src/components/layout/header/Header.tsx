@@ -99,9 +99,11 @@ export const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Добавляем ref для меню и кнопки бургера
+  // Добавляем ref для элементов
   const menuRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
+  const searchMobileRef = useRef<HTMLDivElement>(null);
+  const searchToggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -149,39 +151,40 @@ export const Header = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
 
-      // Проверяем, кликнули ли мы вне меню И вне кнопки бургера
+      // Только для мобильного меню - проверяем клик вне меню и вне бургера
       if (
         menuRef.current &&
         !menuRef.current.contains(target) &&
         burgerRef.current &&
-        !burgerRef.current.contains(target)
+        !burgerRef.current.contains(target) &&
+        isMenuOpen
       ) {
         setIsMenuOpen(false);
       }
 
-      // Закрываем поиск если кликнули вне него
-      const searchMobile = document.querySelector(".header__search-mobile");
-      const searchToggle = document.querySelector(".header__search-toggle");
+      // Для мобильного поиска - проверяем клик вне поиска и вне кнопки поиска
+      // НО: не закрываем если кликнули внутрь поисковой строки!
+      const searchInput = document.querySelector(".header__search-input input");
       if (
-        searchMobile &&
-        !searchMobile.contains(target) &&
-        searchToggle &&
-        !searchToggle.contains(target)
+        searchMobileRef.current &&
+        !searchMobileRef.current.contains(target) &&
+        searchToggleRef.current &&
+        !searchToggleRef.current.contains(target) &&
+        searchInput &&
+        !searchInput.contains(target) &&
+        isSearchOpen
       ) {
         setIsSearchOpen(false);
       }
     };
 
-    // Добавляем обработчик с небольшим таймаутом для предотвращения мгновенного закрытия
-    const timeoutId = setTimeout(() => {
-      document.addEventListener("mousedown", handleClickOutside);
-    }, 100);
+    // Добавляем обработчик
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      clearTimeout(timeoutId);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isMenuOpen, isSearchOpen]); // Добавляем зависимости
 
   // Обработчик для клавиши Escape
   useEffect(() => {
@@ -329,6 +332,7 @@ export const Header = () => {
             {/* Управление для мобильных */}
             <div className="header__controls">
               <button
+                ref={searchToggleRef}
                 className="header__search-toggle"
                 onClick={handleSearchToggle}
                 aria-label="Открыть поиск"
@@ -408,6 +412,7 @@ export const Header = () => {
 
           {/* Мобильный поиск */}
           <div
+            ref={searchMobileRef}
             className={`header__search-mobile ${
               isSearchOpen ? "header__search-mobile--open" : ""
             }`}
