@@ -360,3 +360,72 @@ p {
     opacity: 0.7;
   }
 }
+
+/* === КРИТИЧЕСКИЕ ИСПРАВЛЕНИЯ ДЛЯ REAL MOBILE === */
+
+/* 1. Предотвращаем iOS zoom при фокусе */
+input,
+select,
+textarea {
+  font-size: 16px !important; /* iOS перестанет зумить */
+}
+
+/* 2. Исправляем 100vh на мобильных */
+@supports (-webkit-touch-callout: none) {
+  .page-wrapper,
+  body {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* 3. Исправляем позиционирование fixed элементов на iOS */
+.fixed-element {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* 4. Улучшаем скролл на мобильных */
+@media (max-width: 768px) {
+  html {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+  }
+}
+
+/* 5. Исправляем Ant Design на мобильных */
+.ant-modal-wrap,
+.ant-drawer-wrap {
+  touch-action: pan-y;
+}
+
+.ant-input,
+.ant-select-selector,
+.ant-btn {
+  font-size: 16px !important; /* Предотвращаем iOS zoom */
+}
+
+/* 6. Убираем подсветку тапов на iOS */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 7. Исправляем viewport для iOS Safari */
+@viewport {
+  width: device-width;
+  zoom: 1;
+  min-zoom: 1;
+  max-zoom: 1;
+  user-zoom: fixed;
+}
+
+/* 8. Safe area insets для iPhone X+ */
+.safe-area-padding {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
