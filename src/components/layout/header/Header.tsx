@@ -1,11 +1,7 @@
 "use client";
-import { Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import "./Header.scss";
-
-const { Search } = Input;
 
 // Компонент живых часов - красивые
 const LiveClock = () => {
@@ -94,16 +90,52 @@ const InstagramIcon = () => (
   </svg>
 );
 
+// Иконка поиска
+const SearchIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.35-4.35" />
+  </svg>
+);
+
+// Иконка крестика (для очистки поиска)
+const ClearIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   // Добавляем ref для элементов
   const menuRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
   const searchMobileRef = useRef<HTMLDivElement>(null);
   const searchToggleRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -118,6 +150,28 @@ export const Header = () => {
     console.log("Search:", value);
     if (window.innerWidth <= 768) {
       setIsSearchOpen(false);
+    }
+    // Здесь можно добавить логику поиска
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(searchValue);
+  };
+
+  // Функция: очистка поля поиска
+  const handleClearSearch = () => {
+    setSearchValue("");
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+
+    // Если на мобильном, закрываем поиск
+    if (window.innerWidth <= 768) {
+      // Закрываем с небольшой задержкой чтобы пользователь увидел очистку
+      setTimeout(() => {
+        setIsSearchOpen(false);
+      }, 300);
     }
   };
 
@@ -163,15 +217,13 @@ export const Header = () => {
       }
 
       // Для мобильного поиска - проверяем клик вне поиска и вне кнопки поиска
-      // НО: не закрываем если кликнули внутрь поисковой строки!
-      const searchInput = document.querySelector(".header__search-input input");
       if (
         searchMobileRef.current &&
         !searchMobileRef.current.contains(target) &&
         searchToggleRef.current &&
         !searchToggleRef.current.contains(target) &&
-        searchInput &&
-        !searchInput.contains(target) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(target) &&
         isSearchOpen
       ) {
         setIsSearchOpen(false);
@@ -184,7 +236,7 @@ export const Header = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isMenuOpen, isSearchOpen]); // Добавляем зависимости
+  }, [isMenuOpen, isSearchOpen]);
 
   // Обработчик для клавиши Escape
   useEffect(() => {
@@ -198,6 +250,13 @@ export const Header = () => {
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
+
+  // Фокусируемся на поле ввода при открытии мобильного поиска
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchOpen]);
 
   return (
     <header
@@ -318,15 +377,35 @@ export const Header = () => {
 
             {/* Поиск для десктопа */}
             <div className="header__search">
-              <Search
-                placeholder="Поиск..."
-                allowClear
-                enterButton={<SearchOutlined />}
-                size="middle"
-                onSearch={onSearch}
-                className="header__search-input"
-                aria-label="Поиск по сайту"
-              />
+              <form
+                onSubmit={handleSearchSubmit}
+                className="desktop-search-form"
+              >
+                <div className="desktop-search-wrapper">
+                  <input
+                    type="text"
+                    placeholder="Поиск..."
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="desktop-search-input"
+                    aria-label="Поиск по сайту"
+                  />
+                  {/* Кнопка очистки - показывается только когда есть текст */}
+                  {searchValue && (
+                    <button
+                      type="button"
+                      className="desktop-search-clear"
+                      onClick={handleClearSearch}
+                      aria-label="Очистить поиск"
+                    >
+                      <ClearIcon />
+                    </button>
+                  )}
+                  <button type="submit" className="desktop-search-button">
+                    <SearchIcon />
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* Управление для мобильных */}
@@ -338,7 +417,7 @@ export const Header = () => {
                 aria-label="Открыть поиск"
                 aria-expanded={isSearchOpen}
               >
-                <SearchOutlined aria-hidden="true" />
+                <SearchIcon />
               </button>
 
               <button
@@ -418,16 +497,33 @@ export const Header = () => {
             }`}
             hidden={!isSearchOpen}
           >
-            <Search
-              placeholder="Поиск..."
-              allowClear
-              enterButton={<SearchOutlined />}
-              size="large"
-              onSearch={onSearch}
-              className="header__search-input"
-              aria-label="Поиск по сайту"
-              autoFocus
-            />
+            <form onSubmit={handleSearchSubmit} className="mobile-search-form">
+              <div className="search-input-wrapper">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Поиск по сайту..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  className="mobile-search-input"
+                  aria-label="Поиск по сайту"
+                />
+                {/* Кнопка очистки для мобильного - показывается только когда есть текст */}
+                {searchValue && (
+                  <button
+                    type="button"
+                    className="mobile-search-clear"
+                    onClick={handleClearSearch}
+                    aria-label="Очистить поиск"
+                  >
+                    <ClearIcon />
+                  </button>
+                )}
+                <button type="submit" className="mobile-search-button">
+                  <SearchIcon />
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

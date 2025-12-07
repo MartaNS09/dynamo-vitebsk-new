@@ -1,3 +1,5 @@
+
+
 // ===== HEADER COMPONENT =====
 
 // Анимации
@@ -507,6 +509,15 @@
   position: relative;
   z-index: 2;
   gap: 1rem;
+
+  // Добавляем медиа-запрос для лучшего управления пространством
+  @media (max-width: 1000px) {
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 940px) {
+    gap: 0.5rem;
+  }
 }
 
 // Логотип
@@ -627,31 +638,49 @@
   }
 }
 
-// Поиск
+// ===== ИСПРАВЛЕННЫЙ HEADER__SEARCH =====
 .header__search {
-  flex: 0 1 clamp(150px, 20vw, 200px);
-  min-width: 120px;
+  flex: 0 1 auto; // Меняем на auto вместо фиксированных значений
+  min-width: 150px; // Минимальная ширина
+  max-width: 250px; // Максимальная ширина
+  width: 100%;
+
+  @media (max-width: 1200px) {
+    min-width: 130px;
+    max-width: 200px;
+  }
+
+  @media (max-width: 1100px) {
+    min-width: 120px;
+    max-width: 180px;
+  }
+
+  @media (max-width: 1000px) {
+    min-width: 110px;
+    max-width: 160px;
+  }
 
   @media (max-width: 940px) {
-    flex: 0 1 clamp(100px, 15vw, 150px);
-    min-width: 90px;
+    min-width: 100px;
+    max-width: 140px;
 
-    .ant-input-group {
-      .ant-input {
-        font-size: 0.8rem;
-        height: 32px;
+    .desktop-search-wrapper {
+      height: 32px;
+    }
 
-        &::placeholder {
-          font-size: 0.8rem;
-        }
+    .desktop-search-button {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+
+      svg {
+        width: 14px;
+        height: 14px;
       }
+    }
 
-      .ant-input-group-addon {
-        button {
-          height: 32px;
-          width: 35px;
-        }
-      }
+    .desktop-search-clear {
+      right: 32px;
     }
   }
 
@@ -680,11 +709,12 @@
   padding: 0.5rem;
   border-radius: 8px;
   transition: all 0.3s ease;
-  width: 40px;
-  height: 40px;
+  width: 44px; // Увеличили для лучшего тапа
+  height: 44px; // Увеличили для лучшего тапа
   position: relative;
   align-items: center;
   justify-content: center;
+  z-index: 1001;
 
   @media (max-width: 768px) {
     display: flex;
@@ -692,6 +722,12 @@
 
   &:hover {
     background: var(--bg-secondary);
+  }
+
+  // Активное состояние
+  &:active {
+    background: var(--bg-secondary);
+    transform: scale(0.95);
   }
 }
 
@@ -723,15 +759,26 @@
   }
 }
 
-.header__menu-toggle--active .header__menu-icon {
-  background: transparent;
+.header__menu-toggle--active {
+  .header__menu-icon {
+    background: transparent;
 
-  &::before {
-    animation: burgerTop 0.3s ease forwards;
+    &::before {
+      animation: burgerTop 0.3s ease forwards;
+    }
+
+    &::after {
+      animation: burgerBottom 0.3s ease forwards;
+    }
   }
 
-  &::after {
-    animation: burgerBottom 0.3s ease forwards;
+  &:hover {
+    .header__menu-icon {
+      &::before,
+      &::after {
+        background: var(--dynamo-blue);
+      }
+    }
   }
 }
 
@@ -798,21 +845,58 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.3s ease;
 
     &:last-child {
       border-bottom: none;
     }
 
-    &:hover {
-      background: var(--bg-secondary);
+    // Ховер для десктопа
+    @media (hover: hover) {
+      &:hover {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
 
-      &::after {
-        display: none;
+        span {
+          background: var(--gradient-primary);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
       }
+    }
+
+    // Активное состояние для мобильных (при тапе)
+    &:active {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transform: scale(0.98);
+
+      span {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+
+    // Анимация при загрузке
+    animation: fadeInUp 0.3s ease-out both;
+
+    // Задержка для каждой ссылки
+    @for $i from 1 through 6 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{0.05s * $i};
+      }
+    }
+
+    &::after {
+      display: none;
     }
 
     span {
       text-align: center;
+      font-weight: 500;
     }
   }
 }
@@ -843,42 +927,6 @@
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
-  }
-
-  .ant-input-group {
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-
-    .ant-input {
-      border: 1px solid var(--border-color);
-      border-right: none;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 1rem;
-      height: 44px;
-
-      &::placeholder {
-        color: var(--text-muted);
-      }
-    }
-
-    .ant-input-group-addon {
-      background: var(--gradient-primary);
-      border: none;
-
-      button {
-        border: none;
-        background: transparent;
-        color: white;
-        height: 44px;
-        width: 50px;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.1);
-        }
-      }
-    }
   }
 }
 
@@ -1007,6 +1055,332 @@
     .header__nav-link {
       padding: 1rem 1.25rem;
       font-size: 1rem;
+    }
+  }
+}
+
+// ===== КАСТОМНЫЙ ПОИСК (БЕЗ ANT DESIGN) - ИСПРАВЛЕННЫЙ =====
+
+// Десктопный поиск
+.desktop-search-form {
+  width: 100%;
+}
+
+.desktop-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 36px;
+  transition: all 0.3s ease;
+  min-width: 120px; // Минимальная ширина
+
+  &:focus-within {
+    border-color: var(--dynamo-blue);
+    box-shadow: 0 0 0 1px rgba(var(--dynamo-blue-rgb, 0, 85, 183), 0.2);
+  }
+
+  &:hover {
+    border-color: var(--dynamo-blue);
+  }
+}
+
+.desktop-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  height: 100%;
+  width: 100%; // Добавляем для корректного сжатия
+  min-width: 0; // Важно для правильного flex-shrink
+
+  // Добавляем отступ справа когда есть текст
+  &:not(:placeholder-shown) {
+    padding-right: 30px;
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// Круговая иконка для кнопки поиска
+.desktop-search-button {
+  width: 36px; // Делаем круглой
+  height: 36px;
+  min-width: 36px; // Запрещаем сжатие
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 0 8px 8px 0; // Скругляем только правую сторону
+
+  &:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    stroke: white;
+  }
+}
+
+// Стили для кнопки очистки
+.desktop-search-clear,
+.mobile-search-clear {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  height: 100%;
+  flex-shrink: 0;
+  position: absolute;
+  right: 36px; // Размещаем перед кнопкой поиска (36px - ширина кнопки поиска)
+
+  &:hover {
+    color: var(--text-primary);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Мобильный поиск
+.mobile-search-form {
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  height: 48px;
+  box-shadow: var(--shadow-sm);
+}
+
+.mobile-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0 16px;
+  font-size: 16px !important; // iOS fix
+  color: var(--text-primary);
+  height: 100%;
+  min-width: 0;
+
+  // Добавляем отступ справа когда есть текст
+  &:not(:placeholder-shown) {
+    padding-right: 40px;
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// Для мобильного крестика
+.mobile-search-clear {
+  right: 56px; // Размещаем перед кнопкой поиска
+}
+
+.mobile-search-button {
+  width: 56px;
+  height: 48px;
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 0 12px 12px 0;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke: white;
+  }
+}
+
+// Адаптивность для десктопного поиска
+@media (max-width: 940px) {
+  .desktop-search-input {
+    font-size: 13px;
+    padding: 0 10px;
+
+    &:not(:placeholder-shown) {
+      padding-right: 26px;
+    }
+  }
+
+  .desktop-search-clear {
+    padding: 0 6px;
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}
+
+// Улучшаем адаптивность навигации
+@media (max-width: 1200px) {
+  .header__nav {
+    gap: 0.75rem;
+  }
+
+  .header__nav-link {
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 1100px) {
+  .header__nav {
+    gap: 0.5rem;
+  }
+
+  .header__nav-link {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 1000px) {
+  .header__nav {
+    gap: 0.4rem;
+  }
+
+  .header__nav-link {
+    font-size: 0.78rem;
+    padding: 0.3rem 0;
+  }
+
+  .header__logo {
+    gap: 0.75rem;
+  }
+
+  .header__logo-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.3rem;
+  }
+
+  .header__logo-title {
+    font-size: 1.1rem;
+  }
+
+  .header__logo-subtitle {
+    font-size: 0.6rem;
+  }
+}
+
+// Для экранов меньше 950px - упрощаем навигацию
+@media (max-width: 950px) {
+  .header__nav {
+    gap: 0.3rem;
+  }
+
+  .header__nav-link {
+    font-size: 0.75rem;
+  }
+}
+
+// Для очень узких экранов перед мобильным режимом
+@media (max-width: 900px) {
+  .header__nav {
+    gap: 0.25rem;
+  }
+
+  .header__nav-link {
+    font-size: 0.72rem;
+  }
+
+  .header__search {
+    min-width: 90px;
+    max-width: 130px;
+  }
+}
+
+// Исправления для мобильных устройств
+@media (max-width: 768px) {
+  // Все кнопки и ссылки на мобильных
+  .header__menu-toggle,
+  .header__search-toggle,
+  .header__nav-mobile .header__nav-link,
+  .phone-icon-wrapper,
+  .header__social-link,
+  .header__clock {
+    &:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+      transition: transform 0.1s ease;
+    }
+  }
+
+  // Специально для мобильного меню
+  .header__nav-mobile .header__nav-link {
+    &:active {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transform: scale(0.98);
+    }
+  }
+
+  // Для телефонной иконки на мобильных
+  .header__phone:active {
+    .phone-icon-wrapper {
+      transform: scale(1.05);
+      box-shadow: 0 3px 10px rgba(var(--dynamo-blue-rgb, 0, 85, 183), 0.25);
+    }
+
+    .phone-number {
+      opacity: 1;
+      visibility: visible;
     }
   }
 }
