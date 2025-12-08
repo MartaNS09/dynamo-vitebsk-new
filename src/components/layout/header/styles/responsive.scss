@@ -1,0 +1,61 @@
+// Адаптивность для верхней строки
+@media (max-width: 1024px) {
+  .header__info-left,
+  .header__info-right {
+    gap: 1rem;
+  }
+
+  .header__address span,
+  .header__hours span {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header__top {
+    display: none;
+  }
+
+  .header__main {
+    padding: 0.5rem 0;
+  }
+
+  .header__logo-icon {
+    width: clamp(36px, 8vw, 40px);
+    height: clamp(36px, 8vw, 40px);
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+  }
+
+  .header__logo-title {
+    font-size: clamp(1.1rem, 4vw, 1.25rem);
+  }
+
+  .header__logo-subtitle {
+    font-size: clamp(0.6rem, 2vw, 0.7rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .header__content {
+    padding: 0.5rem 0;
+    gap: 0.5rem;
+  }
+
+  .header__logo {
+    gap: 0.75rem;
+  }
+
+  .header__logo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+  }
+
+  .header__logo-title {
+    font-size: 1rem;
+  }
+
+  .header__logo-subtitle {
+    font-size: 0.6rem;
+  }
+}

@@ -1,0 +1,130 @@
+// src/components/layout/header/styles/_components.scss
+
+// Логотип
+.header__logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.header__logo-icon {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  background: var(--gradient-hero);
+  border-radius: 12px;
+  width: clamp(40px, 8vw, 50px);
+  height: clamp(40px, 8vw, 50px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+  font-weight: 700;
+  font-family: "Space Grotesk", sans-serif;
+  animation: logoTopSpin 12s linear infinite;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.header__logo:hover .header__logo-icon {
+  animation: logoTopSpin 8s linear infinite;
+  box-shadow: 0 0 20px rgba(0, 85, 183, 0.5), 0 0 40px rgba(0, 85, 183, 0.3),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.header__logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.header__logo-title {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 800;
+  margin: 0;
+  background: var(--gradient-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.header__logo-subtitle {
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+// Навигация для десктопа
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.header__nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: all 0.3s ease;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  white-space: nowrap;
+
+  span {
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    color: var(--text-primary);
+
+    span {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    &::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--gradient-primary);
+    border-radius: 1px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+// Управление
+.header__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    gap: 0.25rem;
+  }
+}

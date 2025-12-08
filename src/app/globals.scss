@@ -42,6 +42,7 @@ body {
 .main-content {
   flex: 1 0 auto;
   padding-top: 140px; // Для двухрядного хедера
+  // padding-top: var(--header-height, 140px); // Используем CSS переменную
   width: 100%;
   overflow: hidden;
 

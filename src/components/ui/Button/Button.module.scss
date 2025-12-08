@@ -1,0 +1,94 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem;
+  background: var(--gradient-primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1.125rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-md);
+  font-family: "Space Grotesk", sans-serif;
+  position: relative;
+  overflow: hidden;
+  min-width: 120px;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Варианты
+.variant-secondary {
+  background: transparent;
+  border: 2px solid var(--dynamo-blue);
+  color: var(--dynamo-blue);
+
+  &:hover:not(:disabled) {
+    background: var(--dynamo-blue);
+    color: white;
+  }
+}
+
+.variant-accent {
+  background: var(--gradient-accent);
+}
+
+.variant-gold {
+  background: var(--gradient-gold);
+  color: var(--text-primary);
+}
+
+// Размеры
+.size-small {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.size-large {
+  padding: 1.25rem 3rem;
+  font-size: 1.25rem;
+}
+
+// Полная ширина
+.fullWidth {
+  width: 100%;
+}
+
+// Состояние загрузки
+.loading {
+  .content {
+    opacity: 0;
+  }
+}
+
+.spinner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
