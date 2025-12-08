@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { FloatingThemeToggle } from "@/components/theme/FloatingThemeToggle";
 import { Header } from "@/components/layout/header/Header";
@@ -28,16 +27,14 @@ export default function RootLayout({
     <html lang="ru" dir="ltr">
       <body className={inter.className}>
         <div className="page-wrapper">
-          <AntdRegistry>
-            <ThemeProvider>
-              <Header />
-              <main className="main-content">
-                <FloatingThemeToggle />
-                {children}
-              </main>
-              <Footer />
-            </ThemeProvider>
-          </AntdRegistry>
+          <ThemeProvider>
+            <Header />
+            <main className="main-content">
+              <FloatingThemeToggle />
+              {children}
+            </main>
+            <Footer />
+          </ThemeProvider>
         </div>
       </body>
     </html>

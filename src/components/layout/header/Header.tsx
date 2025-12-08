@@ -1,6 +1,5 @@
-
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { NAV_ITEMS, MOBILE_NAV_ITEMS } from "@/lib/config/navigation";
 import {
@@ -13,28 +12,40 @@ import {
 } from "@/components/icons";
 import "./Header.scss";
 
-// Компонент живых часов
+// Компонент живых часов - ОКОНЧАТЕЛЬНАЯ ОПТИМИЗАЦИЯ
 const LiveClock = () => {
   const [time, setTime] = useState<string>("");
 
   useEffect(() => {
+    let mounted = true;
+
     const updateTime = () => {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, "0");
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      const seconds = now.getSeconds().toString().padStart(2, "0");
-      setTime(`${hours}:${minutes}:${seconds}`);
+      if (!mounted) return;
+
+      requestAnimationFrame(() => {
+        if (!mounted) return;
+
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, "0");
+        const minutes = now.getMinutes().toString().padStart(2, "0");
+        setTime(`${hours}:${minutes}`);
+      });
     };
 
     updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
+    // Обновляем каждую минуту - достаточно для часов
+    const interval = setInterval(updateTime, 60000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
     <div
       className="header__clock"
-      aria-live="polite"
+      aria-live="off"
       aria-label={`Текущее время: ${time}`}
     >
       <svg
@@ -63,77 +74,92 @@ export const Header = () => {
   const searchToggleRef = useRef<HTMLButtonElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Оптимизированный scroll handler
   useEffect(() => {
+    let ticking = false;
+    let rafId: number;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        rafId = requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
-  const onSearch = (value: string) => {
+  const onSearch = useCallback((value: string) => {
     console.log("Search:", value);
     if (window.innerWidth <= 768) {
       setIsSearchOpen(false);
     }
-  };
+  }, []);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(searchValue);
-  };
+  const handleSearchSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      onSearch(searchValue);
+    },
+    [searchValue, onSearch]
+  );
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearchValue("");
     if (searchInputRef.current) {
-      searchInputRef.current.focus();
+      requestAnimationFrame(() => {
+        searchInputRef.current?.focus();
+      });
     }
     if (window.innerWidth <= 768) {
       setTimeout(() => setIsSearchOpen(false), 300);
     }
-  };
+  }, []);
 
-  const handleSearchToggle = () => {
-    setIsSearchOpen(!isSearchOpen);
-    if (!isSearchOpen) {
-      setIsMenuOpen(false);
-    }
-  };
+  const handleSearchToggle = useCallback(() => {
+    setIsSearchOpen((prev) => !prev);
+  }, []);
 
-  const handleMenuToggle = () => {
+  const handleMenuToggle = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
-    if (!isMenuOpen) {
+  }, []);
+
+  const handleNavClick = useCallback(() => {
+    requestAnimationFrame(() => {
+      setIsMenuOpen(false);
       setIsSearchOpen(false);
-    }
-  };
+    });
+  }, []);
 
-  const handleNavClick = () => {
-    setIsMenuOpen(false);
-    setIsSearchOpen(false);
-  };
-
+  // Упрощенный click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
 
       if (
+        isMenuOpen &&
         menuRef.current &&
         !menuRef.current.contains(target) &&
         burgerRef.current &&
-        !burgerRef.current.contains(target) &&
-        isMenuOpen
+        !burgerRef.current.contains(target)
       ) {
         setIsMenuOpen(false);
       }
 
       if (
+        isSearchOpen &&
         searchMobileRef.current &&
         !searchMobileRef.current.contains(target) &&
         searchToggleRef.current &&
-        !searchToggleRef.current.contains(target) &&
-        searchInputRef.current &&
-        !searchInputRef.current.contains(target) &&
-        isSearchOpen
+        !searchToggleRef.current.contains(target)
       ) {
         setIsSearchOpen(false);
       }
@@ -146,17 +172,22 @@ export const Header = () => {
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsMenuOpen(false);
-        setIsSearchOpen(false);
+        requestAnimationFrame(() => {
+          setIsMenuOpen(false);
+          setIsSearchOpen(false);
+        });
       }
     };
+
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
+      requestAnimationFrame(() => {
+        searchInputRef.current?.focus();
+      });
     }
   }, [isSearchOpen]);
 
