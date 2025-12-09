@@ -36,20 +36,20 @@ export const Hero = () => {
     // Анимация появления
     setIsVisible(true);
 
-    // Смена видов спорта
+    // Смена видов спорта - БЫСТРЕЕ (2 сек вместо 3)
     const sportInterval = setInterval(() => {
       setCurrentSport((prev) => (prev + 1) % SPORTS.length);
-    }, 3000);
+    }, 2000); // ← ИЗМЕНЕНО: 2000ms = 2 секунды
 
     // Смена фото placeholder
     const photoInterval = setInterval(() => {
       setCurrentPhoto((prev) => (prev + 1) % PHOTO_PLACEHOLDERS.length);
     }, 4000);
 
-    // Анимация счетчиков
+    // Анимация счетчиков - 55+ лет вместо 46
     const duration = 2000;
     const steps = 60;
-    const incrementYears = 46 / steps;
+    const incrementYears = 55 / steps; // ← ИЗМЕНЕНО: 55 лет
     const incrementSports = 12 / steps;
     const incrementAthletes = 850 / steps;
 
@@ -57,7 +57,7 @@ export const Hero = () => {
     const counterInterval = setInterval(() => {
       step++;
       setCounters({
-        years: Math.min(46, Math.floor(incrementYears * step)),
+        years: Math.min(55, Math.floor(incrementYears * step)), // ← ИЗМЕНЕНО: 55
         sports: Math.min(12, Math.floor(incrementSports * step)),
         athletes: Math.min(850, Math.floor(incrementAthletes * step)),
       });
@@ -120,9 +120,9 @@ export const Hero = () => {
             {/* Статистика */}
             <div className={styles.stats}>
               <div className={styles.stat}>
-                <div className={styles.statNumber}>{counters.years}</div>
+                <div className={styles.statNumber}>{counters.years}+</div>
                 <div className={styles.statLabel}>
-                  года успешной
+                  лет успешной
                   <br />
                   работы
                 </div>

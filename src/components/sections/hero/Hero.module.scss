@@ -646,3 +646,61 @@
     }
   }
 }
+
+/* ===== УЛУЧШЕННЫЕ ПОЛОСКИ ДЛЯ МОБИЛКИ - КАК В ЗАГОЛОВКЕ ===== */
+@media (max-width: 768px) {
+  .mottoLine {
+    min-width: 40px !important;
+    height: 4px !important;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--dynamo-blue),
+      var(--accent-teal),
+      var(--dynamo-blue),
+      transparent
+    ) !important;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 85, 183, 0.3);
+    opacity: 0.8;
+
+    &:first-child {
+      animation: slideInLeftMobile 0.8s ease 0.6s forwards;
+    }
+
+    &:last-child {
+      animation: slideInRightMobile 0.8s ease 0.6s forwards;
+    }
+  }
+
+  @keyframes slideInLeftMobile {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInRightMobile {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .mottoText {
+    font-weight: 600 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* ===== ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНОВ ===== */
+@media (max-width: 480px) {
+  .mottoLine {
+    min-width: 30px !important;
+    height: 3px !important;
+  }
+
+  .motto {
+    gap: 12px !important;
+  }
+}
