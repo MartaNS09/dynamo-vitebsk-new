@@ -386,3 +386,37 @@ link[rel="preconnect"] {
 img {
   content-visibility: auto;
 }
+
+/* ===== УТИЛИТЫ ДЛЯ ДОСТУПНОСТИ ===== */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ===== FOCUS STATES FOR ACCESSIBILITY ===== */
+:focus-visible {
+  outline: 3px solid var(--dynamo-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ===== БЭМ-СТИЛИ ДЛЯ КОМПОНЕНТОВ ===== */
+[class*="__"] {
+  box-sizing: border-box;
+}
+
+/* ===== АДАПТИВНЫЕ ОТСТУПЫ ДЛЯ СЕКЦИЙ ===== */
+.section-padding {
+  padding: clamp(40px, 8vw, 100px) 0;
+
+  @media (max-width: 768px) {
+    padding: clamp(30px, 6vw, 60px) 0;
+  }
+}
