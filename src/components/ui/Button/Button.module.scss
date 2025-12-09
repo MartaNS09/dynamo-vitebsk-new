@@ -114,3 +114,16 @@
     transform: rotate(360deg);
   }
 }
+
+// В Button.module.scss добавьте:
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  svg {
+    flex-shrink: 0;
+    margin: 0;
+    vertical-align: middle;
+  }
+}

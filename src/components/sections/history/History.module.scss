@@ -1,0 +1,267 @@
+.history {
+  padding: 60px 0;
+  background: linear-gradient(
+    180deg,
+    var(--bg-secondary) 0%,
+    var(--bg-primary) 100%
+  );
+  position: relative;
+  overflow: hidden;
+
+  @media (max-width: 992px) {
+    padding: 50px 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 40px 0;
+  }
+}
+
+/* Заголовок */
+.history__header {
+  text-align: center;
+  margin-bottom: 60px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.history__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 85, 183, 0.1);
+  color: var(--dynamo-blue);
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+.history__title {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.history__highlight {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.history__subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+}
+
+/* Контент */
+.history__content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 60px;
+  align-items: start;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.history__text {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.history__lead {
+  font-size: 1.3rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  font-weight: 500;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+}
+
+.history__preview {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  padding: 20px;
+  background: rgba(0, 85, 183, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid var(--dynamo-blue);
+}
+
+/* Развернутая история */
+.history__expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.history__milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.milestone {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 25px;
+  background: var(--bg-primary);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--dynamo-blue);
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+}
+
+.milestone__icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 85, 183, 0.1);
+  border-radius: 14px;
+  color: var(--dynamo-blue);
+  flex-shrink: 0;
+}
+
+.milestone__content {
+  flex: 1;
+}
+
+.milestone__year {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dynamo-blue);
+  margin-bottom: 8px;
+}
+
+.milestone__content p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.history__fullText {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  padding: 25px;
+  background: var(--bg-primary);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+}
+
+/* Кнопки */
+.history__actions {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+/* Статистика */
+.history__stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  background: var(--bg-primary);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-light);
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 30px;
+    gap: 20px;
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat__number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--dynamo-blue);
+  line-height: 1;
+  margin-bottom: 8px;
+  font-family: "Space Grotesk", sans-serif;
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+}
+
+.stat__label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+}
+
+/* Темная тема */
+[data-theme="dark"] {
+  .history {
+    background: linear-gradient(
+      180deg,
+      var(--bg-secondary) 0%,
+      rgba(10, 15, 28, 0.95) 100%
+    );
+  }
+
+  .milestone,
+  .history__fullText,
+  .history__stats {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+  }
+
+  .history__preview {
+    background: rgba(0, 85, 183, 0.1);
+  }
+}
