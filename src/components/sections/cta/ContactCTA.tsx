@@ -6,7 +6,7 @@ import styles from "./ContactCTA.module.scss";
 
 export const ContactCTA = () => {
   return (
-    <section className={styles.cta} aria-labelledby="cta-title">
+    <section className={styles.cta} aria-labelledby="cta-title" id="contact">
       <div className="container">
         <div className={styles.cta__content}>
           {/* Левая часть — текст */}
@@ -83,7 +83,8 @@ export const ContactCTA = () => {
               <Button
                 variant="primary"
                 size="large"
-                href="/contact"
+                // href="/contact"
+                href="/enrollment" // ← ИЗМЕНИТЬ на это
                 className={styles.cta__button}
               >
                 <span>Записаться сейчас</span>

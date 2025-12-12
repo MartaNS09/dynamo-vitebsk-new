@@ -1,0 +1,359 @@
+.achievements {
+  padding: clamp(60px, 8vw, 100px) 0;
+  background: linear-gradient(
+    180deg,
+    var(--bg-primary) 0%,
+    var(--bg-secondary) 100%
+  );
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.headerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 20px;
+  margin-bottom: 24px;
+  color: var(--dynamo-gold);
+}
+
+.title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-bottom: 80px;
+}
+
+.achievementCard {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 40px 30px;
+  border: 1px solid var(--border-light);
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--dynamo-blue);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .cardIcon {
+      transform: scale(1.1);
+      background: rgba(0, 85, 183, 0.2);
+    }
+  }
+}
+
+.cardIcon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 85, 183, 0.1);
+  border-radius: 20px;
+  margin: 0 auto 24px;
+  color: var(--dynamo-blue);
+  transition: all 0.3s ease;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardNumber {
+  font-size: 3.5rem;
+  font-weight: 800;
+  font-family: "Space Grotesk", sans-serif;
+  line-height: 1;
+  color: var(--dynamo-blue);
+  margin-bottom: 8px;
+}
+
+.cardTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.cardDescription {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.legendsSection {
+  margin-bottom: 80px;
+}
+
+.legendsTitle {
+  font-size: 2.2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.legendsSubtitle {
+  font-size: 1.2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 50px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.legendsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.legendCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 30px;
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--dynamo-blue);
+  }
+}
+
+.legendHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.legendYear {
+  background: rgba(0, 85, 183, 0.1);
+  color: var(--dynamo-blue);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.legendSport {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.legendName {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.legendAchievement {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.callToAction {
+  background: var(--gradient-primary); /* Используем твой градиент */
+  //   background: linear-gradient(
+  //     135deg,
+  //     var(--dynamo-blue) 0%,
+  //     rgba(0, 85, 183, 0.9) 100%
+  //   );
+  border-radius: 24px;
+  padding: 60px;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
+    pointer-events: none;
+  }
+
+  //   @media (max-width: 768px) {
+  //     padding: 40px 20px;
+  //   }
+}
+
+.ctaText {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+  line-height: 1.4;
+  position: relative;
+  z-index: 2;
+  color: white; /* Убедись что цвет белый */
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 40px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 16px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 200px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+  }
+}
+
+.primaryButton {
+  background: white;
+  color: var(--dynamo-blue);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+.secondaryButton {
+  background: transparent;
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+    transform: translateY(-3px);
+  }
+}
+
+// Темная тема
+[data-theme="dark"] {
+  .achievementCard {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+  }
+
+  .legendCard {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+  }
+
+  .callToAction {
+    background: linear-gradient(135deg, var(--dynamo-blue) 0%, #0a0f1c 100%);
+  }
+}
+
+// Добавь этот блок в КОНЕЦ файла:
+@media (max-width: 768px) {
+  .callToAction {
+    padding: 40px 20px;
+  }
+
+  .ctaText {
+    font-size: 1.5rem;
+  }
+}
+
+// Для светлой темы:
+:global([data-theme="light"]) {
+  .callToAction {
+    background: linear-gradient(
+      135deg,
+      var(--dynamo-blue) 0%,
+      var(--dynamo-blue-light) 100%
+    );
+  }
+}
+
+// Для темной темы:
+:global([data-theme="dark"]) {
+  .callToAction {
+    background: linear-gradient(135deg, var(--dynamo-blue) 0%, #0a0f1c 100%);
+  }
+}
