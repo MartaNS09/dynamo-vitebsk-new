@@ -1,8 +1,11 @@
+
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button/Button";
 import { ArrowRight, Award } from "lucide-react";
+// import Image from "next/image"; // Добавляем Next.js Image компонент
 import styles from "./Hero.module.scss";
 
 const SPORTS = [
@@ -15,11 +18,32 @@ const SPORTS = [
   "велоспорт",
 ];
 
-const PHOTO_PLACEHOLDERS = [
-  "Спортсмены в зале",
-  "художественная гимнастика",
-  "Занятия по пулевой стрельбе",
-  "кикбоксинг",
+// Обновляем PHOTO_PLACEHOLDERS, добавляем alt описания
+const PHOTOS = [
+  {
+    id: 1,
+    src: "/images/hero/sports-hall.jpg", // Пример пути
+    alt: "Спортсмены тренируются в современном зале СДЮШОР Динамо Витебск",
+    title: "Спортсмены в зале",
+  },
+  {
+    id: 2,
+    src: "/images/hero/gymnastics.jpg",
+    alt: "Занятия по художественной гимнастике для детей в Витебске",
+    title: "художественная гимнастика",
+  },
+  {
+    id: 3,
+    src: "/images/hero/shooting.jpg",
+    alt: "Тренировка по пулевой стрельбе в спортивной школе Динамо",
+    title: "Занятия по пулевой стрельбе",
+  },
+  {
+    id: 4,
+    src: "/images/hero/kickboxing.jpg",
+    alt: "Кикбоксинг для взрослых и детей в СДЮШОР Динамо Витебск",
+    title: "кикбоксинг",
+  },
 ];
 
 export const Hero = () => {
@@ -33,23 +57,19 @@ export const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Анимация появления
     setIsVisible(true);
 
-    // Смена видов спорта - БЫСТРЕЕ (2 сек вместо 3)
     const sportInterval = setInterval(() => {
       setCurrentSport((prev) => (prev + 1) % SPORTS.length);
-    }, 2000); // ← ИЗМЕНЕНО: 2000ms = 2 секунды
+    }, 2000);
 
-    // Смена фото placeholder
     const photoInterval = setInterval(() => {
-      setCurrentPhoto((prev) => (prev + 1) % PHOTO_PLACEHOLDERS.length);
+      setCurrentPhoto((prev) => (prev + 1) % PHOTOS.length);
     }, 4000);
 
-    // Анимация счетчиков - 55+ лет вместо 46
     const duration = 2000;
     const steps = 60;
-    const incrementYears = 55 / steps; // ← ИЗМЕНЕНО: 55 лет
+    const incrementYears = 55 / steps;
     const incrementSports = 12 / steps;
     const incrementAthletes = 850 / steps;
 
@@ -57,7 +77,7 @@ export const Hero = () => {
     const counterInterval = setInterval(() => {
       step++;
       setCounters({
-        years: Math.min(55, Math.floor(incrementYears * step)), // ← ИЗМЕНЕНО: 55
+        years: Math.min(55, Math.floor(incrementYears * step)),
         sports: Math.min(12, Math.floor(incrementSports * step)),
         athletes: Math.min(850, Math.floor(incrementAthletes * step)),
       });
@@ -73,7 +93,10 @@ export const Hero = () => {
   }, []);
 
   return (
-    <section className={`${styles.hero} ${isVisible ? styles.visible : ""}`}>
+    <section
+      className={`${styles.hero} ${isVisible ? styles.visible : ""}`}
+      aria-label="Главная секция спортивной школы"
+    >
       <div className="container">
         <div className={styles.heroContent}>
           {/* Левая часть - контент */}
@@ -89,15 +112,15 @@ export const Hero = () => {
             </div>
 
             {/* Девиз - линии с обеих сторон */}
-            <div className={styles.motto}>
-              <div className={styles.mottoLine}></div>
-              <div className={styles.mottoTextWrapper}>
+            <h2 className={styles.motto}>
+              <span className={styles.mottoLine}></span>
+              <span className={styles.mottoTextWrapper}>
                 <span className={styles.mottoText}>
                   Сила в движении и единстве
                 </span>
-              </div>
-              <div className={styles.mottoLine}></div>
-            </div>
+              </span>
+              <span className={styles.mottoLine}></span>
+            </h2>
 
             {/* Приглашение */}
             <div className={styles.invitation}>
@@ -110,7 +133,10 @@ export const Hero = () => {
               <div className={styles.sportRotator}>
                 <span className={styles.rotatorLabel}>Направление:</span>
                 <div className={styles.sportHighlightWrapper}>
-                  <span className={styles.sportHighlight}>
+                  <span
+                    className={styles.sportHighlight}
+                    aria-live="polite" // Объявляет изменения скринридеру
+                  >
                     {SPORTS[currentSport]}
                   </span>
                 </div>
@@ -118,9 +144,18 @@ export const Hero = () => {
             </div>
 
             {/* Статистика */}
-            <div className={styles.stats}>
+            <div
+              className={styles.stats}
+              role="region"
+              aria-label="Статистика спортивной школы"
+            >
               <div className={styles.stat}>
-                <div className={styles.statNumber}>{counters.years}+</div>
+                <div
+                  className={styles.statNumber}
+                  aria-label={`${counters.years} лет работы`}
+                >
+                  {counters.years}+
+                </div>
                 <div className={styles.statLabel}>
                   лет успешной
                   <br />
@@ -128,10 +163,15 @@ export const Hero = () => {
                 </div>
               </div>
 
-              <div className={styles.statDivider}></div>
+              <div className={styles.statDivider} aria-hidden="true"></div>
 
               <div className={styles.stat}>
-                <div className={styles.statNumber}>{counters.sports}+</div>
+                <div
+                  className={styles.statNumber}
+                  aria-label={`${counters.sports} спортивных направлений`}
+                >
+                  {counters.sports}+
+                </div>
                 <div className={styles.statLabel}>
                   спортивных
                   <br />
@@ -139,10 +179,15 @@ export const Hero = () => {
                 </div>
               </div>
 
-              <div className={styles.statDivider}></div>
+              <div className={styles.statDivider} aria-hidden="true"></div>
 
               <div className={styles.stat}>
-                <div className={styles.statNumber}>{counters.athletes}+</div>
+                <div
+                  className={styles.statNumber}
+                  aria-label={`${counters.athletes} активных спортсменов`}
+                >
+                  {counters.athletes}+
+                </div>
                 <div className={styles.statLabel}>
                   активных
                   <br />
@@ -160,7 +205,7 @@ export const Hero = () => {
                 className={styles.primaryButton}
               >
                 <span>Подробнее</span>
-                <ArrowRight size={20} />
+                <ArrowRight size={20} aria-hidden="true" />
               </Button>
               <Button
                 variant="outline"
@@ -169,38 +214,61 @@ export const Hero = () => {
                 className={styles.secondaryButton}
               >
                 <span>О школе</span>
-                <Award size={20} />
+                <Award size={20} aria-hidden="true" />
               </Button>
             </div>
           </div>
 
           {/* Правая часть - фото */}
           <div className={styles.heroRight}>
+            <h3 className="visually-hidden">Фотогалерея спортивной школы</h3>
             <div className={styles.photoContainer}>
               <div className={styles.photoFrame}>
                 <div className={`${styles.photoSlide} ${styles.photoActive}`}>
-                  <div className={styles.photoPlaceholder}>
+                  {/* Плейсхолдер пока нет фото */}
+                  <div
+                    className={styles.photoPlaceholder}
+                    role="img"
+                    aria-label={PHOTOS[currentPhoto].alt}
+                  >
                     <div className={styles.photoContent}>
                       <div className={styles.photoTitle}>
-                        {PHOTO_PLACEHOLDERS[currentPhoto]}
+                        {PHOTOS[currentPhoto].title}
                       </div>
                       <div className={styles.photoSubtitle}>
                         СДЮШОР Динамо Витебск
                       </div>
                     </div>
                   </div>
+                  {/* Когда будут реальные фото, используйте: */}
+                  {/* <Image
+                    src={PHOTOS[currentPhoto].src}
+                    alt={PHOTOS[currentPhoto].alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className={styles.photoImage}
+                    priority
+                  /> */}
                 </div>
               </div>
 
               {/* Индикаторы фото */}
-              <div className={styles.photoIndicators}>
-                {PHOTO_PLACEHOLDERS.map((_, index) => (
-                  <div
-                    key={index}
+              <div
+                className={styles.photoIndicators}
+                role="tablist"
+                aria-label="Выбор фотографии"
+              >
+                {PHOTOS.map((photo, index) => (
+                  <button
+                    key={photo.id}
                     className={`${styles.indicator} ${
                       currentPhoto === index ? styles.active : ""
                     }`}
                     onClick={() => setCurrentPhoto(index)}
+                    role="tab"
+                    aria-label={`Показать фото ${index + 1}: ${photo.title}`}
+                    aria-selected={currentPhoto === index}
+                    aria-controls={`photo-${photo.id}`}
                   />
                 ))}
               </div>

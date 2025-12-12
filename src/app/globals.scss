@@ -1,3 +1,426 @@
+// // ===== БАЗОВЫЕ ИСПРАВЛЕНИЯ СКРОЛЛА =====
+// * {
+//   margin: 0;
+//   padding: 0;
+//   box-sizing: border-box;
+// }
+
+// html,
+// body {
+//   max-width: 100%;
+//   overflow-x: hidden;
+//   position: relative;
+// }
+
+// // ===== STICKY FOOTER LAYOUT =====
+// html {
+//   height: 100%;
+// }
+
+// body {
+//   min-height: 100vh;
+//   display: flex;
+//   flex-direction: column;
+//   font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
+//     sans-serif;
+//   background: var(--bg-primary);
+//   color: var(--text-primary);
+//   line-height: 1.6;
+//   transition: background-color 0.3s ease, color 0.3s ease;
+//   width: 100%;
+//   overflow-x: hidden;
+// }
+
+// .page-wrapper {
+//   display: flex;
+//   flex-direction: column;
+//   min-height: 100vh;
+//   width: 100%;
+//   flex: 1 0 auto;
+// }
+
+// .main-content {
+//   flex: 1 0 auto;
+
+//   padding-top: 100px; // Для двухрядного хедера
+
+//   width: 100%;
+//   overflow: hidden;
+
+//   @media (max-width: 992px) {
+//     padding-top: 60px; // Меньше на планшетах
+//   }
+
+//   @media (max-width: 768px) {
+//     // padding-top: 100px; // Для мобильного хедера
+//     padding-top: 50px; // Меньше на мобилке
+//   }
+// }
+
+// // ===== СУПЕР-СОВРЕМЕННАЯ СИСТЕМА ДИЗАЙНА ДЛЯ ДИНАМО =====
+
+// // === ИМПОРТ ШРИФТОВ ===
+// @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
+// @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+
+// // === CSS ПЕРЕМЕННЫЕ ===
+// :root {
+//   // Основные цвета
+//   --dynamo-blue: #0055b7;
+//   --dynamo-blue-light: #1a75ff;
+//   --dynamo-blue-bright: #0099ff;
+//   --dynamo-gold: #ffd700;
+//   --dynamo-gold-light: #ffed4e;
+
+//   // RGB значения для прозрачности
+//   --dynamo-blue-rgb: 0, 85, 183;
+//   --accent-purple-rgb: 139, 92, 246;
+//   --accent-teal-rgb: 0, 212, 170;
+
+//   // Акцентные цвета
+//   --accent-teal: #00d4aa;
+//   --accent-purple: #8b5cf6;
+//   --accent-cyan: #06b6d4;
+
+//   // Градиенты
+//   --gradient-primary: linear-gradient(
+//     135deg,
+//     var(--dynamo-blue) 0%,
+//     var(--dynamo-blue-light) 100%
+//   );
+//   --gradient-hero: linear-gradient(
+//     135deg,
+//     var(--dynamo-blue) 0%,
+//     var(--accent-purple) 50%,
+//     var(--accent-teal) 100%
+//   );
+//   --gradient-accent: linear-gradient(
+//     135deg,
+//     var(--accent-teal) 0%,
+//     var(--accent-cyan) 100%
+//   );
+//   --gradient-gold: linear-gradient(
+//     135deg,
+//     var(--dynamo-gold) 0%,
+//     var(--dynamo-gold-light) 100%
+//   );
+
+//   // Светлая тема
+//   --bg-primary: #ffffff;
+//   --bg-secondary: #f8fafc;
+//   --bg-card: #ffffff;
+//   --bg-overlay: rgba(255, 255, 255, 0.95);
+
+//   --text-primary: #0f172a;
+//   --text-secondary: #475569;
+//   --text-muted: #64748b;
+
+//   --border-color: #e2e8f0;
+//   --border-light: #f1f5f9;
+
+//   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+//   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+//   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+//   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+// }
+
+// // Темная тема
+// [data-theme="dark"] {
+//   --bg-primary: #0a0f1c;
+//   --bg-secondary: #1a2332;
+//   --bg-card: #1e293b;
+//   --bg-overlay: rgba(10, 15, 28, 0.95);
+
+//   --text-primary: #f1f5f9;
+//   --text-secondary: #cbd5e1;
+//   --text-muted: #94a3b8;
+
+//   --border-color: #334155;
+//   --border-light: #1e293b;
+
+//   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+//   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+//   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+//   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+// }
+
+// // === ТИПОГРАФИКА ===
+// h1,
+// h2,
+// h3,
+// h4,
+// h5,
+// h6 {
+//   font-family: "Space Grotesk", sans-serif;
+//   font-weight: 700;
+//   line-height: 1.2;
+//   margin-bottom: 1rem;
+// }
+
+// h1 {
+//   font-size: clamp(2.5rem, 5vw, 4rem);
+//   background: var(--gradient-hero);
+//   -webkit-background-clip: text;
+//   -webkit-text-fill-color: transparent;
+//   background-clip: text;
+// }
+
+// p {
+//   margin-bottom: 1rem;
+//   color: var(--text-secondary);
+// }
+
+// .lead {
+//   font-size: 1.375rem;
+//   font-weight: 400;
+//   color: var(--text-secondary);
+//   line-height: 1.6;
+// }
+
+// // === КОНТЕЙНЕР ===
+// .container {
+//   max-width: 1440px;
+//   margin: 0 auto;
+//   padding: 0 clamp(1rem, 3vw, 2rem);
+//   width: 100%;
+//   overflow: hidden;
+// }
+
+// // === КАРТОЧКА ===
+// .card {
+//   background: var(--bg-card);
+//   border-radius: 16px;
+//   padding: 2rem;
+//   box-shadow: var(--shadow-md);
+//   border: 1px solid var(--border-light);
+//   transition: all 0.3s ease;
+
+//   &:hover {
+//     transform: translateY(-5px);
+//     box-shadow: var(--shadow-lg);
+//   }
+// }
+
+// // === УЛУЧШЕННЫЕ КНОПКИ С ГРАДИЕНТАМИ ===
+// // .button {
+// //   display: inline-flex;
+// //   align-items: center;
+// //   justify-content: center;
+// //   padding: 1rem 2.5rem;
+// //   background: var(--gradient-primary);
+// //   color: white;
+// //   text-decoration: none;
+// //   border-radius: 16px;
+// //   font-weight: 600;
+// //   font-size: 1.125rem;
+// //   border: none;
+// //   cursor: pointer;
+// //   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+// //   box-shadow: var(--shadow-md);
+// //   font-family: "Space Grotesk", sans-serif;
+// //   position: relative;
+// //   overflow: hidden;
+
+// //   &::before {
+// //     content: "";
+// //     position: absolute;
+// //     top: 0;
+// //     left: -100%;
+// //     width: 100%;
+// //     height: 100%;
+// //     background: linear-gradient(
+// //       90deg,
+// //       transparent,
+// //       rgba(255, 255, 255, 0.3),
+// //       transparent
+// //     );
+// //     transition: left 0.6s ease;
+// //   }
+
+// //   &:hover {
+// //     transform: translateY(-3px);
+// //     box-shadow: var(--shadow-xl);
+
+// //     &::before {
+// //       left: 100%;
+// //     }
+// //   }
+
+// //   &:active {
+// //     transform: translateY(-1px);
+// //   }
+
+// //   &--secondary {
+// //     background: transparent;
+// //     border: 2px solid var(--dynamo-blue);
+// //     color: var(--dynamo-blue);
+
+// //     &:hover {
+// //       background: var(--dynamo-blue);
+// //       color: white;
+// //       transform: translateY(-3px);
+// //     }
+// //   }
+
+// //   &--accent {
+// //     background: var(--gradient-accent);
+
+// //     &:hover {
+// //       background: linear-gradient(
+// //         135deg,
+// //         var(--accent-purple) 0%,
+// //         var(--accent-teal) 100%
+// //       );
+// //     }
+// //   }
+
+// //   &--gold {
+// //     background: var(--gradient-gold);
+// //     color: var(--text-primary);
+
+// //     &:hover {
+// //       background: linear-gradient(
+// //         135deg,
+// //         var(--dynamo-gold-light) 0%,
+// //         var(--dynamo-gold) 100%
+// //       );
+// //     }
+// //   }
+
+// //   &--small {
+// //     padding: 0.75rem 1.5rem;
+// //     font-size: 1rem;
+// //   }
+
+// //   &--large {
+// //     padding: 1.25rem 3rem;
+// //     font-size: 1.25rem;
+// //   }
+// // }
+
+// // === АНИМАЦИИ ===
+// @keyframes fadeInUp {
+//   from {
+//     opacity: 0;
+//     transform: translateY(30px);
+//   }
+//   to {
+//     opacity: 1;
+//     transform: translateY(0);
+//   }
+// }
+
+// .fade-in-up {
+//   animation: fadeInUp 0.8s ease-out both;
+// }
+
+// // === АДАПТИВНОСТЬ ===
+// @media (max-width: 768px) {
+//   .container {
+//     padding: 0 1rem;
+//   }
+
+//   // .main-content {
+//   //   // padding-top: 100px;
+//   // }
+
+//   .card {
+//     padding: 1.5rem;
+//   }
+
+//   .button {
+//     padding: 0.875rem 2rem;
+//     font-size: 1rem;
+//   }
+// }
+
+// // Отступ для мобильной навигации
+// @media (max-width: 768px) {
+//   .page-wrapper {
+//     padding-bottom: 70px; // Высота мобильной навигации
+//   }
+// }
+
+// /* === TOUCH DEVICE OPTIMIZATIONS === */
+// @media (hover: none) and (pointer: coarse) {
+//   // Уменьшаем или убираем hover эффекты на touch устройствах
+//   .button:hover {
+//     transform: none;
+//   }
+
+//   .card:hover {
+//     transform: none;
+//   }
+
+//   // Делаем тап-области больше только для основных кнопок
+//   .button {
+//     min-height: 44px;
+//     min-width: 44px;
+//   }
+
+//   // Улучшаем видимость активных состояний
+//   a:active,
+//   button:active {
+//     opacity: 0.7;
+//   }
+// }
+
+// // ===== ОПТИМИЗАЦИЯ ПРОИЗВОДИТЕЛЬНОСТИ =====
+// @media (prefers-reduced-motion: reduce) {
+//   *,
+//   *::before,
+//   *::after {
+//     animation-duration: 0.01ms !important;
+//     animation-iteration-count: 1 !important;
+//     transition-duration: 0.01ms !important;
+//     scroll-behavior: auto !important;
+//   }
+// }
+
+// // ===== ПРЕДЗАГРУЗКА КРИТИЧЕСКИХ РЕСУРСОВ =====
+// link[rel="preconnect"] {
+//   display: none; /* Скрываем для валидации, но это работает */
+// }
+
+// // ===== ОПТИМИЗАЦИЯ ИЗОБРАЖЕНИЙ =====
+// img {
+//   content-visibility: auto;
+// }
+
+// /* ===== УТИЛИТЫ ДЛЯ ДОСТУПНОСТИ ===== */
+// .visually-hidden {
+//   position: absolute !important;
+//   width: 1px !important;
+//   height: 1px !important;
+//   padding: 0 !important;
+//   margin: -1px !important;
+//   overflow: hidden !important;
+//   clip: rect(0, 0, 0, 0) !important;
+//   white-space: nowrap !important;
+//   border: 0 !important;
+// }
+
+// /* ===== FOCUS STATES FOR ACCESSIBILITY ===== */
+// :focus-visible {
+//   outline: 3px solid var(--dynamo-blue);
+//   outline-offset: 2px;
+//   border-radius: 4px;
+// }
+
+// /* ===== БЭМ-СТИЛИ ДЛЯ КОМПОНЕНТОВ ===== */
+// [class*="__"] {
+//   box-sizing: border-box;
+// }
+
+// /* ===== АДАПТИВНЫЕ ОТСТУПЫ ДЛЯ СЕКЦИЙ ===== */
+// .section-padding {
+//   padding: clamp(40px, 8vw, 100px) 0;
+
+//   @media (max-width: 768px) {
+//     padding: clamp(30px, 6vw, 60px) 0;
+//   }
+// }
+
 // ===== БАЗОВЫЕ ИСПРАВЛЕНИЯ СКРОЛЛА =====
 * {
   margin: 0;
@@ -5,61 +428,9 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  max-width: 100%;
-  overflow-x: hidden;
-  position: relative;
-}
-
-// ===== STICKY FOOTER LAYOUT =====
-html {
-  height: 100%;
-}
-
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
-    sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-.page-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-  flex: 1 0 auto;
-}
-
-.main-content {
-  flex: 1 0 auto;
-
-  padding-top: 100px; // Для двухрядного хедера
-
-  width: 100%;
-  overflow: hidden;
-
-  @media (max-width: 992px) {
-    padding-top: 60px; // Меньше на планшетах
-  }
-
-  @media (max-width: 768px) {
-    // padding-top: 100px; // Для мобильного хедера
-    padding-top: 50px; // Меньше на мобилке
-  }
-}
-
 // ===== СУПЕР-СОВРЕМЕННАЯ СИСТЕМА ДИЗАЙНА ДЛЯ ДИНАМО =====
 
-// === ИМПОРТ ШРИФТОВ ===
+// === ИМПОРТ ШРИФТОВ (В САМОМ НАЧАЛЕ!) ===
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
 
@@ -105,7 +476,7 @@ body {
     var(--dynamo-gold-light) 100%
   );
 
-  // Светлая тема
+  // Светлая тема (по умолчанию)
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-card: #ffffff;
@@ -144,6 +515,63 @@ body {
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
+// ===== STICKY FOOTER LAYOUT =====
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%; /* Предотвращает масштабирование текста на iOS */
+  text-size-adjust: 100%;
+  font-size: 16px; /* Базовый размер шрифта */
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* Для iOS Safari */
+  display: flex;
+  flex-direction: column;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased; /* Сглаживание для Mac */
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Улучшенная работа с прокруткой
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  flex: 1 0 auto;
+}
+
+.main-content {
+  flex: 1 0 auto;
+  padding-top: 100px; // Для двухрядного хедера
+  width: 100%;
+  overflow: hidden;
+
+  @media (max-width: 992px) {
+    padding-top: 60px; // Меньше на планшетах
+  }
+
+  @media (max-width: 768px) {
+    padding-top: 50px; // Меньше на мобилке
+  }
+}
+
 // === ТИПОГРАФИКА ===
 h1,
 h2,
@@ -151,10 +579,11 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 h1 {
@@ -163,11 +592,21 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent; /* Fallback для браузеров без поддержки */
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
 }
 
 p {
   margin-bottom: 1rem;
   color: var(--text-secondary);
+  line-height: 1.7;
 }
 
 .lead {
@@ -175,6 +614,10 @@ p {
   font-weight: 400;
   color: var(--text-secondary);
   line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+  }
 }
 
 // === КОНТЕЙНЕР ===
@@ -184,6 +627,10 @@ p {
   padding: 0 clamp(1rem, 3vw, 2rem);
   width: 100%;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    padding: 0 1rem;
+  }
 }
 
 // === КАРТОЧКА ===
@@ -199,104 +646,11 @@ p {
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
   }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
 }
-
-// === УЛУЧШЕННЫЕ КНОПКИ С ГРАДИЕНТАМИ ===
-// .button {
-//   display: inline-flex;
-//   align-items: center;
-//   justify-content: center;
-//   padding: 1rem 2.5rem;
-//   background: var(--gradient-primary);
-//   color: white;
-//   text-decoration: none;
-//   border-radius: 16px;
-//   font-weight: 600;
-//   font-size: 1.125rem;
-//   border: none;
-//   cursor: pointer;
-//   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-//   box-shadow: var(--shadow-md);
-//   font-family: "Space Grotesk", sans-serif;
-//   position: relative;
-//   overflow: hidden;
-
-//   &::before {
-//     content: "";
-//     position: absolute;
-//     top: 0;
-//     left: -100%;
-//     width: 100%;
-//     height: 100%;
-//     background: linear-gradient(
-//       90deg,
-//       transparent,
-//       rgba(255, 255, 255, 0.3),
-//       transparent
-//     );
-//     transition: left 0.6s ease;
-//   }
-
-//   &:hover {
-//     transform: translateY(-3px);
-//     box-shadow: var(--shadow-xl);
-
-//     &::before {
-//       left: 100%;
-//     }
-//   }
-
-//   &:active {
-//     transform: translateY(-1px);
-//   }
-
-//   &--secondary {
-//     background: transparent;
-//     border: 2px solid var(--dynamo-blue);
-//     color: var(--dynamo-blue);
-
-//     &:hover {
-//       background: var(--dynamo-blue);
-//       color: white;
-//       transform: translateY(-3px);
-//     }
-//   }
-
-//   &--accent {
-//     background: var(--gradient-accent);
-
-//     &:hover {
-//       background: linear-gradient(
-//         135deg,
-//         var(--accent-purple) 0%,
-//         var(--accent-teal) 100%
-//       );
-//     }
-//   }
-
-//   &--gold {
-//     background: var(--gradient-gold);
-//     color: var(--text-primary);
-
-//     &:hover {
-//       background: linear-gradient(
-//         135deg,
-//         var(--dynamo-gold-light) 0%,
-//         var(--dynamo-gold) 100%
-//       );
-//     }
-//   }
-
-//   &--small {
-//     padding: 0.75rem 1.5rem;
-//     font-size: 1rem;
-//   }
-
-//   &--large {
-//     padding: 1.25rem 3rem;
-//     font-size: 1.25rem;
-//   }
-// }
 
 // === АНИМАЦИИ ===
 @keyframes fadeInUp {
@@ -312,26 +666,6 @@ p {
 
 .fade-in-up {
   animation: fadeInUp 0.8s ease-out both;
-}
-
-// === АДАПТИВНОСТЬ ===
-@media (max-width: 768px) {
-  .container {
-    padding: 0 1rem;
-  }
-
-  // .main-content {
-  //   // padding-top: 100px;
-  // }
-
-  .card {
-    padding: 1.5rem;
-  }
-
-  .button {
-    padding: 0.875rem 2rem;
-    font-size: 1rem;
-  }
 }
 
 // Отступ для мобильной навигации
@@ -375,16 +709,41 @@ p {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
 
-// ===== ПРЕДЗАГРУЗКА КРИТИЧЕСКИХ РЕСУРСОВ =====
-link[rel="preconnect"] {
-  display: none; /* Скрываем для валидации, но это работает */
+  .fade-in-up {
+    animation: none;
+  }
 }
 
 // ===== ОПТИМИЗАЦИЯ ИЗОБРАЖЕНИЙ =====
 img {
+  max-width: 100%;
+  height: auto;
+  display: block;
   content-visibility: auto;
+}
+
+// Отключаем подсветку ссылок на iOS
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+// Улучшаем скроллбар
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
 /* ===== УТИЛИТЫ ДЛЯ ДОСТУПНОСТИ ===== */
@@ -407,6 +766,11 @@ img {
   border-radius: 4px;
 }
 
+// Убираем outline для мыши, но оставляем для клавиатуры
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* ===== БЭМ-СТИЛИ ДЛЯ КОМПОНЕНТОВ ===== */
 [class*="__"] {
   box-sizing: border-box;
@@ -418,5 +782,61 @@ img {
 
   @media (max-width: 768px) {
     padding: clamp(30px, 6vw, 60px) 0;
+  }
+}
+
+/* ===== SELECTION STYLES ===== */
+::selection {
+  background-color: rgba(var(--dynamo-blue-rgb), 0.2);
+  color: var(--text-primary);
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .main-content {
+    padding-top: 0;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  a {
+    color: #000;
+    text-decoration: underline;
+  }
+}
+
+/* ===== LOADING STATES ===== */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-top-color: var(--dynamo-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== SAFE TRANSITIONS ===== */
+@media (prefers-reduced-motion: no-preference) {
+  .smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
