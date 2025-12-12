@@ -9,7 +9,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  // swcMinify: true,
 
   // Важно для SCSS модулей
   sassOptions: {
