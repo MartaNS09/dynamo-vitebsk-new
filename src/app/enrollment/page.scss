@@ -63,6 +63,8 @@
 }
 
 .form-group {
+  position: relative;
+
   label {
     display: flex;
     align-items: center;
@@ -97,6 +99,11 @@
     &::placeholder {
       color: var(--text-muted);
     }
+
+    &.error {
+      border-color: #ff4757;
+      background-color: rgba(255, 71, 87, 0.05);
+    }
   }
 
   select {
@@ -106,6 +113,14 @@
     background-position: right 16px center;
     padding-right: 40px;
   }
+}
+
+.error-message {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.875rem;
+  color: #ff4757;
+  font-weight: 500;
 }
 
 .form-row {
@@ -123,6 +138,17 @@
 
   button {
     width: 100%;
+  }
+
+  .required-note {
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+
+    .required-star {
+      color: #ff4757;
+      font-weight: bold;
+    }
   }
 
   .form-note {
@@ -286,6 +312,10 @@
     background: var(--bg-card);
     border-color: var(--border-color);
     color: var(--text-primary);
+
+    &.error {
+      background-color: rgba(255, 71, 87, 0.1);
+    }
   }
 
   .contacts-card {
