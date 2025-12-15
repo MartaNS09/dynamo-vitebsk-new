@@ -1,0 +1,165 @@
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  margin: 0 2rem;
+  position: relative;
+  z-index: 1000; // Важно!
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.desktop-nav__list {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+
+  @media (max-width: 1200px) {
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 1000px) {
+    gap: 1rem;
+  }
+}
+
+.desktop-nav__item {
+  position: relative;
+}
+
+.desktop-nav__link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  position: relative;
+  transition: all 0.3s ease;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1rem;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary);
+
+    span {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .desktop-nav__chevron {
+      transform: rotate(180deg);
+    }
+  }
+
+  &--school {
+    padding-right: 1.5rem;
+  }
+}
+
+// ПОДЧЕРКИВАНИЕ ДЛЯ ОБЫЧНЫХ ССЫЛОК (не для "О школе")
+.desktop-nav__item:not(.desktop-nav__item--school) {
+  .desktop-nav__link {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--gradient-primary);
+      border-radius: 1px;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+}
+
+.desktop-nav__chevron {
+  transition: transform 0.3s ease;
+}
+
+.desktop-nav__school-menu {
+  position: fixed;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  padding: 1rem;
+  min-width: 200px;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border-color);
+  z-index: 1001;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.desktop-nav__school-menu-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.desktop-nav__school-menu-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  border-radius: 6px;
+
+  &:hover {
+    background: rgba(var(--dynamo-blue-rgb, 0, 85, 183), 0.1);
+    color: var(--dynamo-blue);
+    padding-left: 1.25rem;
+  }
+}
+
+[data-theme="dark"] {
+  .desktop-nav__school-menu {
+    background: rgba(20, 25, 35, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .desktop-nav__school-menu-link {
+    color: rgba(255, 255, 255, 0.95);
+
+    &:hover {
+      background: rgba(var(--dynamo-blue-rgb, 0, 85, 183), 0.25);
+      color: white;
+    }
+  }
+}
