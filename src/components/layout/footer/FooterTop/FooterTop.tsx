@@ -1,18 +1,12 @@
 "use client";
-import Link from "next/link";
 import { InstagramIcon } from "@/components/icons";
+import { FooterLogo } from "../Logo/FooterLogo";
 
 export const FooterTop = () => {
   return (
     <div className="footer__top-row">
       <div className="footer__logo-section">
-        <Link href="/" className="footer__logo">
-          <div className="footer__logo-icon">Д</div>
-          <div className="footer__logo-text">
-            <h2 className="footer__logo-title">Динамо</h2>
-            <span className="footer__logo-subtitle">СДЮШОР Витебск</span>
-          </div>
-        </Link>
+        <FooterLogo /> {/* Заменяем старый логотип на новый */}
       </div>
 
       <div className="footer__slogan-section">
@@ -20,7 +14,10 @@ export const FooterTop = () => {
       </div>
 
       <div className="footer__actions">
-        <a href="#signup" className="footer__signup-button button button--small">
+        <a
+          href="#signup"
+          className="footer__signup-button button button--small"
+        >
           Записаться
         </a>
         <a
