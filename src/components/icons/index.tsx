@@ -1,39 +1,40 @@
-// src/components/icons/index.tsx
-
 // Иконка телефона
-export const PhoneIcon = () => (
+export const PhoneIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     width="16"
     height="16"
     viewBox="0 0 24 24"
     fill="currentColor"
     aria-hidden="true"
+    {...props}
   >
     <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1zM5 6h1.5c.1 1.2.4 2.4.8 3.5L5.3 11.7c-.4-1.3-.7-2.6-.8-4H5zm14 12c-3.2 0-6.2-1.2-8.5-3.5l1.2-1.2c1.8 1.8 4.2 2.9 6.8 2.9h1.5c-.1-1.4-.4-2.7-.8-4l1.2-1.2c.6 1.4 1 2.9 1.2 4.4v1.6z" />
   </svg>
 );
 
 // Иконка локации
-export const LocationIcon = () => (
+export const LocationIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     width="14"
     height="14"
     viewBox="0 0 24 24"
     fill="currentColor"
     aria-hidden="true"
+    {...props}
   >
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
   </svg>
 );
 
 // Иконка часов
-export const ClockIcon = () => (
+export const ClockIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     width="14"
     height="14"
     viewBox="0 0 24 24"
     fill="currentColor"
     aria-hidden="true"
+    {...props}
   >
     <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
   </svg>
@@ -85,8 +86,6 @@ export const ClearIcon = () => (
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
 );
-
-// src/components/icons/index.tsx - ДОБАВЛЯЕМ К СУЩЕСТВУЮЩИМ
 
 // Иконка дома (для мобильной навигации)
 export const HomeIcon = () => (
@@ -224,3 +223,106 @@ export const ChevronIcon = ({ isOpen = false }: { isOpen?: boolean }) => (
     <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
   </svg>
 );
+
+// ========== ИКОНКИ ДЛЯ СПОРТИВНЫХ СЕКЦИЙ ==========
+
+// Иконка стрелки влево
+export const ArrowLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+);
+
+// Иконка календаря
+export const CalendarIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
+// Иконка пользователей
+export const UsersIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+// Иконка галочки
+export const CheckIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+// Иконка звезды
+export const StarIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    stroke="currentColor"
+    strokeWidth="1"
+    {...props}
+  >
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+// ========== АЛИАСЫ ДЛЯ СОВМЕСТИМОСТИ ==========
+
+// Эти экспорты для совместимости с существующим кодом
+export const ArrowLeft = ArrowLeftIcon;
+export const Phone = PhoneIcon;
+export const Calendar = CalendarIcon;
+export const Users = UsersIcon;
+export const Clock = ClockIcon;
+export const MapPin = LocationIcon;
+export const Check = CheckIcon;
+export const Star = StarIcon;

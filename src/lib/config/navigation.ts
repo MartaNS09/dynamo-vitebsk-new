@@ -1,6 +1,6 @@
 export const NAV_ITEMS = [
   {
-    href: "/", // Главная страница
+    href: "/",
     label: "О школе",
     submenu: [
       { href: "/history", label: "История" },

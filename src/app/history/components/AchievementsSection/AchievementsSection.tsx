@@ -194,7 +194,7 @@ export default function AchievementsSection() {
           </p>
           <div className={styles.ctaButtons}>
             <a
-              href="/enrollment" // ← ИЗМЕНИТЕ с "/contact" на "/enrollment"
+              href="/enrollment"
               className={styles.primaryButton}
               aria-label="Записаться в школу"
             >

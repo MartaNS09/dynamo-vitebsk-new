@@ -1,0 +1,110 @@
+/* AbonementCard.module.scss */
+.card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.popular {
+  border: 2px solid var(--dynamo-gold);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "ПОПУЛЯРНЫЙ";
+    position: absolute;
+    top: 15px;
+    right: -35px;
+    background: var(--dynamo-gold);
+    color: var(--text-primary);
+    padding: 5px 40px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transform: rotate(45deg);
+    letter-spacing: 1px;
+  }
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.description {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.priceContainer {
+  margin-bottom: 1.5rem;
+}
+
+.price {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--dynamo-blue);
+  line-height: 1;
+
+  .period {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+}
+
+.features {
+  flex-grow: 1;
+  margin-bottom: 2rem;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.icon {
+  color: var(--accent-teal);
+  flex-shrink: 0;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .price {
+    font-size: 2rem;
+  }
+}
