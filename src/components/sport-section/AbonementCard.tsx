@@ -1,68 +1,78 @@
+"use client";
+
 import React from "react";
 import { Abonement } from "@/types/sport-section.types";
-import { Button } from "@/components/ui/Button/Button"; // ← исправьте импорт
-import { Check, Star } from "@/components/icons";
+import { Check } from "@/components/icons";
 import styles from "./AbonementCard.module.scss";
 
 interface AbonementCardProps {
   abonement: Abonement;
   sectionName: string;
+  index?: number;
 }
 
 export default function AbonementCard({
   abonement,
   sectionName,
+  index = 0,
 }: AbonementCardProps) {
   return (
     <div
       className={`${styles.card} ${abonement.isPopular ? styles.popular : ""}`}
+      data-card-index={index}
     >
-      {/* Популярный бейдж */}
+      {/* Звезда */}
       {abonement.isPopular && (
-        <div className={styles.popularBadge}>
-          <Star style={{ width: 16, height: 16 }} /> {/* ← ИСПРАВЛЕНО */}
-          <span>Самый популярный</span>
-        </div>
+        <div
+          className={styles.popularStar}
+          title="Популярный абонемент"
+          aria-label="Популярный"
+        />
       )}
 
       {/* Заголовок и описание */}
       <div className={styles.header}>
-        <h3 className={styles.name}>{abonement.name}</h3>
+        <h3 className={styles.title}>{abonement.name}</h3>
         <p className={styles.description}>{abonement.description}</p>
       </div>
 
-      {/* Цена */}
-      <div className={styles.priceSection}>
+      {/* Цена и длительность */}
+      <div className={styles.priceContainer}>
         <div className={styles.price}>
           <span className={styles.priceAmount}>{abonement.price}</span>
-          <span className={styles.priceCurrency}>BYN</span>
+          <span className={styles.currency}>{abonement.currency}</span>
         </div>
-        <div className={styles.duration}>{abonement.duration}</div>
+        <span className={styles.duration}>{abonement.duration}</span>
       </div>
 
       {/* Особенности */}
-      <ul className={styles.features}>
-        {abonement.features.map((feature, index) => (
-          <li key={index} className={styles.feature}>
-            <Check
-              style={{ width: 16, height: 16 }} // ← ИСПРАВЛЕНО
-              className={styles.checkIcon}
-            />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
+      <div className={styles.features}>
+        <ul className={styles.featuresList}>
+          {abonement.features.map((feature, idx) => (
+            <li key={idx} className={styles.feature}>
+              <Check
+                style={{ width: 14, height: 14 }}
+                className={styles.icon}
+              />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      {/* Кнопка записи */}
+      {/* Кнопка */}
       <div className={styles.actions}>
-        <Button
-          variant={abonement.isPopular ? "primary" : "secondary"}
-          size="medium"
-          href={`/enrollment?section=${sectionName}&abonement=${abonement.id}`}
-          fullWidth
+        <a
+          href={`/enrollment?section=${encodeURIComponent(
+            sectionName
+          )}&abonement=${abonement.id}`}
+          className={styles.enrollButton}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
         >
-          Выбрать этот абонемент
-        </Button>
+          Оплатить
+        </a>
       </div>
     </div>
   );

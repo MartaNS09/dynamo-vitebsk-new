@@ -1,110 +1,324 @@
-/* AbonementCard.module.scss */
 .card {
   background: var(--bg-card);
-  border-radius: 20px;
-  padding: 2rem;
+  border-radius: 16px;
+  padding: 1.5rem;
   border: 1px solid var(--border-light);
   box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
-  height: 100%;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
   flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: visible;
+  flex-shrink: 0;
+  animation: cardAppear 0.5s ease-out;
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--dynamo-blue-light);
   }
 }
 
+/* Анимация появления карточки */
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ⭐ ЗОЛОТОЙ БОРДЕР для популярного */
 .popular {
-  border: 2px solid var(--dynamo-gold);
+  border: 1.5px solid rgba(var(--dynamo-gold-rgb, 255, 215, 0), 0.8);
+  background: linear-gradient(
+    145deg,
+    var(--bg-card) 0%,
+    rgba(var(--dynamo-gold-rgb, 255, 215, 0), 0.03) 100%
+  );
   position: relative;
-  overflow: hidden;
+
+  &:hover {
+    border-color: var(--dynamo-blue-light);
+  }
+}
+
+/* ⭐ ЗВЕЗДОЧКА */
+.popularStar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--dynamo-gold);
+  color: #000;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 900;
+  box-shadow: 0 3px 10px rgba(255, 215, 0, 0.25);
+  z-index: 5;
+  cursor: help;
+  transition: all 0.3s ease;
+
+  /* ⭐ ВАЖНО! Отключаем события для звезды */
+  pointer-events: none;
+
+  &:hover {
+    transform: scale(1.2) rotate(15deg);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+  }
+
+  &::after {
+    content: "★";
+  }
 
   &::before {
-    content: "ПОПУЛЯРНЫЙ";
+    content: "Популярный";
     position: absolute;
-    top: 15px;
-    right: -35px;
-    background: var(--dynamo-gold);
-    color: var(--text-primary);
-    padding: 5px 40px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    transform: rotate(45deg);
-    letter-spacing: 1px;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
   }
 }
 
+/* Верхняя часть карточки */
 .header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  padding-right: 0.5rem;
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   font-family: "Space Grotesk", sans-serif;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-clamp: 1;
+  padding-right: 2.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .description {
-  color: var(--text-secondary);
+  color: var(--dynamo-blue);
   font-size: 0.9375rem;
-  line-height: 1.5;
-  margin-bottom: 1rem;
+  line-height: 1.2;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* Блок цены */
 .priceContainer {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(var(--dynamo-blue-rgb), 0.05);
+    border-color: var(--dynamo-blue-light);
+  }
 }
 
 .price {
   font-family: "Space Grotesk", sans-serif;
-  font-size: 2.5rem;
+  font-size: 1.625rem;
   font-weight: 800;
   color: var(--dynamo-blue);
   line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.125rem;
 
-  .period {
-    font-size: 1rem;
+  .currency {
+    font-size: 0.875rem;
     color: var(--text-secondary);
-    font-weight: 400;
+    font-weight: 500;
+    margin-left: 0.125rem;
   }
 }
 
+.duration {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: rgba(var(--dynamo-blue-rgb), 0.1);
+  padding: 0.25rem 0.625rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Особенности - ФИКСИРОВАННАЯ ВЫСОТА */
 .features {
   flex-grow: 1;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
+  min-height: 120px;
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .feature {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  align-items: flex-start;
+  gap: 0.5rem;
   color: var(--text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.3;
 
-  &:last-child {
-    margin-bottom: 0;
+  .icon {
+    color: var(--accent-teal);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+
+  span {
+    flex: 1;
   }
 }
 
-.icon {
-  color: var(--accent-teal);
-  flex-shrink: 0;
-}
-
-.footer {
+/* Кнопка записи */
+.actions {
   margin-top: auto;
+  width: 100%;
 }
 
+/* Создаем кнопку как в hero */
+.enrollButton {
+  width: 100%;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1.0625rem;
+  min-height: 56px;
+  border: 2px solid transparent;
+  background: var(--gradient-primary);
+  color: white;
+  cursor: pointer;
+  text-align: center;
+
+  /* ВЫСОКИЙ Z-INDEX для перекрытия звезды */
+  position: relative;
+  z-index: 100;
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(var(--dynamo-blue-rgb), 0.2);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    min-height: 50px;
+  }
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
   .card {
-    padding: 1.5rem;
+    width: 260px;
+    padding: 1.25rem;
+    scroll-snap-align: start;
   }
 
-  .price {
-    font-size: 2rem;
+  .popularStar {
+    top: 10px;
+    right: 10px;
+    width: 22px;
+    height: 22px;
+    font-size: 0.8rem;
+  }
+
+  .title {
+    padding-right: 2rem;
+    font-size: 1rem;
+  }
+
+  .features {
+    min-height: 110px;
+  }
+}
+
+/* Десктоп */
+@media (min-width: 769px) {
+  .card {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .popularStar {
+    width: 22px;
+    height: 22px;
+    font-size: 0.8rem;
+    top: 10px;
+    right: 10px;
+  }
+
+  .title {
+    padding-right: 2rem;
+  }
+}
+
+/* Темная тема */
+[data-theme="dark"] {
+  .card {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .popular {
+    border-color: rgba(var(--dynamo-gold-rgb, 255, 215, 0), 0.7);
+  }
+
+  .popularStar {
+    background: var(--dynamo-gold);
+    color: #000;
   }
 }
