@@ -1,4 +1,3 @@
-
 .container {
   min-height: 100vh;
   background: var(--bg-primary);
@@ -1003,14 +1002,30 @@
 
 // ========== АБОНЕМЕНТЫ ==========
 .abonementsSection {
+  padding: 1rem 0.5rem;
+
   .sectionTitle {
     font-size: 1.75rem;
     margin-bottom: 1rem;
     color: var(--text-primary);
+    margin-top: 1rem;
+
+    // 🔴 ФИКС: Правильные отступы на мобилке
+    @media (max-width: 768px) {
+      margin-bottom: 1.5rem;
+      margin-top: 0.75rem; // 🔴 И ЭТУ ДЛЯ МОБИЛКИ
+      padding-left: 0;
+      padding-right: 0;
+    }
   }
 
   .sectionSubtitle {
     display: none;
+  }
+
+  // 🔴 ДОБАВЬТЕ ЭТО ДЛЯ МОБИЛЬНОЙ ВЕРСИИ:
+  @media (max-width: 768px) {
+    padding: 0.75rem 0.25rem;
   }
 }
 
@@ -1030,10 +1045,9 @@
     overflow-x: auto;
     overflow-y: visible;
     scroll-snap-type: x mandatory;
-    gap: 1rem;
-    padding: 0.5rem 0 1.5rem;
-    margin: 0 -1rem;
-    padding-left: 1rem;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 1.5rem; // 🔴 ФИКС: Добавили горизонтальные паддинги
+    margin: 0; // 🔴 ФИКС: Убрали отрицательный margin
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     position: relative;
@@ -1042,10 +1056,19 @@
     &::-webkit-scrollbar {
       display: none;
     }
+  }
+}
 
-    &::after {
-      display: none;
-    }
+// 🔴 НОВЫЙ СТИЛЬ: Обертка для каждой карточки
+.abonementCard {
+  @media (max-width: 768px) {
+    flex: 0 0 auto;
+    width: 280px; // Фиксированная ширина
+    scroll-snap-align: start;
+
+    // 🔴 ВАЖНО: Убираем все лишние отступы
+    margin: 0;
+    padding: 0 0.125rem; // Минимальные отступы по бокам
   }
 }
 
@@ -1066,6 +1089,12 @@
     font-size: 1.75rem;
     margin-bottom: 1.5rem;
     color: var(--text-primary);
+
+    // 🔴 ФИКС: Правильные отступы на мобилке
+    @media (max-width: 768px) {
+      padding-left: 0;
+      padding-right: 0;
+    }
   }
 }
 
@@ -1086,19 +1115,14 @@
     overflow-y: visible;
     scroll-snap-type: x mandatory;
     gap: 0.75rem;
-    padding: 0.5rem 0 1.5rem;
-    margin: 0 -1rem;
-    padding-left: 1rem;
+    padding: 0.5rem 1rem 1.5rem; // 🔴 ФИКС: Добавили горизонтальные паддинги
+    margin: 0; // 🔴 ФИКС: Убрали отрицательный margin
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     position: relative;
     -ms-overflow-style: none;
 
     &::-webkit-scrollbar {
-      display: none;
-    }
-
-    &::after {
       display: none;
     }
   }
@@ -1121,12 +1145,9 @@
     width: 140px;
     height: 180px;
     scroll-snap-align: start;
-  }
 
-  &:hover {
-    transform: translateY(-5px);
-
-    @media (max-width: 768px) {
+    // 🔴 ФИКС: Убираем эффект наведения на мобилке
+    &:hover {
       transform: none;
     }
   }
@@ -1452,7 +1473,7 @@
     gap: 0.5rem;
     color: var(--text-secondary);
     font-size: 0.8125rem;
-    margin-top: 0.75rem;
+    margin: 0.75rem 1rem 0; // 🔴 ФИКС: Добавили горизонтальные отступы
     padding: 0.75rem;
     background: var(--bg-secondary);
     border-radius: 8px;
@@ -1516,6 +1537,65 @@
 
   .galleryGrid {
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+}
+
+/* 🔴 КРИТИЧЕСКИЕ ФИКСЫ ДЛЯ МОБИЛЬНОЙ ВЕРСИИ */
+@media (max-width: 768px) {
+  // 🔴 ФИКС для секции абонементов
+  .abonementsSection {
+    width: 100%;
+    overflow: hidden;
+
+    .abonementsGrid {
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+
+      // 🔴 Прячем горизонтальный скроллбар
+      &::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  }
+
+  // 🔴 ФИКС для секции галереи
+  .gallerySection {
+    .galleryGrid {
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+
+      &::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  }
+
+  // 🔴 ФИКС для заголовков на мобилке
+  .sectionTitle {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* 🔴 ФИКС ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНОВ */
+@media (max-width: 400px) {
+  .galleryItem {
+    width: 120px !important;
+    height: 160px !important;
+  }
+
+  .abonementCard {
+    width: 260px !important;
   }
 }
 
