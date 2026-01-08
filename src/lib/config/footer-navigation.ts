@@ -16,7 +16,7 @@ export const FOOTER_DESKTOP_NAV = [
     links: [
       { href: "/", label: "Главная" },
       { href: "/departments", label: "Отделения" },
-      { href: "/sections", label: "Секции" },
+      { href: "/sports", label: "Спортивные секции" }, // ← УЖЕ ПРАВИЛЬНО
       { href: "/subscriptions", label: "Абонементы" },
     ],
   },
@@ -35,8 +35,8 @@ export const FOOTER_MOBILE_NAV = [
     icon: "departments",
   },
   {
-    href: "/sections",
-    label: "Секции",
+    href: "/sports", // ← Ссылка на страницу со спортивными секциями
+    label: "Секции", // ← Короткий текст для мобилки
     icon: "sections",
   },
   {
