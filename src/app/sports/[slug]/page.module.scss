@@ -1,13 +1,31 @@
+
 .container {
   min-height: 100vh;
   background: var(--bg-primary);
+  overflow-x: hidden;
 }
 
-// Навигация
 .breadcrumbs {
   padding: 1.5rem 0;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-light);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.contentWrapper {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 clamp(1rem, 3vw, 2rem);
+
+  @media (max-width: 768px) {
+    padding: 0 1rem;
+  }
 }
 
 .breadcrumbsContent {
@@ -20,10 +38,6 @@
     align-items: flex-start;
     gap: 1rem;
   }
-}
-
-.backButton {
-  flex-shrink: 0;
 }
 
 .breadcrumbsText {
@@ -51,7 +65,6 @@
   }
 }
 
-// 🔴 ОБНОВЛЕННАЯ Hero секция (ОСТАВЛЯЕМ КАК БЫЛО)
 .hero {
   padding: clamp(60px, 8vw, 80px) 0;
   background: linear-gradient(
@@ -100,7 +113,6 @@
     grid-template-columns: 1fr;
     gap: 3rem;
 
-    // 🔴 НА МОБИЛКЕ: сначала текст, потом фото
     .heroText {
       order: 1;
     }
@@ -170,6 +182,19 @@
     width: 22px;
     height: 22px;
   }
+
+  .emojiIcon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .infoText {
+    flex: 1;
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
 }
 
 .locationText {
@@ -193,7 +218,6 @@
   }
 }
 
-// 🔴 ФОТО КАК БЫЛИ - НЕ МЕНЯЕМ!
 .heroImages {
   position: relative;
   display: flex;
@@ -209,7 +233,6 @@
   }
 }
 
-// Общие стили для рамок (ОСТАВЛЯЕМ КАК БЫЛО)
 .imageFramePrimary,
 .imageFrameSecondary {
   position: relative;
@@ -267,7 +290,6 @@
   }
 }
 
-// Первое фото (ОСТАВЛЯЕМ КАК БЫЛО)
 .imageFramePrimary {
   z-index: 3;
   animation: floatPrimary 6s ease-in-out infinite;
@@ -394,7 +416,6 @@
   }
 }
 
-// Второе фото (ОСТАВЛЯЕМ КАК БЫЛО)
 .imageFrameSecondary {
   z-index: 2;
   margin-bottom: -40px;
@@ -522,7 +543,6 @@
   }
 }
 
-// Декоративный элемент
 .heroDecoration {
   position: absolute;
   top: 50%;
@@ -558,7 +578,6 @@
   }
 }
 
-// Анимации (ОСТАВЛЯЕМ КАК БЫЛО)
 @keyframes floatPrimary {
   0%,
   100% {
@@ -634,7 +653,6 @@
   }
 }
 
-// Адаптивность для фото (ОСТАВЛЯЕМ КАК БЫЛО)
 @media (max-width: 1200px) {
   .imageFramePrimary {
     .image {
@@ -732,7 +750,6 @@
   }
 }
 
-// Темная тема для Hero
 [data-theme="dark"] {
   .hero {
     background: linear-gradient(
@@ -767,24 +784,79 @@
   }
 }
 
-// ========== ОСНОВНАЯ ЧАСТЬ СТРАНИЦЫ (АДАПТИВНАЯ) ==========
+// ========== НОВАЯ СТРУКТУРА ==========
 
 .contentLayout {
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 3rem;
+  display: block;
   padding: 3rem 0;
 
+  @media (min-width: 993px) {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "description sidebar"
+      "fullwidth fullwidth";
+    gap: 3rem;
+    align-items: start;
+  }
+
   @media (max-width: 992px) {
-    grid-template-columns: 1fr;
     gap: 2rem;
   }
 }
 
-.mainContent {
+// 🔴 Описание
+.descriptionSection {
+  @media (min-width: 993px) {
+    grid-area: description;
+  }
+}
+
+// 🔴 Сайдбар - УБИРАЕМ sticky и скролл
+.sidebar {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2rem;
+  margin-top: 2rem;
+
+  @media (min-width: 993px) {
+    grid-area: sidebar;
+    align-self: flex-start;
+    margin-top: 0;
+    // 🔴 УБРАЛИ sticky и скролл
+    position: static;
+    top: auto;
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  @media (max-width: 992px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    height: auto;
+
+    .ctaCard {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// 🔴 Контент на полную ширину
+.fullWidthContent {
+  @media (min-width: 993px) {
+    grid-area: fullwidth;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    width: 100%;
+  }
 
   @media (max-width: 768px) {
     gap: 2.5rem;
@@ -795,6 +867,19 @@
   font-size: 1.75rem;
   margin-bottom: 1.5rem;
   color: var(--text-primary);
+  position: relative;
+  padding-bottom: 0.75rem;
+
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--dynamo-blue), var(--accent-teal));
+    border-radius: 2px;
+  }
 
   @media (max-width: 768px) {
     font-size: 1.5rem;
@@ -802,47 +887,115 @@
   }
 }
 
-.sectionSubtitle {
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-}
-
-// Описание секции
+// 🔴 УЛУЧШАЕМ: Описание секции с красной строкой
 .descriptionSection {
   .descriptionContent {
     color: var(--text-secondary);
-    line-height: 1.7;
-    font-size: 1.0625rem;
+    line-height: 1.8;
+    font-size: 1.125rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+
+    p {
+      margin-bottom: 1.5rem;
+      line-height: 1.8;
+      text-align: justify;
+      text-indent: 1.5em;
+      hyphens: auto;
+
+      &:first-of-type {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        line-height: 1.6;
+        text-indent: 0;
+      }
+
+      strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+    }
 
     h2,
     h3 {
       color: var(--text-primary);
-      margin: 1.5rem 0 1rem;
-      font-size: 1.375rem;
+      margin: 2.5rem 0 1.25rem;
+      font-size: 1.5rem;
+      line-height: 1.3;
+      font-weight: 700;
+      position: relative;
+      padding-bottom: 0.5rem;
+      text-indent: 0;
+
+      &:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--dynamo-blue),
+          var(--accent-teal)
+        );
+        border-radius: 2px;
+      }
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      margin: 2rem 0 1rem;
+
+      &:after {
+        width: 40px;
+      }
     }
 
     ul,
     ol {
-      margin: 1rem 0;
-      padding-left: 1.5rem;
+      margin: 1.5rem 0;
+      padding-left: 2rem;
+      text-indent: 0;
     }
 
     li {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+      padding-left: 0.5rem;
+      position: relative;
+      text-indent: 0;
+
+      &:before {
+        content: "•";
+        color: var(--dynamo-blue);
+        font-weight: bold;
+        position: absolute;
+        left: -1rem;
+      }
     }
 
     @media (max-width: 768px) {
-      font-size: 1rem;
+      font-size: 1.0625rem;
+      line-height: 1.7;
+
+      p {
+        text-indent: 1em;
+      }
 
       h2,
       h3 {
-        font-size: 1.25rem;
-        margin: 1.25rem 0 0.75rem;
+        font-size: 1.375rem;
+        margin: 2rem 0 1rem;
+      }
+
+      h3 {
+        font-size: 1.125rem;
+      }
+
+      p:first-of-type {
+        font-size: 1.125rem;
       }
     }
   }
@@ -867,44 +1020,31 @@
   gap: 1.25rem;
   animation: gridAppear 0.6s ease-out;
 
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
   @media (max-width: 768px) {
-    /* Горизонтальная прокрутка на мобилках */
     display: flex;
     overflow-x: auto;
+    overflow-y: visible;
     scroll-snap-type: x mandatory;
     gap: 1rem;
     padding: 0.5rem 0 1.5rem;
     margin: 0 -1rem;
     padding-left: 1rem;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-
     position: relative;
-
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 40px;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, var(--bg-primary));
-      pointer-events: none;
-    }
+    -ms-overflow-style: none;
 
     &::-webkit-scrollbar {
-      height: 4px;
+      display: none;
     }
 
-    &::-webkit-scrollbar-track {
-      background: var(--border-light);
-      border-radius: 2px;
-      margin: 0 1rem;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--dynamo-blue);
-      border-radius: 2px;
+    &::after {
+      display: none;
     }
   }
 }
@@ -920,78 +1060,7 @@
   }
 }
 
-// Подсказка для горизонтальной прокрутки на мобилках
-@media (max-width: 768px) {
-  .abonementsSection {
-    position: relative;
-    margin: 0 -1rem;
-    padding: 0 1rem;
-
-    &:after {
-      content: "← Прокрутите в сторону →";
-      display: block;
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.8125rem;
-      margin-top: 0.75rem;
-      opacity: 0.7;
-      animation: fadeHint 3s ease-in-out infinite;
-    }
-  }
-}
-
-@keyframes fadeHint {
-  0%,
-  100% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-// Адаптивность для абонементов
-@media (min-width: 769px) and (max-width: 1024px) {
-  .abonementsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1rem;
-  }
-}
-
-@media (min-width: 1025px) and (max-width: 1439px) {
-  .abonementsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.25rem;
-  }
-}
-
-@media (min-width: 1440px) {
-  .abonementsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
-  }
-}
-
-// ========== ТРЕНЕРЫ ==========
-.trainersSection {
-  .trainersGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-
-    @media (max-width: 768px) {
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.25rem;
-    }
-
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-  }
-}
-
-// ========== ГАЛЕРЕЯ С ГОРИЗОНТАЛЬНОЙ ПРОКРУТКОЙ ==========
+// ========== ГАЛЕРЕЯ ==========
 .gallerySection {
   .sectionTitle {
     font-size: 1.75rem;
@@ -1002,52 +1071,35 @@
 
 .galleryGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); // Узкие колонки
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
   animation: gridAppear 0.6s ease-out;
 
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
   @media (max-width: 768px) {
-    /* Горизонтальная прокрутка на мобилках */
     display: flex;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     scroll-snap-type: x mandatory;
     gap: 0.75rem;
     padding: 0.5rem 0 1.5rem;
     margin: 0 -1rem;
     padding-left: 1rem;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-
-    /* Индикатор прокрутки */
     position: relative;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 40px;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, var(--bg-primary));
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    /* Стилизация скроллбара */
-    &::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: var(--border-light);
-      border-radius: 2px;
-      margin: 0 1rem;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--dynamo-blue);
-      border-radius: 2px;
+      display: none;
     }
   }
 }
@@ -1057,15 +1109,18 @@
   overflow: hidden;
   box-shadow: var(--shadow-md);
   transition: transform 0.3s ease;
-  height: 200px; // Фиксированная высота
+  height: 220px;
+  position: relative;
 
-  /* Для мобильной версии - фиксированная ширина */
+  @media (max-width: 992px) {
+    height: 200px;
+  }
+
   @media (max-width: 768px) {
     flex: 0 0 auto;
-    width: 140px; // Узкие карточки на мобилках
+    width: 140px;
     height: 180px;
     scroll-snap-align: start;
-    scroll-margin-left: 1rem;
   }
 
   &:hover {
@@ -1079,113 +1134,258 @@
 
 .galleryImage {
   width: 100%;
-  height: 100%; // Заполняем контейнер
-  object-fit: contain; // Показываем ВСЁ фото без обрезки
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
   display: block;
-  background-color: var(--bg-card); // Фон для пустых областей
+  transition: transform 0.5s ease;
+}
+
+// ========== СТИЛИ КАРТОЧЕК В САЙДБАРЕ ==========
+.sidebarTitle {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  position: relative;
+  padding-bottom: 0.5rem;
+
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--dynamo-blue);
+    border-radius: 1px;
+  }
 
   @media (max-width: 768px) {
-    object-fit: contain; // Не обрезаем на мобилках
+    font-size: 1.125rem;
+    margin-bottom: 1.25rem;
   }
 }
 
-/* Подсказка для горизонтальной прокрутки галереи на мобилках */
-@media (max-width: 768px) {
-  .gallerySection {
-    position: relative;
-    padding-bottom: 0.5rem;
-    margin: 0 -1rem;
-    padding: 0 1rem;
+.benefitsCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-light);
 
-    /* Подсказка как у абонементов */
-    &:after {
-      content: "← Прокрутите в сторону →";
-      display: block;
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.8125rem;
-      margin-top: 0.75rem;
-      opacity: 0.7;
-      animation: fadeHint 3s ease-in-out infinite;
-    }
+  @media (max-width: 768px) {
+    padding: 1.25rem;
   }
 }
 
-/* Десктоп - обычная сетка */
-@media (min-width: 769px) {
-  .galleryGrid {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(160px, 1fr)
-    ); // Узкие колонки
-    gap: 1rem;
-  }
-
-  .galleryItem {
-    height: 200px;
-  }
-
-  .galleryImage {
-    height: 100%;
-    object-fit: contain; // Важно: не обрезаем!
-  }
-}
-
-/* Для планшетов */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .galleryGrid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); // Еще уже
-    gap: 0.875rem;
-  }
-
-  .galleryItem {
-    height: 190px;
-  }
-}
-
-/* Для больших экранов - больше колонок */
-@media (min-width: 1440px) {
-  .galleryGrid {
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 1.25rem;
-  }
-
-  .galleryItem {
-    height: 210px;
-  }
-}
-
-// ========== САЙДБАР (АДАПТИВНЫЙ) ==========
-.sidebar {
+.benefitsList {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.25rem;
+}
 
-  @media (max-width: 992px) {
-    margin-top: 2rem;
+.benefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.benefitIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.benefitText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
   }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+.documentsCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-light);
+
+  @media (max-width: 768px) {
+    padding: 1.25rem;
+  }
+}
+
+.documentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.documentItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.documentNumber {
+  width: 32px;
+  height: 32px;
+  background: var(--dynamo-blue);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.documentText {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.trainersCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-light);
+
+  @media (max-width: 768px) {
+    padding: 1.25rem;
+  }
+}
+
+.trainersList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+// 🔴 ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ ТРЕНЕРОВ
+.trainerCompact {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateX(5px);
+    border-color: var(--dynamo-blue);
+    box-shadow: 0 4px 12px rgba(0, 85, 183, 0.1);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.trainerPhoto {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  position: relative;
+
+  .photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 10px; // Скругленные углы как у фото
+    border: 2px solid var(--border-light);
+  }
+
+  // Стили для аватара - такой же формы как фото
+  .avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px; // Скругленные углы вместо круга
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--border-light);
+
+    // Градиент для глубины
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0) 50%
+      );
+      pointer-events: none;
+    }
+  }
+
+  .initials {
+    font-size: 1.5rem;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    letter-spacing: 1px;
+  }
+}
+
+.trainerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.trainerName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.375rem 0;
+  line-height: 1.2;
+}
+
+.trainerPosition {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
 }
 
 .ctaCard {
   background: var(--bg-card);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-light);
 
   @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
-}
-
-.ctaTitle {
-  font-size: 1.25rem;
-  margin-bottom: 1.5rem;
-  color: var(--text-primary);
-
-  @media (max-width: 768px) {
-    font-size: 1.125rem;
-    margin-bottom: 1.25rem;
+    padding: 1.25rem;
   }
 }
 
@@ -1228,72 +1428,113 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
 
-.contactsCard {
-  background: var(--bg-card);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid var(--border-light);
-
-  @media (max-width: 768px) {
-    padding: 1.25rem;
-  }
-}
-
-.contactsTitle {
-  font-size: 1.125rem;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-}
-
-.contactsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.contactItem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-
-  strong {
+  :global(.button) {
+    padding: 0.75rem 1rem;
     font-size: 0.875rem;
-    color: var(--text-secondary);
-  }
+    min-height: 44px;
 
-  a,
-  span {
-    font-size: 0.9375rem;
-    color: var(--text-primary);
-    text-decoration: none;
-
-    &:hover {
-      color: var(--dynamo-blue);
+    @media (max-width: 768px) {
+      padding: 0.625rem 0.875rem;
+      font-size: 0.8125rem;
     }
   }
+}
+
+/* 🔴 ПОДСКАЗКА ДЛЯ ПРОКРУТКИ - ТОЛЬКО НА МОБИЛКЕ */
+.scrollHintMobile {
+  display: none;
 
   @media (max-width: 768px) {
-    a,
-    span {
-      font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    animation: fadeHint 3s ease-in-out infinite;
+
+    svg {
+      animation: bounceRight 1s ease-in-out infinite;
     }
   }
 }
 
-/* ФИКС ДРОЖАНИЯ - ТОЛЬКО САМОЕ НЕОБХОДИМОЕ */
-.breadcrumbs {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
+/* 🔴 КРИТИЧЕСКИЙ ФИКС: Отключаем аппаратное ускорение */
+.breadcrumbs,
 .abonementsGrid,
-.trainersGrid,
 .galleryGrid {
   transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+}
+
+/* 🔴 ФИКС ДЛЯ МОБИЛКИ */
+@media (max-width: 768px) {
+  .container {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .contentLayout {
+    width: 100%;
+  }
+}
+
+/* 🔴 ДОПОЛНИТЕЛЬНЫЕ ФИКСЫ ДЛЯ ПЛАНШЕТА */
+@media (min-width: 769px) and (max-width: 992px) {
+  .contentLayout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+
+    .benefitsCard,
+    .documentsCard,
+    .trainersCard,
+    .ctaCard {
+      margin-bottom: 0;
+    }
+
+    .ctaCard {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .abonementsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .galleryGrid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+}
+
+@keyframes fadeHint {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes bounceRight {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
 }

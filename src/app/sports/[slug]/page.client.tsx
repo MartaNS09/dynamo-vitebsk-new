@@ -1,128 +1,133 @@
+
 "use client";
 
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AbonementCard from "@/components/sport-section/AbonementCard";
-import TrainerCard from "@/components/sport-section/TrainerCard";
 import { Button } from "@/components/ui/Button/Button";
 import {
-  ArrowLeftIcon as ArrowLeft,
   PhoneIcon as Phone,
   CalendarIcon as Calendar,
   UsersIcon as Users,
-  ClockIcon as Clock,
   LocationIcon as MapPin,
 } from "@/components/icons";
 import { SectionWithData } from "./page";
 import styles from "./page.module.scss";
+import { ChevronRight } from "lucide-react";
 
 interface SportSectionPageClientProps {
   section: SectionWithData;
 }
 
+// Функция для получения инициалов (Фамилия и Имя)
+function getInitials(name: string): string {
+  if (!name || typeof name !== "string") return "??";
+
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter((part) => part.length > 0);
+
+  if (parts.length === 0) return "??";
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+
+  // Русские имена обычно: Фамилия Имя Отчество
+  // Берем первую букву Фамилии и первую букву Имени
+  // Для "Фроленко Ирина Николаевна" → "ФИ"
+  const lastName = parts[0].charAt(0).toUpperCase(); // Фамилия (первое слово)
+  const firstName = parts[1].charAt(0).toUpperCase(); // Имя (второе слово)
+
+  return lastName + firstName;
+}
+
+// Функция для цвета
+function getAvatarColor(name: string): string {
+  const colors = ["#0055b7", "#1a75ff", "#003d82", "#0066cc"];
+  if (!name) return colors[0];
+
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  return colors[Math.abs(hash) % colors.length];
+}
+
 export default function SportSectionPageClient({
   section,
 }: SportSectionPageClientProps) {
-  // ФИКС ДРОЖАНИЯ - ПРАВИЛЬНЫЙ СПОСОБ
   useEffect(() => {
-    // 1. Используем requestAnimationFrame для стабильности
-    const applyFix = () => {
-      // ТОЛЬКО для элементов, которые дрожат
-      const breadcrumbs = document.querySelector(".breadcrumbs");
-      const abonementsGrid = document.querySelector(".abonementsGrid");
-      const cards = document.querySelectorAll(".card");
+    // Фикс для iOS скролла
+    const fixIOSScroll = () => {
+      const preventScale = (e: WheelEvent) => {
+        if (e.ctrlKey) {
+          e.preventDefault();
+        }
+      };
 
-      if (breadcrumbs) {
-        (breadcrumbs as HTMLElement).style.transformStyle = "flat";
-        (breadcrumbs as HTMLElement).style.transform = "translateZ(0)";
-      }
+      document.body.style.overscrollBehaviorY = "none";
+      document.addEventListener("wheel", preventScale, { passive: false });
 
-      if (abonementsGrid) {
-        (abonementsGrid as HTMLElement).style.transformStyle = "flat";
-        (abonementsGrid as HTMLElement).style.transform = "translateZ(0)";
-      }
-
-      cards.forEach((card) => {
-        (card as HTMLElement).style.transformStyle = "flat";
-        (card as HTMLElement).style.transform = "translateZ(0)";
-
-        // Находим кнопки внутри карточек
-        const buttons = card.querySelectorAll("button, a[href]");
-        buttons.forEach((btn) => {
-          (btn as HTMLElement).style.position = "relative";
-          (btn as HTMLElement).style.zIndex = "1000";
-        });
-
-        // Находим звезды
-        const stars = card.querySelectorAll(".popularStar");
-        stars.forEach((star) => {
-          (star as HTMLElement).style.pointerEvents = "none";
-          (star as HTMLElement).style.zIndex = "5";
-        });
-      });
+      return () => {
+        document.body.style.overscrollBehaviorY = "auto";
+        document.removeEventListener("wheel", preventScale);
+      };
     };
 
-    // Даем время загрузиться DOM
-    const timer = setTimeout(() => {
-      requestAnimationFrame(applyFix);
-    }, 100);
-
-    return () => clearTimeout(timer);
+    fixIOSScroll();
   }, []);
 
   return (
     <main className={styles.container}>
       {/* Навигация */}
-      <nav className={styles.breadcrumbs}>
-        <div className="container">
+      <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
+        <div className={styles.contentWrapper}>
           <div className={styles.breadcrumbsContent}>
-            <Button
-              variant="outline"
-              size="small"
-              href="/sports"
-              icon={<ArrowLeft />}
-              className={styles.backButton}
-            >
-              Все секции
-            </Button>
             <div className={styles.breadcrumbsText}>
-              <Link href="/">Главная</Link> /
-              <Link href="/sports">Спортивные секции</Link> /
-              <span>{section.name}</span>
+              <Link href="/" aria-label="Перейти на главную страницу">
+                Главная
+              </Link>{" "}
+              /
+              <Link href="/sports" aria-label="Перейти к спортивным секциям">
+                Спортивные секции
+              </Link>{" "}
+              /<span aria-current="page">{section.name}</span>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero секция */}
-      <section className={styles.hero}>
-        <div className="container">
+      {/* Hero секция - НЕ ТРОГАЕМ */}
+      <section className={styles.hero} aria-labelledby="hero-title">
+        <div className={styles.contentWrapper}>
           <div className={styles.heroContent}>
             <div className={styles.heroText}>
-              <h1 className={styles.title}>{section.name}</h1>
+              <h1 id="hero-title" className={styles.title}>
+                {section.name}
+              </h1>
               <p className={styles.subtitle}>{section.shortDescription}</p>
 
               <div className={styles.heroInfo}>
                 <div className={styles.infoItem}>
-                  <Users style={{ width: 20, height: 20 }} />
+                  <Users style={{ width: 20, height: 20 }} aria-hidden="true" />
                   <span>{section.ageInfo}</span>
                 </div>
                 <div className={styles.infoItem}>
-                  <Clock style={{ width: 20, height: 20 }} />
-                  <span>{section.schedule}</span>
+                  <span className={styles.emojiIcon} aria-hidden="true">
+                    ⭐
+                  </span>
+                  <span className={styles.infoText}>
+                    Феноменальная эстетика и координация движений
+                  </span>
                 </div>
                 <div className={styles.infoItem}>
-                  <MapPin style={{ width: 20, height: 20 }} />
-                  <div className={styles.locationText}>
-                    {section.location
-                      .split("; ")
-                      .map((addr: string, idx: number) => (
-                        <span key={idx} className={styles.addressLine}>
-                          {addr}
-                        </span>
-                      ))}
-                  </div>
+                  <span className={styles.emojiIcon} aria-hidden="true">
+                    ✨
+                  </span>
+                  <span className={styles.infoText}>
+                    Оттачивание грациозности и волевого характера
+                  </span>
                 </div>
               </div>
 
@@ -131,22 +136,24 @@ export default function SportSectionPageClient({
                   variant="primary"
                   size="medium"
                   href={`/enrollment?section=${section.slug}`}
-                  icon={<Calendar />}
+                  icon={<Calendar aria-hidden="true" />}
+                  aria-label={`Записаться в секцию ${section.name}`}
                 >
-                  Записаться онлайн
+                  Записаться
                 </Button>
                 <Button
                   variant="outline"
                   size="medium"
                   href="tel:+375333102525"
-                  icon={<Phone />}
+                  icon={<Phone aria-hidden="true" />}
+                  aria-label="Получить консультацию по телефону"
                 >
-                  Бесплатная консультация
+                  Получить консультацию
                 </Button>
               </div>
             </div>
 
-            {/* Фото */}
+            {/* Фото в Hero */}
             <div className={styles.heroImages}>
               <div className={styles.imageFramePrimary}>
                 <div className={styles.imageWrapper}>
@@ -163,8 +170,10 @@ export default function SportSectionPageClient({
                   <div className={styles.frameCorner}></div>
                   <div className={styles.frameGlow}></div>
                 </div>
-                <div className={styles.imageBadge}>
-                  <span className={styles.badgeIcon}>🏆</span>
+                <div className={styles.imageBadge} aria-label="Лучшие тренеры">
+                  <span className={styles.badgeIcon} aria-hidden="true">
+                    🏆
+                  </span>
                   <span className={styles.badgeText}>Лучшие тренеры</span>
                 </div>
               </div>
@@ -187,57 +196,218 @@ export default function SportSectionPageClient({
                   <span className={styles.captionText}>СДЮШОР «Динамо»</span>
                 </div>
               </div>
-
-              <div className={styles.heroDecoration}>
-                <div className={styles.decorationLine}></div>
-                <div className={styles.decorationCircle}></div>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Остальная часть */}
-      <div className="container">
+      {/* Основной контент */}
+      <div className={styles.contentWrapper}>
         <div className={styles.contentLayout}>
-          <div className={styles.mainContent}>
-            <section className={styles.descriptionSection}>
-              <h2 className={styles.sectionTitle}>О секции</h2>
-              <div
-                className={styles.descriptionContent}
-                dangerouslySetInnerHTML={{ __html: section.fullDescription }}
-              />
-            </section>
+          {/* 🔴 Описание (левая колонка) */}
+          <section
+            className={styles.descriptionSection}
+            aria-labelledby="description-title"
+          >
+            <h2 id="description-title" className={styles.sectionTitle}>
+              О художественной гимнастике
+            </h2>
+            <div
+              className={styles.descriptionContent}
+              dangerouslySetInnerHTML={{ __html: section.fullDescription }}
+            />
+          </section>
 
-            <section className={styles.abonementsSection}>
-              <h2 className={styles.sectionTitle}>Абонементы и цены</h2>
-              <p className={styles.sectionSubtitle}>
-                Выберите подходящий вариант
-              </p>
+          {/* 🔴 Сайдбар (правая колонка) */}
+          <aside
+            className={styles.sidebar}
+            aria-label="Дополнительная информация"
+          >
+            {/* Весь сайдбар как был */}
+            <div className={styles.benefitsCard}>
+              <h3 className={styles.sidebarTitle}>Наши преимущества</h3>
+              <div className={styles.benefitsList}>
+                <div className={styles.benefitItem}>
+                  <span className={styles.benefitIcon} aria-hidden="true">
+                    🏆
+                  </span>
+                  <div className={styles.benefitText}>
+                    <strong>Профессиональные тренеры</strong>
+                    <p>Мастера спорта с педагогическим образованием</p>
+                  </div>
+                </div>
+                <div className={styles.benefitItem}>
+                  <span className={styles.benefitIcon} aria-hidden="true">
+                    ⭐
+                  </span>
+                  <div className={styles.benefitText}>
+                    <strong>Безопасность</strong>
+                    <p>Занятия на профессиональном оборудовании</p>
+                  </div>
+                </div>
+                <div className={styles.benefitItem}>
+                  <span className={styles.benefitIcon} aria-hidden="true">
+                    ✨
+                  </span>
+                  <div className={styles.benefitText}>
+                    <strong>Индивидуальный подход</strong>
+                    <p>Малые группы, внимание каждому ребенку</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
+            <div className={styles.documentsCard}>
+              <h3 className={styles.sidebarTitle}>Необходимые документы</h3>
+              <div className={styles.documentsList}>
+                <div className={styles.documentItem}>
+                  <div className={styles.documentNumber}>01</div>
+                  <div className={styles.documentText}>
+                    копия документа, удостоверяющего личность
+                  </div>
+                </div>
+                <div className={styles.documentItem}>
+                  <div className={styles.documentNumber}>02</div>
+                  <div className={styles.documentText}>
+                    медицинская справка о неимении медицинских противопоказаний
+                    к занятию избранным видом спорта
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.trainersCard}>
+              <h3 className={styles.sidebarTitle}>Наши тренеры</h3>
+              <div className={styles.trainersList}>
+                {section.trainers.map((trainer) => {
+                  // Безопасная проверка фото
+                  const photo = trainer.photo || "";
+                  const hasPhoto = photo.trim() !== "";
+
+                  return (
+                    <div key={trainer.id} className={styles.trainerCompact}>
+                      <div className={styles.trainerPhoto}>
+                        {hasPhoto ? (
+                          // Фото тренера
+                          <Image
+                            src={photo} // используем безопасную переменную photo
+                            alt={`Тренер ${trainer.name}`}
+                            width={80}
+                            height={80}
+                            className={styles.photo}
+                          />
+                        ) : (
+                          // Аватар с инициалами
+                          <div
+                            className={styles.avatar}
+                            style={{
+                              backgroundColor: getAvatarColor(trainer.name),
+                            }}
+                          >
+                            <span className={styles.initials}>
+                              {getInitials(trainer.name)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className={styles.trainerInfo}>
+                        <h4 className={styles.trainerName}>{trainer.name}</h4>
+                        <p className={styles.trainerPosition}>
+                          {trainer.position}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className={styles.ctaCard}>
+              <h3 className={styles.sidebarTitle}>Записаться в секцию</h3>
+
+              {section.location && (
+                <div className={styles.ctaInfo}>
+                  <div className={styles.infoRow}>
+                    <MapPin
+                      style={{ width: 18, height: 18 }}
+                      aria-hidden="true"
+                    />
+                    <div className={styles.locationText}>
+                      {section.location
+                        .split("; ")
+                        .map((addr: string, idx: number) => (
+                          <span key={idx} className={styles.addressLine}>
+                            {addr}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className={styles.ctaActions}>
+                <Button
+                  variant="primary"
+                  size="medium"
+                  href={`/enrollment?section=${section.slug}`}
+                  icon={<Calendar aria-hidden="true" />}
+                  fullWidth
+                  className={styles.compactButton}
+                  aria-label={`Записаться онлайн в секцию ${section.name}`}
+                >
+                  Записаться
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="medium"
+                  href="tel:+375333102525"
+                  icon={<Phone aria-hidden="true" />}
+                  fullWidth
+                  className={styles.compactButton}
+                  aria-label="Позвонить для записи в секцию"
+                >
+                  Получить консультацию
+                </Button>
+              </div>
+            </div>
+          </aside>
+
+          {/* 🔴 КОНТЕНТ НА ВСЮ ШИРИНУ (после сайдбара) */}
+          <div className={styles.fullWidthContent}>
+            {/* Абонементы */}
+            <section
+              className={styles.abonementsSection}
+              aria-labelledby="abonements-title"
+            >
+              <h2 id="abonements-title" className={styles.sectionTitle}>
+                Абонементы и цены
+              </h2>
               <div className={styles.abonementsGrid}>
                 {section.abonements.map((abonement, index) => (
-                  <AbonementCard
-                    key={abonement.id}
-                    abonement={abonement}
-                    sectionName={section.name}
-                    index={index}
-                  />
+                  <div key={abonement.id} className={styles.abonementCard}>
+                    <AbonementCard
+                      abonement={abonement}
+                      sectionName={section.name}
+                      index={index}
+                    />
+                  </div>
                 ))}
+              </div>
+              <div className={styles.scrollHintMobile}>
+                <ChevronRight style={{ width: 16, height: 16 }} />
+                Прокрутите в сторону
               </div>
             </section>
 
-            <section className={styles.trainersSection}>
-              <h2 className={styles.sectionTitle}>Наши тренеры</h2>
-              <div className={styles.trainersGrid}>
-                {section.trainers.map((trainer) => (
-                  <TrainerCard key={trainer.id} trainer={trainer} />
-                ))}
-              </div>
-            </section>
-
-            <section className={styles.gallerySection}>
-              <h2 className={styles.sectionTitle}>Фотогалерея</h2>
+            {/* Галерея */}
+            <section
+              className={styles.gallerySection}
+              aria-labelledby="gallery-title"
+            >
+              <h2 id="gallery-title" className={styles.sectionTitle}>
+                Фотогалерея
+              </h2>
               <div className={styles.galleryGrid}>
                 {section.gallery.map((image, index) => (
                   <div key={index} className={styles.galleryItem}>
@@ -247,85 +417,17 @@ export default function SportSectionPageClient({
                       width={300}
                       height={200}
                       className={styles.galleryImage}
+                      loading="lazy"
                     />
                   </div>
                 ))}
               </div>
+              <div className={styles.scrollHintMobile}>
+                <ChevronRight style={{ width: 16, height: 16 }} />
+                Прокрутите в сторону
+              </div>
             </section>
           </div>
-
-          <aside className={styles.sidebar}>
-            <div className={styles.ctaCard}>
-              <h3 className={styles.ctaTitle}>Записаться в секцию</h3>
-
-              <div className={styles.ctaInfo}>
-                <div className={styles.infoRow}>
-                  <Clock style={{ width: 18, height: 18 }} />
-                  <span>{section.schedule}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <MapPin style={{ width: 18, height: 18 }} />
-                  <div className={styles.locationText}>
-                    {section.location
-                      .split("; ")
-                      .map((addr: string, idx: number) => (
-                        <span key={idx} className={styles.addressLine}>
-                          {addr}
-                        </span>
-                      ))}
-                  </div>
-                </div>
-                <div className={styles.infoRow}>
-                  <Users style={{ width: 18, height: 18 }} />
-                  <span>
-                    {section.trainers[0]?.name?.split(" ")[0] || "Тренер"}
-                  </span>
-                </div>
-              </div>
-
-              <div className={styles.ctaActions}>
-                <Button
-                  variant="primary"
-                  size="large"
-                  href={`/enrollment?section=${section.slug}`}
-                  icon={<Calendar />}
-                  fullWidth
-                >
-                  Записаться онлайн
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="large"
-                  href="tel:+375333102525"
-                  icon={<Phone />}
-                  fullWidth
-                >
-                  Позвонить для записи
-                </Button>
-              </div>
-            </div>
-
-            <div className={styles.contactsCard}>
-              <h4 className={styles.contactsTitle}>Контакты</h4>
-              <div className={styles.contactsList}>
-                <div className={styles.contactItem}>
-                  <strong>Телефон:</strong>
-                  <a href="tel:+375333102525">+375 (33) 310-25-25</a>
-                </div>
-                <div className={styles.contactItem}>
-                  <strong>Email:</strong>
-                  <a href="mailto:vitebsksdushor@dynamo.by">
-                    vitebsksdushor@dynamo.by
-                  </a>
-                </div>
-                <div className={styles.contactItem}>
-                  <strong>Адрес:</strong>
-                  <span>ул. Терешковой 16/2, Витебск</span>
-                </div>
-              </div>
-            </div>
-          </aside>
         </div>
       </div>
     </main>

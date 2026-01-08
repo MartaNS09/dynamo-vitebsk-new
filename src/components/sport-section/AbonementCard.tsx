@@ -71,7 +71,7 @@ export default function AbonementCard({
             e.stopPropagation();
           }}
         >
-          Оплатить
+          Выбрать
         </a>
       </div>
     </div>

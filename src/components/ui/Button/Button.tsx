@@ -9,6 +9,7 @@
 //   isLoading?: boolean;
 //   fullWidth?: boolean;
 //   href?: string;
+//   icon?: React.ReactNode; // ← ДОБАВЬТЕ ЭТО
 // }
 
 // export const Button: React.FC<ButtonProps> = ({
@@ -20,6 +21,7 @@
 //   className,
 //   href,
 //   disabled,
+//   icon, // ← ДОБАВЬТЕ ЭТО
 //   ...props
 // }) => {
 //   const buttonClasses = [
@@ -33,11 +35,20 @@
 //     .filter(Boolean)
 //     .join(" ");
 
+//   const content = (
+//     <>
+//       {isLoading && <span className={styles.spinner} aria-hidden="true" />}
+//       <span className={styles.content}>
+//         {icon && <span className={styles.iconWrapper}>{icon}</span>}
+//         {children}
+//       </span>
+//     </>
+//   );
+
 //   if (href) {
 //     return (
 //       <a href={href} className={buttonClasses}>
-//         {isLoading && <span className={styles.spinner} aria-hidden="true" />}
-//         <span className={styles.content}>{children}</span>
+//         {content}
 //       </a>
 //     );
 //   }
@@ -49,8 +60,7 @@
 //       aria-busy={isLoading}
 //       {...props}
 //     >
-//       {isLoading && <span className={styles.spinner} aria-hidden="true" />}
-//       <span className={styles.content}>{children}</span>
+//       {content}
 //     </button>
 //   );
 // };
@@ -66,7 +76,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   fullWidth?: boolean;
   href?: string;
-  icon?: React.ReactNode; // ← ДОБАВЬТЕ ЭТО
+  icon?: React.ReactNode;
+  type?: "button" | "submit" | "reset"; // 🔴 ДОБАВЬТЕ ЭТО
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -78,7 +89,8 @@ export const Button: React.FC<ButtonProps> = ({
   className,
   href,
   disabled,
-  icon, // ← ДОБАВЬТЕ ЭТО
+  icon,
+  type = "button", // 🔴 ДОБАВЬТЕ ЭТО (значение по умолчанию)
   ...props
 }) => {
   const buttonClasses = [
@@ -115,6 +127,7 @@ export const Button: React.FC<ButtonProps> = ({
       className={buttonClasses}
       disabled={disabled || isLoading}
       aria-busy={isLoading}
+      type={type} // 🔴 ДОБАВЬТЕ ЭТО
       {...props}
     >
       {content}
