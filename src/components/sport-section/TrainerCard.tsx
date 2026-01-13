@@ -7,7 +7,7 @@ interface TrainerCardProps {
   trainer: Trainer;
 }
 
-// Функция для получения инициалов (две буквы: первая имя и первая фамилия)
+// Функция для получения инициалов (первая буква фамилии и первая буква имени)
 function getInitials(name: string): string {
   if (!name || typeof name !== "string") return "??";
 
@@ -19,10 +19,13 @@ function getInitials(name: string): string {
   if (parts.length === 0) return "??";
   if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
 
-  // Берем первую букву имени и первую букву последнего слова (фамилии)
-  const first = parts[0].charAt(0).toUpperCase();
-  const last = parts[parts.length - 1].charAt(0).toUpperCase();
-  return first + last;
+  // Русские имена обычно: Фамилия Имя Отчество
+  // Берем первую букву Фамилии и первую букву Имени
+  // Для "Фроленко Ирина Николаевна" → "ФИ"
+  const lastName = parts[0].charAt(0).toUpperCase(); // Фамилия (первое слово)
+  const firstName = parts[1].charAt(0).toUpperCase(); // Имя (второе слово)
+
+  return lastName + firstName;
 }
 
 // Функция для цвета

@@ -105,28 +105,28 @@ export const ALL_SECTIONS: SportSection[] = [
     ],
     trainers: [
       {
-        id: "1",
+        id: "gymnastics-frolenko",
         name: "Фроленко Ирина Николаевна",
         position: "тренер-преподаватель",
-        photo: "/images/trainers/gymnastics-1.jpg",
+        photo: "/images/trainers/gymnastics-frolenko.jpg",
       },
       {
-        id: "2",
+        id: "gymnastics-kravchenko",
         name: "Кравченко Диана Алексеевна",
         position: "тренер-преподаватель",
-        photo: "", // НЕТ фото
+        photo: "",
       },
       {
-        id: "3",
+        id: "gymnastics-kuznetsova",
         name: "Кузнецова Светлана Федоровна",
         position: "тренер-преподаватель",
-        photo: "", // НЕТ фото
+        photo: "",
       },
       {
-        id: "4",
+        id: "gymnastics-artamonova",
         name: "Артамонова Елизавета Вадимовна",
         position: "тренер-преподаватель",
-        photo: "", // НЕТ фото
+        photo: "",
       },
     ],
     coverImage: "/images/sections/gymnastics-1.jpg",
@@ -158,7 +158,26 @@ export const ALL_SECTIONS: SportSection[] = [
     ageInfo: "для взрослых и детей с 4 лет",
     category: "Единоборства",
     abonements: [],
-    trainers: [],
+    trainers: [
+      {
+        id: "kickboxing-klushin",
+        name: "Клюшин Валентин Геннадьевич",
+        position: "тренер-преподаватель",
+        photo: "/images/trainers/Kickboxing-Klyshin.jpg",
+      },
+      {
+        id: "kickboxing-belchikova",
+        name: "Бельчикова Оксана Алексеевна",
+        position: "тренер-преподаватель",
+        photo: "/images/trainers/Kickboxing-Belchikova.jpg",
+      },
+      {
+        id: "kickboxing-pashkevich",
+        name: "Пашкевич Сергей Андреевич",
+        position: "тренер-преподаватель",
+        photo: "",
+      },
+    ],
     coverImage: "/images/sections/kickboxing.jpg",
     gallery: [],
     isActive: true,
@@ -174,9 +193,19 @@ export const ALL_SECTIONS: SportSection[] = [
     ageInfo: "для взрослых и детей с 15 лет",
     category: "Йога",
     abonements: [],
-    trainers: [],
-    coverImage: "/images/sections/yoga.jpg",
-    gallery: [],
+    trainers: [
+      {
+        id: "vietvodao-sadovskiy", // Используем тот же ID что и в Вьет Во Дао
+        name: "Садовский Юрий Анатольевич",
+        position: "тренер-преподаватель",
+        photo: "/images/trainers/VietVoDao-sadovskiy.jpg",
+      },
+    ],
+
+    coverImage: "/images/sections/yoga-1.jpg",
+    heroImages: ["/images/sections/yoga-1.jpg", "/images/sections/yoga-2.jpg"],
+
+    gallery: ["/images/sections/yoga-1.jpg", "/images/sections/yoga-2.jpg"],
     isActive: true,
     schedule: "Вт/Чт 19:00-20:30",
     location: "ул. Пушкина, 6, офис 410",
@@ -190,7 +219,20 @@ export const ALL_SECTIONS: SportSection[] = [
     ageInfo: "для взрослых и детей с 6 лет",
     category: "Единоборства",
     abonements: [],
-    trainers: [],
+    trainers: [
+      {
+        id: "judo-frolov",
+        name: "Фролов Дмитрий Викторович",
+        position: "тренер-преподаватель",
+        photo: "",
+      },
+      {
+        id: "judo-zaletskaya",
+        name: "Залецкая Анна Владимировна",
+        position: "тренер-преподаватель",
+        photo: "",
+      },
+    ],
     coverImage: "/images/sections/judo.jpg",
     gallery: [],
     isActive: true,
@@ -206,7 +248,14 @@ export const ALL_SECTIONS: SportSection[] = [
     ageInfo: "для детей с 7 лет",
     category: "Единоборства",
     abonements: [],
-    trainers: [],
+    trainers: [
+      {
+        id: "vietvodao-sadovskiy",
+        name: "Садовский Юрий Анатольевич",
+        position: "тренер-преподаватель",
+        photo: "/images/trainers/VietVoDao-sadovskiy.jpg",
+      },
+    ],
     coverImage: "/images/sections/viet-vo-dao.jpg",
     gallery: [],
     isActive: true,
@@ -222,7 +271,32 @@ export const ALL_SECTIONS: SportSection[] = [
     ageInfo: "для взрослых и детей с 11 лет",
     category: "Стрельба",
     abonements: [],
-    trainers: [],
+    trainers: [
+      {
+        id: "shooting-goloveshko",
+        name: "Головешко Олег Михайлович",
+        position: "тренер-преподаватель",
+        photo: "",
+      },
+      {
+        id: "shooting-kachevskiy",
+        name: "Качевский Алексей Игоревич",
+        position: "тренер-преподаватель",
+        photo: "",
+      },
+      {
+        id: "shooting-lyubochko",
+        name: "Любочко Эдуард Сократович",
+        position: "тренер-преподаватель",
+        photo: "/images/trainers/Shooting-lyubochko.jpg",
+      },
+      {
+        id: "shooting-palinov",
+        name: "Палинов Антон Сергеевич",
+        position: "тренер-преподаватель",
+        photo: "/images/trainers/Shooting-palinov.jpg",
+      },
+    ],
     coverImage: "/images/sections/strelba.jpg",
     gallery: [],
     isActive: true,
@@ -286,7 +360,20 @@ export const ALL_SECTIONS: SportSection[] = [
     ageInfo: "для детей с 6 лет",
     category: "Экстрим",
     abonements: [],
-    trainers: [],
+    trainers: [
+      {
+        id: "freestyle-perfilyev",
+        name: "Перфильев Артур Анатольевич",
+        position: "тренер-преподаватель",
+        photo: "/images/trainers/Freestyle-perfilyev.jpg",
+      },
+      {
+        id: "freestyle-pakulina",
+        name: "Пакулина Ольга Викторовна",
+        position: "тренер-преподаватель",
+        photo: "",
+      },
+    ],
     coverImage: "/images/sections/freestyle.jpg",
     gallery: [],
     isActive: true,
@@ -302,7 +389,14 @@ export const ALL_SECTIONS: SportSection[] = [
     ageInfo: "для детей с 6 лет",
     category: "Прикладной спорт",
     abonements: [],
-    trainers: [],
+    trainers: [
+      {
+        id: "fireman-medvedev",
+        name: "Медведев Сергей Михайлович",
+        position: "тренер-преподаватель",
+        photo: "/images/trainers/Fireman-medvedev.jpg",
+      },
+    ],
     coverImage: "/images/sections/pozharno-spasatelnyj.jpg",
     gallery: [],
     isActive: true,

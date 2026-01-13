@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect } from "react";
@@ -118,7 +117,7 @@ export default function SportSectionPageClient({
                     ⭐
                   </span>
                   <span className={styles.infoText}>
-                    Феноменальная эстетика и координация движений
+                    Твой спортивный путь начинается здесь
                   </span>
                 </div>
                 <div className={styles.infoItem}>
@@ -126,7 +125,7 @@ export default function SportSectionPageClient({
                     ✨
                   </span>
                   <span className={styles.infoText}>
-                    Оттачивание грациозности и волевого характера
+                    Воспитываем характер и добиваемся результатов вместе
                   </span>
                 </div>
               </div>
@@ -210,7 +209,7 @@ export default function SportSectionPageClient({
             aria-labelledby="description-title"
           >
             <h2 id="description-title" className={styles.sectionTitle}>
-              О художественной гимнастике
+              О секции {section.name}
             </h2>
             <div
               className={styles.descriptionContent}

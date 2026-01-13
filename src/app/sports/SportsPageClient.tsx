@@ -120,7 +120,7 @@ export function SportsPageClient() {
                     подходящую спортивную секцию для себя или своего ребенка.
                     <span className={styles.highlight}>
                       {" "}
-                      Профессиональные тренеры
+                      Профессиональные тренера
                     </span>{" "}
                     и
                     <span className={styles.highlight}>
@@ -188,7 +188,7 @@ export function SportsPageClient() {
                     </span>
                   </div>
                   <div className={styles.statItem}>
-                    <span className={styles.statNumber}>15+</span>
+                    <span className={styles.statNumber}>50+</span>
                     <span className={styles.statLabel}>лет опыта работы</span>
                   </div>
                 </div>

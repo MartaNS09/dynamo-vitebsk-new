@@ -1,50 +1,3 @@
-// супер последнее и правильное
-
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   reactStrictMode: true,
-
-//   // Важно для SCSS модулей
-//   sassOptions: {
-//     silenceDeprecations: ["legacy-js-api"],
-//   },
-
-//   // Для production
-//   experimental: {
-//     optimizeCss: false,
-//   },
-
-//   images: {
-//     // ✅ ОПТИМИЗАЦИЯ ДЛЯ LIGHTHOUSE
-//     formats: ["image/webp"], // Только WebP - самый легкий формат
-//     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-//     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-
-//     // Если будут внешние изображения
-//     remotePatterns: [
-//       {
-//         protocol: "https",
-//         hostname: "**",
-//       },
-//     ],
-
-//     // ✅ ОПЦИИ ДЛЯ ПРОИЗВОДИТЕЛЬНОСТИ
-//     minimumCacheTTL: 60, // Кэшировать на 60 секунд
-//     disableStaticImages: false, // Разрешить статические изображения
-//   },
-
-//   // ✅ ДОПОЛНИТЕЛЬНЫЕ ОПТИМИЗАЦИИ
-//   compiler: {
-//     removeConsole: process.env.NODE_ENV === "production", // Убрать console.log в продакшене
-//   },
-
-//   // ✅ КОМПРЕССИЯ
-//   compress: true,
-// };
-
-// module.exports = nextConfig;
-
-// самая последняя еще не провереная
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -63,7 +16,8 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
 
-    qualities: [75, 85],
+    // ДОБАВЛЯЕМ НЕДОСТАЮЩИЕ КАЧЕСТВА
+    qualities: [70, 75, 85, 90],
 
     minimumCacheTTL: 60 * 60 * 24, // 1 день
 
