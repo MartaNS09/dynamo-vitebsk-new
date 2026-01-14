@@ -1,4 +1,3 @@
-// Навигация для десктоп футера
 export const FOOTER_DESKTOP_NAV = [
   {
     title: "О нас",
@@ -8,7 +7,7 @@ export const FOOTER_DESKTOP_NAV = [
       { href: "/trainers", label: "Тренера" },
       { href: "/contacts", label: "Контакты" },
       { href: "/blog", label: "Блог" },
-      { href: "/rent", label: "Прокат" },
+      { href: "/rental", label: "Прокат" },
     ],
   },
   {
@@ -16,7 +15,7 @@ export const FOOTER_DESKTOP_NAV = [
     links: [
       { href: "/", label: "Главная" },
       { href: "/departments", label: "Отделения" },
-      { href: "/sports", label: "Спортивные секции" }, 
+      { href: "/sports", label: "Спортивные секции" },
       { href: "/subscriptions", label: "Абонементы" },
     ],
   },
@@ -35,8 +34,8 @@ export const FOOTER_MOBILE_NAV = [
     icon: "departments",
   },
   {
-    href: "/sports", 
-    label: "Секции", 
+    href: "/sports",
+    label: "Секции",
     icon: "sections",
   },
   {
