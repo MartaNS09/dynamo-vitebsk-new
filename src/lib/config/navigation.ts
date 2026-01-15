@@ -5,7 +5,7 @@ export const NAV_ITEMS = [
     submenu: [
       { href: "/history", label: "История" },
       { href: "/administration", label: "Администрация" },
-      { href: "/coaches", label: "Тренеры" },
+      { href: "/trainers", label: "Тренеры" },
       { href: "/enrollment", label: "Запись" },
     ],
   },
@@ -19,7 +19,7 @@ export const MOBILE_NAV_ITEMS = [
   { href: "/", label: "Главная" },
   { href: "/history", label: "История" },
   { href: "/administration", label: "Администрация" },
-  { href: "/coaches", label: "Тренеры" },
+  { href: "/trainers", label: "Тренеры" },
   { href: "/departments", label: "Отделения" },
   { href: "/sports", label: "Спортивные секции" },
   { href: "/enrollment", label: "Запись" },
