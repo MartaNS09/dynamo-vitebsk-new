@@ -31,9 +31,7 @@ function getInitials(name: string): string {
   if (parts.length === 0) return "??";
   if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
 
-  // Русские имена обычно: Фамилия Имя Отчество
-  // Берем первую букву Фамилии и первую букву Имени
-  // Для "Фроленко Ирина Николаевна" → "ФИ"
+ 
   const lastName = parts[0].charAt(0).toUpperCase(); // Фамилия (первое слово)
   const firstName = parts[1].charAt(0).toUpperCase(); // Имя (второе слово)
 
