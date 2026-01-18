@@ -402,6 +402,7 @@ export const ALL_SECTIONS: SportSection[] = [
     ],
     coverImage: "/images/sections/judo-1.jpg",
     heroImages: ["/images/sections/judo-1.jpg", "/images/sections/judo-2.jpg"],
+
     gallery: [
       "/images/sections/judo-1.jpg",
       "/images/sections/judo-2.jpg",
@@ -409,6 +410,8 @@ export const ALL_SECTIONS: SportSection[] = [
       "/images/sections/judo-4.jpg",
       "/images/sections/judo-5.jpg",
       "/images/sections/judo-6.jpg",
+      "/images/sections/judo-7.jpg",
+      "/images/sections/judo-8.jpg",
     ],
     isActive: true,
     schedule: "Пн/Ср/Пт 16:00-18:00",
