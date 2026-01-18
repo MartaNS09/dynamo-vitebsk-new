@@ -161,7 +161,7 @@ export const ALL_SECTIONS: SportSection[] = [
       {
         id: "kickboxing-1",
         name: "АБОНЕМЕНТ",
-        description: " Занятий в месяц:1 ",
+        description: " Занятий в месяц:1",
         price: 20,
         currency: "BYN",
         duration: "1 месяц",
@@ -175,7 +175,7 @@ export const ALL_SECTIONS: SportSection[] = [
       {
         id: "kickboxing-2",
         name: "АБОНЕМЕНТ",
-        description: " Занятий в месяц:4",
+        description: "4 занятия в месяц",
         price: 65,
         currency: "BYN",
         duration: "1 месяц",
@@ -189,7 +189,7 @@ export const ALL_SECTIONS: SportSection[] = [
       {
         id: "kickboxing-3",
         name: "АБОНЕМЕНТ",
-        description: " 8 занятий в месяц",
+        description: "8 занятий в месяц",
         price: 70,
         currency: "BYN",
         duration: "1 месяц",
@@ -203,12 +203,12 @@ export const ALL_SECTIONS: SportSection[] = [
       {
         id: "kickboxing-4",
         name: "АБОНЕМЕНТ",
-        description: " 12 занятий в месяц",
+        description: "12 занятий в месяц",
         price: 75,
         currency: "BYN",
         duration: "1 месяц",
         features: [
-          "Занятия 3 раз в неделю",
+          "Занятия 3 раза в неделю",
           "Профессиональные тренеры",
           "Индивидуальный подход",
         ],
@@ -305,12 +305,12 @@ export const ALL_SECTIONS: SportSection[] = [
       {
         id: "vajra-yoga-3",
         name: "АБОНЕМЕНТ",
-        description: "8 занятий в месяц",
+        description: "8 занятия в месяц",
         price: 90,
         currency: "BYN",
         duration: "1 месяц",
         features: [
-          "Занятия 2 раза в неделю",
+          "Занятия 2 раз в неделю",
           "Профессиональные тренеры",
           "Индивидуальный подход",
         ],
@@ -325,10 +325,8 @@ export const ALL_SECTIONS: SportSection[] = [
         photo: "/images/trainers/VietVoDao-sadovskiy.jpg",
       },
     ],
-
     coverImage: "/images/sections/yoga-1.jpg",
     heroImages: ["/images/sections/yoga-1.jpg", "/images/sections/yoga-2.jpg"],
-
     gallery: ["/images/sections/yoga-1.jpg", "/images/sections/yoga-2.jpg"],
     isActive: true,
     schedule: "Вт/Чт 19:00-20:30",
@@ -401,18 +399,9 @@ export const ALL_SECTIONS: SportSection[] = [
       },
     ],
     coverImage: "/images/sections/judo-1.jpg",
-    heroImages: ["/images/sections/judo-1.jpg", "/images/sections/judo-2.jpg"],
+    heroImages: [],
 
-    gallery: [
-      "/images/sections/judo-1.jpg",
-      "/images/sections/judo-2.jpg",
-      "/images/sections/judo-3.jpg",
-      "/images/sections/judo-4.jpg",
-      "/images/sections/judo-5.jpg",
-      "/images/sections/judo-6.jpg",
-      "/images/sections/judo-7.jpg",
-      "/images/sections/judo-8.jpg",
-    ],
+    gallery: [],
     isActive: true,
     schedule: "Пн/Ср/Пт 16:00-18:00",
     location: "ул. Замковая, 4",
@@ -425,7 +414,22 @@ export const ALL_SECTIONS: SportSection[] = [
     fullDescription: "Полное описание будет добавлено администратором...",
     ageInfo: "для детей с 7 лет",
     category: "Единоборства",
-    abonements: [],
+    abonements: [
+      {
+        id: "viet-vo-dao-1",
+        name: "АБОНЕМЕНТ",
+        description: "12 занятий в месяц",
+        price: 90,
+        currency: "BYN",
+        duration: "1 месяц",
+        features: [
+          "Занятия 3 раза в неделю",
+          "Профессиональные тренеры",
+          "Индивидуальный подход",
+        ],
+        isPopular: true,
+      },
+    ],
     trainers: [
       {
         id: "vietvodao-sadovskiy",
@@ -448,7 +452,36 @@ export const ALL_SECTIONS: SportSection[] = [
     fullDescription: "Полное описание будет добавлено администратором...",
     ageInfo: "для взрослых и детей с 11 лет",
     category: "Стрельба",
-    abonements: [],
+    abonements: [
+      {
+        id: "shooting-1",
+        name: "АБОНЕМЕНТ",
+        description: "(ДЕТСКИЙ)4 занятия в месяц",
+        price: 30,
+        currency: "BYN",
+        duration: "1 месяц",
+        features: [
+          "Занятия 1 раз в неделю",
+          "Профессиональные тренеры",
+          "Индивидуальный подход",
+        ],
+        isPopular: true,
+      },
+      {
+        id: "shooting-2",
+        name: "АБОНЕМЕНТ",
+        description: "(ДЕТСКИЙ)8 занятий в месяц",
+        price: 45,
+        currency: "BYN",
+        duration: "1 месяц",
+        features: [
+          "Занятия 2 раза в неделю",
+          "Профессиональные тренеры",
+          "Индивидуальный подход",
+        ],
+        isPopular: true,
+      },
+    ],
     trainers: [
       {
         id: "shooting-goloveshko",
@@ -489,7 +522,22 @@ export const ALL_SECTIONS: SportSection[] = [
     fullDescription: "Полное описание будет добавлено администратором...",
     ageInfo: "для детей с 4 лет",
     category: "Танцы",
-    abonements: [],
+    abonements: [
+      {
+        id: "choreography-1",
+        name: "АБОНЕМЕНТ",
+        description: "8 занятий в месяц",
+        price: 50,
+        currency: "BYN",
+        duration: "1 месяц",
+        features: [
+          "Занятия 2 раза в неделю",
+          "Профессиональные тренеры",
+          "Индивидуальный подход",
+        ],
+        isPopular: true,
+      },
+    ],
     trainers: [],
     coverImage: "/images/sections/horeografiya.jpg",
     gallery: [],
@@ -505,7 +553,36 @@ export const ALL_SECTIONS: SportSection[] = [
     fullDescription: "Полное описание будет добавлено администратором...",
     ageInfo: "для детей с 3 лет",
     category: "Гимнастика",
-    abonements: [],
+    abonements: [
+      {
+        id: "developing-gymnastics-1",
+        name: "АБОНЕМЕНТ",
+        description: "8 занятий в месяц",
+        price: 60,
+        currency: "BYN",
+        duration: "1 месяц",
+        features: [
+          "Занятия 2 раза в неделю",
+          "Профессиональные тренеры",
+          "Индивидуальный подход",
+        ],
+        isPopular: true,
+      },
+      {
+        id: "developing-gymnastics-2",
+        name: "АБОНЕМЕНТ",
+        description: "12 занятий в месяц",
+        price: 80,
+        currency: "BYN",
+        duration: "1 месяц",
+        features: [
+          "Занятия 3 раза в неделю",
+          "Профессиональные тренеры",
+          "Индивидуальный подход",
+        ],
+        isPopular: true,
+      },
+    ],
     trainers: [],
     coverImage: "/images/sections/razvivayushchaya.jpg",
     gallery: [],
@@ -537,7 +614,22 @@ export const ALL_SECTIONS: SportSection[] = [
     fullDescription: "Полное описание будет добавлено администратором...",
     ageInfo: "для детей с 6 лет",
     category: "Экстрим",
-    abonements: [],
+    abonements: [
+      {
+        id: "freestyle-1",
+        name: "АБОНЕМЕНТ",
+        description: "8 занятий в месяц",
+        price: 64,
+        currency: "BYN",
+        duration: "1 месяц",
+        features: [
+          "Занятия 2 раза в неделю",
+          "Профессиональные тренеры",
+          "Индивидуальный подход",
+        ],
+        isPopular: true,
+      },
+    ],
     trainers: [
       {
         id: "freestyle-perfilyev",
@@ -566,7 +658,22 @@ export const ALL_SECTIONS: SportSection[] = [
     fullDescription: "Полное описание будет добавлено администратором...",
     ageInfo: "для детей с 6 лет",
     category: "Прикладной спорт",
-    abonements: [],
+    abonements: [
+      {
+        id: "fireman-1",
+        name: "АБОНЕМЕНТ",
+        description: "8 занятий в месяц",
+        price: 48,
+        currency: "BYN",
+        duration: "1 месяц",
+        features: [
+          "Занятия 2 раза в неделю",
+          "Профессиональные тренеры",
+          "Индивидуальный подход",
+        ],
+        isPopular: true,
+      },
+    ],
     trainers: [
       {
         id: "fireman-medvedev",

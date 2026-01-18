@@ -31,7 +31,6 @@ function getInitials(name: string): string {
   if (parts.length === 0) return "??";
   if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
 
- 
   const lastName = parts[0].charAt(0).toUpperCase(); // Фамилия (первое слово)
   const firstName = parts[1].charAt(0).toUpperCase(); // Имя (второе слово)
 
@@ -55,24 +54,18 @@ export default function SportSectionPageClient({
   section,
 }: SportSectionPageClientProps) {
   useEffect(() => {
-    // Фикс для iOS скролла
-    const fixIOSScroll = () => {
-      const preventScale = (e: WheelEvent) => {
-        if (e.ctrlKey) {
-          e.preventDefault();
-        }
-      };
-
-      document.body.style.overscrollBehaviorY = "none";
-      document.addEventListener("wheel", preventScale, { passive: false });
-
-      return () => {
-        document.body.style.overscrollBehaviorY = "auto";
-        document.removeEventListener("wheel", preventScale);
-      };
+    // Фикс для предотвращения масштабирования колесиком мыши с Ctrl
+    const preventScale = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+      }
     };
 
-    fixIOSScroll();
+    document.addEventListener("wheel", preventScale, { passive: false });
+
+    return () => {
+      document.removeEventListener("wheel", preventScale);
+    };
   }, []);
 
   return (

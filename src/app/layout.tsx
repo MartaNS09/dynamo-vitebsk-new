@@ -12,6 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"),
   title:
     "Динамо Витебск - СДЮШОР | Специализированная школа олимпийского резерва",
   description: "Официальный сайт СДЮШОР Динамо Витебск...",
