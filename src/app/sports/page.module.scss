@@ -22,7 +22,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(
+    background:
+      radial-gradient(
         circle at 20% 50%,
         rgba(255, 255, 255, 0.1) 0%,
         transparent 50%
@@ -111,7 +112,8 @@
   display: block;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2),
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
     // Легкая тень для объема
     0 2px 8px rgba(255, 255, 255, 0.1); // Белое свечение
 }
@@ -167,26 +169,10 @@
 .highlight {
   font-weight: 700;
   color: rgba(255, 255, 255, 0.95); // Почти белый, не желтый
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 0 8px rgba(255, 255, 255, 0.2); // Белое свечение
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(255, 255, 255, 0.2); // Белое свечение
 }
-
-// .highlight {
-//   font-weight: 800; // Очень жирный
-//   color: rgba(255, 255, 255, 1); // Чистый белый
-//   position: relative;
-//   display: inline-block;
-
-//   &::after {
-//     content: "";
-//     position: absolute;
-//     bottom: -2px;
-//     left: 0;
-//     width: 100%;
-//     height: 2px;
-//     background: rgba(255, 255, 255, 0.7); // Белая подчеркивающая линия
-//     border-radius: 1px;
-//   }
-// }
 
 .heroAction {
   display: flex;
@@ -396,11 +382,12 @@
   background: var(--bg-primary);
 }
 
+/* ✅ ФИКС: УЛУЧШАЕМ СЕТКУ КАРТОЧЕК */
 .sectionsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-  margin-bottom: 4rem;
+  gap: 1rem; // Уменьшили gap с 1.25rem
+  margin-bottom: 3rem;
 
   @media (max-width: 1200px) {
     grid-template-columns: repeat(3, 1fr);
@@ -408,11 +395,24 @@
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ✅ ФИКС: УБИРАЕМ ЭФФЕКТ "СЪЕДАНИЯ" ПРИ ХОВЕРЕ */
+@media (min-width: 769px) {
+  .sectionsGrid {
+    // Добавляем небольшой отступ для эффекта ховера
+    padding: 10px 2px 2px 2px;
+    margin: -2px;
   }
 }
 
@@ -651,7 +651,7 @@
   }
 
   .titleSub {
-    font-size: clamp(1.25rem, 2.5vw, 1.5rem); // Адаптивный для мобилок
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
   }
 
   .description {

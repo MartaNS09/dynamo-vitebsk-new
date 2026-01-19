@@ -25,26 +25,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru" dir="ltr" data-scroll-behavior="smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-      </head>
-
       <body className={inter.className}>
-        <div className="page-wrapper">
-          <ThemeProvider>
+        <ThemeProvider>
+          <div className="page-wrapper">
             <Header />
             <main className="main-content">
               <FloatingThemeToggle />
               {children}
             </main>
             <Footer />
-          </ThemeProvider>
-        </div>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

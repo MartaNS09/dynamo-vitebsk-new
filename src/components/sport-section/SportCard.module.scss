@@ -8,11 +8,12 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 420px;
 
   &:hover {
     box-shadow: var(--shadow-md);
     border-color: var(--dynamo-blue-light);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
 
     .ctaText {
       color: var(--dynamo-blue);
@@ -30,10 +31,15 @@
 
   @media (max-width: 768px) {
     border-radius: 12px;
+    min-height: 380px;
 
     &:hover {
-      transform: none;
+      transform: translateY(-2px);
     }
+  }
+
+  @media (max-width: 480px) {
+    min-height: 360px;
   }
 }
 
@@ -46,48 +52,78 @@
   outline: none;
 }
 
+/* ✅ ФИКС: ПОКАЗЫВАЕМ ВСЁ ФОТО 292×344 БЕЗ ОБРЕЗКИ */
 .imageContainer {
-  position: relative;
-  aspect-ratio: 4/3;
-  overflow: hidden;
-  background: var(--bg-secondary);
-}
-
-.imageWrapper {
-  position: relative;
   width: 100%;
-  height: 100%;
-}
+  min-height: 220px; // МИНИМАЛЬНАЯ высота
+  height: auto; // Высота автоматическая
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 85, 183, 0.05),
+    rgba(0, 212, 170, 0.05)
+  );
+  padding: 12px 12px 0 12px; // ✅ ДОБАВЛЯЕМ PADDING TOP и по бокам
 
-.image {
-  object-fit: cover;
-  transition: transform 0.3s ease;
+  @media (max-width: 768px) {
+    min-height: 200px;
+    padding: 10px 10px 0 10px;
+  }
 
-  .card:hover & {
-    transform: scale(1.03);
+  @media (max-width: 480px) {
+    min-height: 180px;
+    padding: 8px 8px 0 8px;
   }
 }
 
+/* ✅ ФИКС: АДАПТИВНОЕ ФОТО - ПОКАЗЫВАЕМ ВСЁ */
+.image {
+  width: 100%;
+  height: auto; // ✅ АВТО ВЫСОТА
+  max-height: 220px; // ✅ МАКСИМАЛЬНАЯ высота
+  object-fit: contain; // ✅ ПОКАЗЫВАЕМ ВСЁ ФОТО
+  object-position: center;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+
+  .card:hover & {
+    transform: scale(1.02);
+  }
+}
+
+/* ✅ ФИКС: КОМПАКТНЫЙ КОНТЕНТ С PADDING TOP */
 .content {
-  padding: 1.25rem; // Уменьшили
+  padding: 1rem 1rem 0.75rem 1rem; // ✅ top right bottom left
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  gap: 0.625rem; // Уменьшили
-}
+  gap: 0.5rem;
+  min-height: 160px; // Уменьшили
 
-.header {
-  margin: 0;
+  @media (max-width: 768px) {
+    padding: 0.75rem 0.75rem 0.625rem 0.75rem;
+    gap: 0.375rem;
+    min-height: 140px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.625rem 0.625rem 0.5rem 0.625rem;
+    gap: 0.25rem;
+    min-height: 120px;
+  }
 }
 
 .title {
-  font-size: 1.125rem; // Уменьшили
+  font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.3;
   color: var(--text-primary);
   font-family: "Space Grotesk", sans-serif;
   margin: 0;
-  min-height: 2.8em; // Фиксированная высота
+  min-height: 2.2em;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -95,54 +131,78 @@
   overflow: hidden;
   text-overflow: ellipsis;
   line-clamp: 2;
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    min-height: 2em;
+  }
 }
 
 .description {
-  font-size: 0.875rem; // Уменьшили
-  line-height: 1.5;
+  font-size: 0.875rem;
+  line-height: 1.4;
   color: var(--text-secondary);
   margin: 0;
   flex-grow: 1;
-  min-height: 2.6em; // Фиксированная высота
+  min-height: 1.6em; // Уменьшили
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-clamp: 2;
+
+  @media (max-width: 480px) {
+    font-size: 0.8125rem;
+    min-height: 1.4em;
+  }
 }
 
-.ageGroup {
-  margin-top: auto; // Прижимаем к низу
-  padding-top: 0.5rem; // Небольшой отступ сверху
+/* ✅ ФИКС: ПРИЖИМАЕМ К НИЗУ БЕЗ ПУСТОТ */
+.bottomContent {
+  margin-top: auto; // ✅ ПРИЖИМАЕМ К НИЗУ
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    padding-top: 0.625rem;
+    gap: 0.375rem;
+  }
 }
 
 .ageLabel {
   display: inline-block;
-  padding: 0.375rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   background: rgba(var(--dynamo-blue-rgb), 0.1);
   color: var(--dynamo-blue);
-  border-radius: 8px;
-  font-size: 0.75rem; // Уменьшили
+  border-radius: 6px;
+  font-size: 0.75rem;
   font-weight: 600;
-  line-height: 1;
-}
+  line-height: 1.1;
 
-.cta {
-  margin-top: 0.75rem; // Уменьшили
-  padding-top: 0.875rem;
-  border-top: 1px solid var(--border-light);
+  @media (max-width: 480px) {
+    font-size: 0.6875rem;
+    padding: 0.1875rem 0.375rem;
+  }
 }
 
 .ctaText {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.875rem; // Уменьшили
+  font-size: 0.875rem;
   transition: color 0.2s ease;
+
+  @media (max-width: 480px) {
+    font-size: 0.8125rem;
+    gap: 0.25rem;
+  }
 }
 
 .arrow {
@@ -158,51 +218,15 @@
   }
 
   .imageContainer {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .ageLabel {
     background: rgba(var(--dynamo-blue-rgb), 0.2);
   }
-
-  .cta {
-    border-top-color: var(--border-color);
-  }
 }
 
-@media (max-width: 768px) {
-  .content {
-    padding: 1rem; // Еще меньше на мобилках
-    gap: 0.5rem;
-  }
-
-  .cta {
-    margin-top: 0.5rem;
-    padding-top: 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .title {
-    font-size: 1rem;
-    min-height: 2.4em;
-  }
-
-  .description {
-    font-size: 0.8125rem;
-    min-height: 2.4em;
-  }
-
-  .ctaText {
-    font-size: 0.8125rem;
-  }
-
-  .ageLabel {
-    font-size: 0.6875rem;
-    padding: 0.25rem 0.5rem;
-  }
-}
-
+/* Отключаем ховер для тач-устройств */
 @media (hover: none) and (pointer: coarse) {
   .card:hover {
     transform: none;

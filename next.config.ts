@@ -7,10 +7,10 @@ const nextConfig = {
   },
 
   images: {
-    formats: ["image/webp", "image/avif"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60 * 60 * 24,
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [320, 420, 640, 750, 828, 1080, 1200, 1920, 2048],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       {
         protocol: "https",
@@ -20,9 +20,16 @@ const nextConfig = {
   },
 
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production" && {
-      exclude: ["error", "warn"],
-    },
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+
+  swcMinify: true,
+  compress: true,
+
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ["lucide-react", "react-icons"],
+    scrollRestoration: true,
   },
 };
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AbonementCard from "@/components/sport-section/AbonementCard";
@@ -53,21 +52,6 @@ function getAvatarColor(name: string): string {
 export default function SportSectionPageClient({
   section,
 }: SportSectionPageClientProps) {
-  useEffect(() => {
-    // Фикс для предотвращения масштабирования колесиком мыши с Ctrl
-    const preventScale = (e: WheelEvent) => {
-      if (e.ctrlKey) {
-        e.preventDefault();
-      }
-    };
-
-    document.addEventListener("wheel", preventScale, { passive: false });
-
-    return () => {
-      document.removeEventListener("wheel", preventScale);
-    };
-  }, []);
-
   return (
     <main className={styles.container}>
       {/* Навигация */}
@@ -88,7 +72,7 @@ export default function SportSectionPageClient({
         </div>
       </nav>
 
-      {/* Hero секция - НЕ ТРОГАЕМ */}
+      {/* Hero секция */}
       <section className={styles.hero} aria-labelledby="hero-title">
         <div className={styles.contentWrapper}>
           <div className={styles.heroContent}>
@@ -143,7 +127,7 @@ export default function SportSectionPageClient({
               </div>
             </div>
 
-            {/* Фото в Hero */}
+            {/* Фото в Hero - ИСПОЛЬЗУЕМ СТАНДАРТНЫЙ NEXT/IMAGE */}
             <div className={styles.heroImages}>
               <div className={styles.imageFramePrimary}>
                 <div className={styles.imageWrapper}>
@@ -153,8 +137,9 @@ export default function SportSectionPageClient({
                     width={400}
                     height={470}
                     className={styles.image}
-                    priority
-                    quality={90}
+                    priority // ✅ ПЕРВОЕ ИЗОБРАЖЕНИЕ С ПРИОРИТЕТОМ
+                    quality={85}
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <div className={styles.frameBorder}></div>
                   <div className={styles.frameCorner}></div>
@@ -176,7 +161,9 @@ export default function SportSectionPageClient({
                     width={350}
                     height={410}
                     className={styles.image}
-                    quality={85}
+                    quality={80} // ✅ СНИЖАЕМ КАЧЕСТВО ДЛЯ НЕПРИОРИТЕТНЫХ
+                    loading="lazy" // ✅ ЛЕНИВАЯ ЗАГРУЗКА
+                    sizes="(max-width: 768px) 100vw, 40vw"
                   />
                   <div className={styles.frameBorder}></div>
                   <div className={styles.frameCorner}></div>
@@ -270,7 +257,6 @@ export default function SportSectionPageClient({
               <h3 className={styles.sidebarTitle}>Наши тренеры</h3>
               <div className={styles.trainersList}>
                 {section.trainers.map((trainer) => {
-                  // Безопасная проверка фото
                   const photo = trainer.photo || "";
                   const hasPhoto = photo.trim() !== "";
 
@@ -278,16 +264,16 @@ export default function SportSectionPageClient({
                     <div key={trainer.id} className={styles.trainerCompact}>
                       <div className={styles.trainerPhoto}>
                         {hasPhoto ? (
-                          // Фото тренера
                           <Image
-                            src={photo} // используем безопасную переменную photo
+                            src={photo}
                             alt={`Тренер ${trainer.name}`}
                             width={80}
                             height={80}
                             className={styles.photo}
+                            quality={75} // ✅ Оптимальное качество для миниатюр
+                            loading="lazy"
                           />
                         ) : (
-                          // Аватар с инициалами
                           <div
                             className={styles.avatar}
                             style={{
@@ -363,7 +349,7 @@ export default function SportSectionPageClient({
             </div>
           </aside>
 
-          {/* 🔴 КОНТЕНТ НА ВСЮ ШИРИНУ (после сайдбара) */}
+          {/* 🔴 КОНТЕНТ НА ВСЮ ШИРИНУ */}
           <div className={styles.fullWidthContent}>
             {/* Абонементы */}
             <section
@@ -408,6 +394,8 @@ export default function SportSectionPageClient({
                       height={200}
                       className={styles.galleryImage}
                       loading="lazy"
+                      quality={75} // ✅ Оптимальное качество для галереи
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
                 ))}
