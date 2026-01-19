@@ -23,8 +23,7 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  swcMinify: true,
-  compress: true,
+  compress: true, // Оставляем сжатие
 
   experimental: {
     optimizeCss: true,
