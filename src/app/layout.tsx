@@ -9,7 +9,6 @@ import "./globals.scss";
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
   display: "swap",
-  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -25,29 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="ru"
-      dir="ltr"
-      data-scroll-behavior="smooth"
-      className={inter.variable}
-    >
-      <head>
-        {/* 🔴 КРИТИЧЕСКИ ВАЖНО: Оптимизированная загрузка Space Grotesk */}
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="ru" dir="ltr" data-scroll-behavior="smooth">
       <body className={inter.className}>
         <ThemeProvider>
           <div className="page-wrapper">
