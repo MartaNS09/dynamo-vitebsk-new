@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SportCard from "@/components/sport-section/SportCard";
 import { ALL_SECTIONS } from "@/data/sport-sections";
+import { getCategorySlug, getCategoryName } from "@/utils/categories";
 import styles from "./page.module.scss";
 
 export function SportsPageClient() {
@@ -13,38 +14,40 @@ export function SportsPageClient() {
   const filtersSectionRef = useRef<HTMLElement>(null);
   const [isPending, startTransition] = useTransition();
 
-  // Получаем категорию из URL - единственный источник правды
-  const urlCategory = searchParams.get("category");
+  // Получаем категорию из URL и преобразуем slug в название
+  const categorySlug = searchParams.get("category");
   const [activeFilter, setActiveFilter] = useState<string>(
-    urlCategory || "all"
+    categorySlug ? getCategoryName(categorySlug) || "all" : "all",
   );
 
-  // 🔴 ИСПРАВЛЕННЫЙ: Оптимизированная функция обновления URL
+  // 🔴 ИСПРАВЛЕНО: функция обновления URL
   const updateUrl = useCallback(
-    (filter: string) => {
+    (categoryName: string) => {
       startTransition(() => {
         const params = new URLSearchParams(searchParams.toString());
 
-        if (filter === "all") {
+        if (categoryName === "all") {
           params.delete("category");
         } else {
-          params.set("category", filter);
+          // Преобразуем русское название в английский slug
+          const slug = getCategorySlug(categoryName);
+          params.set("category", slug);
         }
 
         router.push(
           `${pathname}${params.toString() ? "?" + params.toString() : ""}`,
-          { scroll: false }
+          { scroll: false },
         );
       });
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams],
   );
 
-  // 🔴 ИСПРАВЛЕННЫЙ: Эффект для обновления состояния при изменении URL
+  // 🔴 ИСПРАВЛЕНО: обновление при изменении URL (без ошибок ESLint)
   useEffect(() => {
-    const currentCategory = searchParams.get("category") || "all";
+    const slug = searchParams.get("category");
+    const currentCategory = slug ? getCategoryName(slug) || "all" : "all";
 
-    // Используем setTimeout для избежания синхронного setState
     const timer = setTimeout(() => {
       if (currentCategory !== activeFilter) {
         setActiveFilter(currentCategory);
@@ -52,33 +55,27 @@ export function SportsPageClient() {
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [searchParams, activeFilter]);
+  }, [searchParams, activeFilter]); // ← добавили activeFilter
 
-  // Обработчик фильтра с оптимизацией
+  // Обработчик фильтра
   const handleFilter = useCallback(
     (category: string) => {
-      // Немедленно обновляем UI
       setActiveFilter(category);
-      // Затем обновляем URL
       updateUrl(category);
     },
-    [updateUrl]
+    [updateUrl],
   );
 
   // Извлекаем уникальные категории
   const categories = Array.from(
-    new Set(ALL_SECTIONS.map((s) => s.category))
+    new Set(ALL_SECTIONS.map((s) => s.category)),
   ).filter(Boolean) as string[];
 
-  // Фильтруем секции
+  // Фильтруем секции (используем русские названия)
   const filteredSections =
     activeFilter === "all"
       ? ALL_SECTIONS
-      : ALL_SECTIONS.filter(
-          (section) =>
-            section.category?.toLowerCase().trim() ===
-            activeFilter.toLowerCase().trim()
-        );
+      : ALL_SECTIONS.filter((section) => section.category === activeFilter);
 
   // Рассчитываем заполнители для грида
   const itemsPerRow = 4;
@@ -223,11 +220,9 @@ export function SportsPageClient() {
                   <button
                     key={category}
                     className={`${styles.filterButton} ${
-                      activeFilter === category?.toLowerCase()
-                        ? styles.filterButtonActive
-                        : ""
+                      activeFilter === category ? styles.filterButtonActive : ""
                     }`}
-                    onClick={() => handleFilter(category?.toLowerCase() || "")}
+                    onClick={() => handleFilter(category)}
                     aria-label={`Показать секции категории ${category}`}
                     disabled={isPending}
                   >
