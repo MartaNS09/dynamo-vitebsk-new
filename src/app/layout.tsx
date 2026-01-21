@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { FloatingThemeToggle } from "@/components/theme/FloatingThemeToggle";
 import { Header } from "@/components/layout/header/Header";
 import Footer from "@/components/layout/footer/Footer";
+import CookieConsent from "@/components/cookie/CookieConsent";
 import "./globals.scss";
 
 const inter = Inter({
@@ -34,6 +35,8 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            {/* Добавляем баннер cookie - безопасно, без зависимостей */}
+            <CookieConsent />
           </div>
         </ThemeProvider>
       </body>
