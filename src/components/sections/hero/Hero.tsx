@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button/Button";
 import { ArrowRight, Award } from "lucide-react";
-// import Image from "next/image"; // Добавляем Next.js Image компонент
+import Image from "next/image";
 import styles from "./Hero.module.scss";
 
 const SPORTS = [
@@ -11,18 +11,16 @@ const SPORTS = [
   "художественная гимнастика",
   "легкая атлетика",
   "каратэ",
-  "стрельба пулевая",
   "акробатика",
   "велоспорт",
 ];
 
-// Обновляем PHOTO_PLACEHOLDERS, добавляем alt описания
 const PHOTOS = [
   {
     id: 1,
-    src: "/images/hero/sports-hall.jpg", // Пример пути
+    src: "/images/hero/sports.jpg",
     alt: "Спортсмены тренируются в современном зале СДЮШОР Динамо Витебск",
-    title: "Спортсмены в зале",
+    title: "Спорт начинается с первых шагов",
   },
   {
     id: 2,
@@ -32,9 +30,9 @@ const PHOTOS = [
   },
   {
     id: 3,
-    src: "/images/hero/shooting.jpg",
-    alt: "Тренировка по пулевой стрельбе в спортивной школе Динамо",
-    title: "Занятия по пулевой стрельбе",
+    src: "/images/hero/dymamo.jpg",
+    alt: "СДЮШОР Динамо Витебск",
+    title: "Идём к цели вместе",
   },
   {
     id: 4,
@@ -54,57 +52,17 @@ export const Hero = () => {
   });
   const [isVisible, setIsVisible] = useState(false);
 
-  // useEffect(() => {
-  //   setIsVisible(true);
-
-  //   const sportInterval = setInterval(() => {
-  //     setCurrentSport((prev) => (prev + 1) % SPORTS.length);
-  //   }, 2000);
-
-  //   const photoInterval = setInterval(() => {
-  //     setCurrentPhoto((prev) => (prev + 1) % PHOTOS.length);
-  //   }, 4000);
-
-  //   const duration = 2000;
-  //   const steps = 60;
-  //   const incrementYears = 55 / steps;
-  //   const incrementSports = 12 / steps;
-  //   const incrementAthletes = 850 / steps;
-
-  //   let step = 0;
-  //   const counterInterval = setInterval(() => {
-  //     step++;
-  //     setCounters({
-  //       years: Math.min(55, Math.floor(incrementYears * step)),
-  //       sports: Math.min(12, Math.floor(incrementSports * step)),
-  //       athletes: Math.min(850, Math.floor(incrementAthletes * step)),
-  //     });
-
-  //     if (step >= steps) clearInterval(counterInterval);
-  //   }, duration / steps);
-
-  //   return () => {
-  //     clearInterval(sportInterval);
-  //     clearInterval(photoInterval);
-  //     clearInterval(counterInterval);
-  //   };
-  // }, []);
-
-  // В начало useEffect в Hero.tsx (ЗАМЕНИТЕ текущий useEffect):
   useEffect(() => {
-    // Проверяем, не отключил ли пользователь анимации
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const prefersReducedMotion = mediaQuery.matches;
 
     setIsVisible(true);
 
-    // Если пользователь отключил анимации - сразу показываем финальные значения
     if (prefersReducedMotion) {
       setCounters({ years: 55, sports: 12, athletes: 850 });
-      return; // Не запускаем интервалы
+      return;
     }
 
-    // Только если анимации разрешены:
     const sportInterval = setInterval(() => {
       setCurrentSport((prev) => (prev + 1) % SPORTS.length);
     }, 2000);
@@ -147,7 +105,7 @@ export const Hero = () => {
         <div className={styles.heroContent}>
           {/* Левая часть - контент */}
           <div className={styles.heroLeft}>
-            {/* Заголовок - ОДНОЙ СТРОКОЙ */}
+            {/* Заголовок */}
             <div className={styles.titleWrapper}>
               <h1 className={styles.title}>
                 <span className={styles.titleDynamo}>Динамо</span>
@@ -157,7 +115,7 @@ export const Hero = () => {
               <div className={styles.titleLine}></div>
             </div>
 
-            {/* Девиз - линии с обеих сторон */}
+            {/* Девиз */}
             <h2 className={styles.motto}>
               <span className={styles.mottoLine}></span>
               <span className={styles.mottoTextWrapper}>
@@ -179,10 +137,7 @@ export const Hero = () => {
               <div className={styles.sportRotator}>
                 <span className={styles.rotatorLabel}>Направление:</span>
                 <div className={styles.sportHighlightWrapper}>
-                  <span
-                    className={styles.sportHighlight}
-                    aria-live="polite" // Объявляет изменения скринридеру
-                  >
+                  <span className={styles.sportHighlight} aria-live="polite">
                     {SPORTS[currentSport]}
                   </span>
                 </div>
@@ -247,7 +202,7 @@ export const Hero = () => {
               <Button
                 variant="primary"
                 size="large"
-                href="/departments" // ← НОВАЯ ССЫЛКА
+                href="/departments"
                 className={styles.primaryButton}
               >
                 <span>Подробнее</span>
@@ -256,7 +211,7 @@ export const Hero = () => {
               <Button
                 variant="outline"
                 size="large"
-                href="/about"
+                href="/history"
                 className={styles.secondaryButton}
               >
                 <span>О школе</span>
@@ -271,12 +226,15 @@ export const Hero = () => {
             <div className={styles.photoContainer}>
               <div className={styles.photoFrame}>
                 <div className={`${styles.photoSlide} ${styles.photoActive}`}>
-                  {/* Плейсхолдер пока нет фото */}
-                  <div
-                    className={styles.photoPlaceholder}
-                    role="img"
-                    aria-label={PHOTOS[currentPhoto].alt}
-                  >
+                  <Image
+                    src={PHOTOS[currentPhoto].src}
+                    alt={PHOTOS[currentPhoto].alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className={styles.photoImage}
+                    priority={currentPhoto === 0}
+                  />
+                  <div className={styles.photoOverlay}>
                     <div className={styles.photoContent}>
                       <div className={styles.photoTitle}>
                         {PHOTOS[currentPhoto].title}
@@ -286,15 +244,6 @@ export const Hero = () => {
                       </div>
                     </div>
                   </div>
-                  {/* Когда будут реальные фото, используйте: */}
-                  {/* <Image
-                    src={PHOTOS[currentPhoto].src}
-                    alt={PHOTOS[currentPhoto].alt}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className={styles.photoImage}
-                    priority
-                  /> */}
                 </div>
               </div>
 

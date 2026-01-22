@@ -122,11 +122,6 @@ export const HistorySection = () => {
                 </span>
               </Button>
 
-              {/* <Button variant="primary" href="/about">
-                <Trophy size={18} />
-                <span>Вся история школы</span>
-              </Button> */}
-
               <Button variant="primary" href="/history">
                 <Trophy size={18} aria-hidden="true" />
                 <span>Вся история школы</span>

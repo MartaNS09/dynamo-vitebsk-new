@@ -16,7 +16,7 @@ export const FOOTER_DESKTOP_NAV = [
       { href: "/", label: "Главная" },
       { href: "/departments", label: "Отделения" },
       { href: "/sports", label: "Спортивные секции" },
-      { href: "/subscriptions", label: "Абонементы" },
+      { href: "/blog", label: "Блог" },
     ],
   },
 ];
@@ -39,9 +39,9 @@ export const FOOTER_MOBILE_NAV = [
     icon: "sections",
   },
   {
-    href: "/subscriptions",
-    label: "Абонементы",
-    icon: "subscriptions",
+    href: "/blog",
+    label: "Блог",
+    icon: "blog",
   },
 ];
 
