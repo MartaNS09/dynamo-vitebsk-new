@@ -1,4 +1,3 @@
-
 export const SunIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" style={{ display: "block" }}>
     <circle cx="12" cy="12" r="4.5" fill="#FFD700" />

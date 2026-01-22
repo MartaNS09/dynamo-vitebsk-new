@@ -134,50 +134,47 @@ export const MobileTabBar = () => {
                 </defs>
               </svg>
             )}
-            {item.icon === "subscriptions" && (
+            {item.icon === "blog" && (
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <rect
-                  x="2"
-                  y="7"
-                  width="20"
-                  height="14"
-                  rx="2"
-                  ry="2"
-                  stroke="url(#subscriptions-gradient)"
+                <path
+                  d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19Z"
+                  stroke="url(#blog-gradient)"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 <path
-                  d="M16 21V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V21"
-                  stroke="url(#subscriptions-gradient)"
+                  d="M7 7H17V9H7V7Z"
+                  stroke="url(#blog-gradient)"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <circle
-                  cx="12"
-                  cy="11"
-                  r="1"
-                  fill="url(#subscriptions-gradient)"
+                <path
+                  d="M7 11H17V13H7V11Z"
+                  stroke="url(#blog-gradient)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
-                <circle
-                  cx="12"
-                  cy="15"
-                  r="1"
-                  fill="url(#subscriptions-gradient)"
+                <path
+                  d="M7 15H14V17H7V15Z"
+                  stroke="url(#blog-gradient)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
                 <defs>
                   <linearGradient
-                    id="subscriptions-gradient"
-                    x1="2"
+                    id="blog-gradient"
+                    x1="3"
                     y1="3"
-                    x2="22"
+                    x2="21"
                     y2="21"
                     gradientUnits="userSpaceOnUse"
                   >
-                    <stop stopColor="#FFD166" />
-                    <stop offset="1" stopColor="#FFB347" />
+                    <stop stopColor="#06D6A0" />
+                    <stop offset="1" stopColor="#04A777" />
                   </linearGradient>
                 </defs>
               </svg>
