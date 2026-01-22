@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Award } from "lucide-react";
-// import Image from "next/image";
+import Image from "next/image";
 import styles from "./Legends.module.scss";
 
 const LEGENDS = [
@@ -13,7 +13,7 @@ const LEGENDS = [
     sport: "Бокс",
     year: "1988",
     achievement: "Золото Олимпийских игр в Сеуле",
-    image: "/images/legends/yanovsky.jpg", // Пример пути
+    image: "/images/legends/yanovsky.jpg",
     alt: "Вячеслав Яновский, олимпийский чемпион по боксу 1988 года",
   },
   {
@@ -244,21 +244,21 @@ export const LegendsSlider = () => {
                   <div className={styles.legends__cardContent}>
                     {/* Аватар/Фото */}
                     <div className={styles.legends__avatar}>
-                      {/* Плейсхолдер пока нет фото */}
-                      <span aria-hidden="true">{legend.name.charAt(0)}</span>
-
-                      {/* Когда будут реальные фото: */}
-                      {/* <Image
-                        src={legend.image}
-                        alt={legend.alt}
-                        width={80}
-                        height={80}
-                        className={styles.legends__photo}
-                      /> */}
+                      <div className={styles.legends__imageContainer}>
+                        <Image
+                          src={legend.image}
+                          alt={legend.alt}
+                          width={250}
+                          height={333}
+                          className={styles.legends__photo}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                          priority={legend.id <= 4}
+                        />
+                      </div>
                     </div>
 
                     <h3 className={styles.legends__name}>{legend.name}</h3>
-                    <div className={styles.legends__title}>
+                    <div className={styles.legends__titleText}>
                       <Award size={18} aria-hidden="true" />
                       {legend.title}
                     </div>
