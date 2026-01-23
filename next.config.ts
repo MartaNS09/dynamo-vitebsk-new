@@ -11,6 +11,8 @@ const nextConfig = {
     deviceSizes: [320, 420, 640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    // ДОБАВЛЯЕМ ВСЕ ИСПОЛЬЗУЕМЫЕ КАЧЕСТВА
+    qualities: [75, 80, 85, 90, 95],
     remotePatterns: [
       {
         protocol: "https",
@@ -23,7 +25,7 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  compress: true, // Оставляем сжатие
+  compress: true,
 
   experimental: {
     optimizeCss: true,

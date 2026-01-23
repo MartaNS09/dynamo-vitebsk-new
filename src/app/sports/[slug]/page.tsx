@@ -37,6 +37,14 @@ export async function generateMetadata({
       title: `${section.name} | Динамо Витебск`,
       description: section.shortDescription,
       url: `https://dynamovitebsk.by/sports/${section.slug}`,
+      images: [
+        {
+          url: section.coverImage,
+          width: 1200,
+          height: 630,
+          alt: section.name,
+        },
+      ],
     },
   };
 }
@@ -54,10 +62,12 @@ async function getSectionData(slug: string): Promise<SectionWithData | null> {
 
   if (!section) return null;
 
-  const heroImages = section.heroImages || [
-    section.coverImage,
-    section.coverImage,
-  ];
+  // Используем существующие heroImages, если они есть
+  const heroImages = section.heroImages || [section.coverImage];
+
+  // Галерея - используем только существующие изображения
+  const gallery =
+    section.gallery.length > 0 ? section.gallery : [section.coverImage];
 
   return {
     ...section,
@@ -88,14 +98,7 @@ async function getSectionData(slug: string): Promise<SectionWithData | null> {
               description: "Опыт работы 5+ лет",
             } as Trainer,
           ],
-    gallery:
-      section.gallery.length > 0
-        ? section.gallery
-        : [
-            section.coverImage,
-            "/images/sections/default-1.jpg",
-            "/images/sections/default-2.jpg",
-          ],
+    gallery,
     schedule: section.schedule || "Понедельник, среда, пятница 16:00-18:00",
     location: section.location || "г. Витебск, ул. Терешковой 16/2",
   };

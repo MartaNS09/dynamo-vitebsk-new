@@ -19,6 +19,33 @@ interface DetailPageContentProps {
 }
 
 export default function DetailPageContent({ section }: DetailPageContentProps) {
+  // Функция для безопасного получения изображений галереи
+  const getGalleryImages = () => {
+    // Если есть галерея - используем её
+    if (section.gallery && section.gallery.length > 0) {
+      return section.gallery;
+    }
+
+    // Если нет галереи - создаем из доступных изображений
+    const images: string[] = [];
+
+    // Добавляем обложку
+    if (section.coverImage) {
+      images.push(section.coverImage);
+    }
+
+    // Добавляем hero изображения (уникальные)
+    if (section.heroImages && section.heroImages.length > 0) {
+      section.heroImages.forEach((img) => {
+        if (img && !images.includes(img)) {
+          images.push(img);
+        }
+      });
+    }
+
+    return images;
+  };
+
   // Мок данные для примера (потом заменить на реальные из API)
   const mockData = {
     abonements:
@@ -47,14 +74,8 @@ export default function DetailPageContent({ section }: DetailPageContentProps) {
               description: "Опыт работы 5+ лет",
             },
           ],
-    gallery:
-      section.gallery.length > 0
-        ? section.gallery
-        : [
-            section.coverImage,
-            "/images/sections/default-1.jpg",
-            "/images/sections/default-2.jpg",
-          ],
+    // ИСПРАВЛЕНО: используем безопасную функцию
+    gallery: getGalleryImages(),
     schedule: section.schedule || "Понедельник, среда, пятница 16:00-18:00",
     location: section.location || "г. Витебск, ул. Спортивная, 15, зал №3",
   };
@@ -163,23 +184,26 @@ export default function DetailPageContent({ section }: DetailPageContentProps) {
               </div>
             </section>
 
-            {/* Галерея */}
-            <section className={styles.gallerySection}>
-              <h2 className={styles.sectionTitle}>Фотогалерея</h2>
-              <div className={styles.galleryGrid}>
-                {mockData.gallery.map((image, index) => (
-                  <div key={index} className={styles.galleryItem}>
-                    <Image
-                      src={image}
-                      alt={`${section.name} - фото ${index + 1}`}
-                      width={300}
-                      height={200}
-                      className={styles.galleryImage}
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
+            {/* Галерея - только если есть изображения */}
+            {mockData.gallery.length > 0 && (
+              <section className={styles.gallerySection}>
+                <h2 className={styles.sectionTitle}>Фотогалерея</h2>
+                <div className={styles.galleryGrid}>
+                  {mockData.gallery.map((image, index) => (
+                    <div key={index} className={styles.galleryItem}>
+                      <Image
+                        src={image}
+                        alt={`${section.name} - фото ${index + 1}`}
+                        width={300}
+                        height={200}
+                        className={styles.galleryImage}
+                        loading={index > 1 ? "lazy" : "eager"} // Ленивая загрузка после первых 2 изображений
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Сайдбар */}
@@ -199,7 +223,9 @@ export default function DetailPageContent({ section }: DetailPageContentProps) {
                 </div>
                 <div className={styles.infoRow}>
                   <Users style={{ width: 18, height: 18 }} />
-                  <span>{mockData.trainers[0].name.split(" ")[0]}</span>
+                  <span>
+                    {mockData.trainers[0]?.name?.split(" ")[0] || "Тренер"}
+                  </span>
                 </div>
               </div>
 

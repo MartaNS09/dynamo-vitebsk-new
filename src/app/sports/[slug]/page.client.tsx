@@ -52,6 +52,18 @@ function getAvatarColor(name: string): string {
 export default function SportSectionPageClient({
   section,
 }: SportSectionPageClientProps) {
+  // Безопасно получаем hero изображения
+  const getHeroImages = () => {
+    if (section.heroImages && section.heroImages.length > 0) {
+      return section.heroImages;
+    }
+    // Если нет heroImages, используем coverImage
+    return section.coverImage ? [section.coverImage] : [];
+  };
+
+  const heroImages = getHeroImages();
+  const hasHeroImages = heroImages.length > 0;
+
   return (
     <main className={styles.container}>
       {/* Навигация */}
@@ -127,53 +139,64 @@ export default function SportSectionPageClient({
               </div>
             </div>
 
-            {/* Фото в Hero - ИСПОЛЬЗУЕМ СТАНДАРТНЫЙ NEXT/IMAGE */}
-            <div className={styles.heroImages}>
-              <div className={styles.imageFramePrimary}>
-                <div className={styles.imageWrapper}>
-                  <Image
-                    src={section.heroImages[0]}
-                    alt={`${section.name} - основное фото`}
-                    width={400}
-                    height={470}
-                    className={styles.image}
-                    priority // ✅ ПЕРВОЕ ИЗОБРАЖЕНИЕ С ПРИОРИТЕТОМ
-                    quality={85}
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                  <div className={styles.frameBorder}></div>
-                  <div className={styles.frameCorner}></div>
-                  <div className={styles.frameGlow}></div>
+            {/* Фото в Hero - ТЕПЕРЬ С БЕЗОПАСНОЙ ПРОВЕРКОЙ */}
+            {hasHeroImages && (
+              <div className={styles.heroImages}>
+                {/* Первое фото */}
+                <div className={styles.imageFramePrimary}>
+                  <div className={styles.imageWrapper}>
+                    <Image
+                      src={heroImages[0]}
+                      alt={`${section.name} - основное фото`}
+                      width={400}
+                      height={470}
+                      className={styles.image}
+                      priority
+                      quality={85}
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                    <div className={styles.frameBorder}></div>
+                    <div className={styles.frameCorner}></div>
+                    <div className={styles.frameGlow}></div>
+                  </div>
+                  <div
+                    className={styles.imageBadge}
+                    aria-label="Лучшие тренеры"
+                  >
+                    <span className={styles.badgeIcon} aria-hidden="true">
+                      🏆
+                    </span>
+                    <span className={styles.badgeText}>Лучшие тренеры</span>
+                  </div>
                 </div>
-                <div className={styles.imageBadge} aria-label="Лучшие тренеры">
-                  <span className={styles.badgeIcon} aria-hidden="true">
-                    🏆
-                  </span>
-                  <span className={styles.badgeText}>Лучшие тренеры</span>
-                </div>
-              </div>
 
-              <div className={styles.imageFrameSecondary}>
-                <div className={styles.imageWrapper}>
-                  <Image
-                    src={section.heroImages[1] || section.heroImages[0]}
-                    alt={`${section.name} - дополнительное фото`}
-                    width={350}
-                    height={410}
-                    className={styles.image}
-                    quality={80} // ✅ СНИЖАЕМ КАЧЕСТВО ДЛЯ НЕПРИОРИТЕТНЫХ
-                    loading="lazy" // ✅ ЛЕНИВАЯ ЗАГРУЗКА
-                    sizes="(max-width: 768px) 100vw, 40vw"
-                  />
-                  <div className={styles.frameBorder}></div>
-                  <div className={styles.frameCorner}></div>
-                  <div className={styles.frameGlow}></div>
-                </div>
-                <div className={styles.imageCaption}>
-                  <span className={styles.captionText}>СДЮШОР «Динамо»</span>
-                </div>
+                {/* Второе фото (если есть) */}
+                {heroImages.length > 1 && (
+                  <div className={styles.imageFrameSecondary}>
+                    <div className={styles.imageWrapper}>
+                      <Image
+                        src={heroImages[1]}
+                        alt={`${section.name} - дополнительное фото`}
+                        width={350}
+                        height={410}
+                        className={styles.image}
+                        quality={80}
+                        loading="lazy"
+                        sizes="(max-width: 768px) 100vw, 40vw"
+                      />
+                      <div className={styles.frameBorder}></div>
+                      <div className={styles.frameCorner}></div>
+                      <div className={styles.frameGlow}></div>
+                    </div>
+                    <div className={styles.imageCaption}>
+                      <span className={styles.captionText}>
+                        СДЮШОР «Динамо»
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -270,7 +293,7 @@ export default function SportSectionPageClient({
                             width={80}
                             height={80}
                             className={styles.photo}
-                            quality={75} // ✅ Оптимальное качество для миниатюр
+                            quality={75}
                             loading="lazy"
                           />
                         ) : (
@@ -376,35 +399,37 @@ export default function SportSectionPageClient({
               </div>
             </section>
 
-            {/* Галерея */}
-            <section
-              className={styles.gallerySection}
-              aria-labelledby="gallery-title"
-            >
-              <h2 id="gallery-title" className={styles.sectionTitle}>
-                Фотогалерея
-              </h2>
-              <div className={styles.galleryGrid}>
-                {section.gallery.map((image, index) => (
-                  <div key={index} className={styles.galleryItem}>
-                    <Image
-                      src={image}
-                      alt={`${section.name} - фото ${index + 1}`}
-                      width={300}
-                      height={200}
-                      className={styles.galleryImage}
-                      loading="lazy"
-                      quality={75} // ✅ Оптимальное качество для галереи
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className={styles.scrollHintMobile}>
-                <ChevronRight style={{ width: 16, height: 16 }} />
-                Прокрутите в сторону
-              </div>
-            </section>
+            {/* Галерея - только если есть изображения */}
+            {section.gallery && section.gallery.length > 0 && (
+              <section
+                className={styles.gallerySection}
+                aria-labelledby="gallery-title"
+              >
+                <h2 id="gallery-title" className={styles.sectionTitle}>
+                  Фотогалерея
+                </h2>
+                <div className={styles.galleryGrid}>
+                  {section.gallery.map((image, index) => (
+                    <div key={index} className={styles.galleryItem}>
+                      <Image
+                        src={image}
+                        alt={`${section.name} - фото ${index + 1}`}
+                        width={300}
+                        height={200}
+                        className={styles.galleryImage}
+                        loading="lazy"
+                        quality={75}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className={styles.scrollHintMobile}>
+                  <ChevronRight style={{ width: 16, height: 16 }} />
+                  Прокрутите в сторону
+                </div>
+              </section>
+            )}
           </div>
         </div>
       </div>
