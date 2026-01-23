@@ -399,9 +399,8 @@ export const ALL_SECTIONS: SportSection[] = [
       },
     ],
     coverImage: "/images/sections/judo-1.jpg",
-    // heroImages: [],
 
-    gallery: [],
+    gallery: ["/images/sections/judo-1.jpg", "/images/sections/judo-2.jpg"],
     isActive: true,
     schedule: "Пн/Ср/Пт 16:00-18:00",
     location: "ул. Замковая, 4",
