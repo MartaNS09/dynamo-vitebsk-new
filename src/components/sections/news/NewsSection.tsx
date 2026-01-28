@@ -1,170 +1,165 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { sortedBlogPosts } from "@/data/blog-posts";
 import styles from "./NewsSection.module.scss";
 
 export function NewsSection() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const slidesToShow = 3;
-  const recentNews = sortedBlogPosts.slice(0, 6);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const autoSlideRef = useRef<NodeJS.Timeout | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
+  // Только 3 новости для производительности
+  const news = sortedBlogPosts.slice(0, 3);
+
+  // Мемоизированные обработчики
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % news.length);
+  }, [news.length]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + news.length) % news.length);
+  }, [news.length]);
+
+  // Автослайдинг с правильным cleanup
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    if (isPaused) return;
+
+    const startAutoSlide = () => {
+      if (autoSlideRef.current) {
+        clearInterval(autoSlideRef.current);
+      }
+      autoSlideRef.current = setInterval(nextSlide, 5000);
     };
 
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    startAutoSlide();
+
+    return () => {
+      if (autoSlideRef.current) {
+        clearInterval(autoSlideRef.current);
+      }
+    };
+  }, [nextSlide, isPaused]); // ✅ Исправлено: добавлены зависимости
+
+  // Остановка автослайда при наведении
+  const handleMouseEnter = useCallback(() => {
+    setIsPaused(true);
+    if (autoSlideRef.current) {
+      clearInterval(autoSlideRef.current);
+    }
   }, []);
 
-  const visibleSlides = isMobile
-    ? [recentNews[currentSlide]]
-    : recentNews.slice(currentSlide, currentSlide + slidesToShow);
+  const handleMouseLeave = useCallback(() => {
+    setIsPaused(false);
+  }, []);
 
-  const nextSlide = () => {
-    if (isMobile) {
-      setCurrentSlide((prev) => (prev >= recentNews.length - 1 ? 0 : prev + 1));
-    } else {
-      setCurrentSlide((prev) =>
-        prev >= recentNews.length - slidesToShow ? 0 : prev + 1,
-      );
-    }
-  };
-
-  const prevSlide = () => {
-    if (isMobile) {
-      setCurrentSlide((prev) =>
-        prev === 0 ? recentNews.length - 1 : prev - 1,
-      );
-    } else {
-      setCurrentSlide((prev) =>
-        prev === 0 ? recentNews.length - slidesToShow : prev - 1,
-      );
-    }
-  };
+  // Форматирование даты
+  const formatDate = useCallback((dateString: string) => {
+    return new Date(dateString).toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }, []);
 
   return (
     <section
-      className={`${styles.newsSection} section-padding`}
-      aria-labelledby="news-title"
+      className={styles.newsSection}
+      ref={containerRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="container">
-        <div className={styles.sectionHeader}>
-          <div className={styles.titleWrapper}>
-            <h2 id="news-title" className={styles.sectionTitle}>
-              Наш блог и новости
-            </h2>
-            <div className={styles.titleLine}></div>
-          </div>
-          <Link href="/blog" className={styles.viewAllLink}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Последние новости</h2>
+          <Link href="/blog" className={styles.allLink}>
             Все новости →
           </Link>
         </div>
 
-        {/* Слайдер */}
-        <div className={styles.sliderContainer}>
-          {/* Кнопка назад */}
+        <div className={styles.newsGrid}>
+          {news.map(
+            (
+              item, // ✅ Исправлено: убрали неиспользуемый index
+            ) => (
+              <article key={item.id} className={styles.newsCard}>
+                <div className={styles.imageContainer}>
+                  <Link href={`/blog/${item.slug}`}>
+                    <Image
+                      src={item.featuredImage.url}
+                      alt={item.featuredImage.alt}
+                      width={400}
+                      height={250}
+                      className={styles.image}
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 400px"
+                      quality={85} // ✅ Оптимизация качества
+                    />
+                  </Link>
+                  <span
+                    className={styles.category}
+                    style={{ backgroundColor: item.category.color }}
+                  >
+                    {item.category.name}
+                  </span>
+                </div>
+
+                <div className={styles.content}>
+                  <h3 className={styles.newsTitle}>
+                    <Link href={`/blog/${item.slug}`}>{item.title}</Link>
+                  </h3>
+                  <p className={styles.excerpt}>{item.excerpt}</p>
+                  <div className={styles.footer}>
+                    <time className={styles.date}>
+                      {formatDate(item.publishedAt)}
+                    </time>
+                    <Link
+                      href={`/blog/${item.slug}`}
+                      className={styles.moreLink}
+                    >
+                      Подробнее
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ),
+          )}
+        </div>
+
+        {/* Простые кнопки навигации */}
+        <div className={styles.navigation}>
           <button
             onClick={prevSlide}
-            className={styles.sliderButton}
-            aria-label="Предыдущие новости"
+            className={styles.navButton}
+            aria-label="Предыдущая новость"
             type="button"
           >
             <ChevronLeft size={20} />
           </button>
-
-          {/* Слайды */}
-          <div className={styles.sliderTrack}>
-            {visibleSlides.map((news) => {
-              // Определяем тип изображения по его размерам
-              const isVertical =
-                news.featuredImage.height > news.featuredImage.width;
-
-              return (
-                <article key={news.id} className={styles.slide}>
-                  <div
-                    className={`${styles.slideImage} ${isVertical ? styles.verticalImage : styles.horizontalImage}`}
-                  >
-                    <Link href={`/blog/${news.slug}`} aria-label={news.title}>
-                      <Image
-                        src={news.featuredImage.url}
-                        alt={news.featuredImage.alt}
-                        width={news.featuredImage.width}
-                        height={news.featuredImage.height}
-                        className={styles.image}
-                        priority={currentSlide === 0}
-                      />
-                    </Link>
-                  </div>
-                  <div className={styles.slideContent}>
-                    <div
-                      className={styles.slideCategory}
-                      style={{ color: news.category.color }}
-                    >
-                      {news.category.name}
-                    </div>
-                    <h3 className={styles.slideTitle}>
-                      <Link href={`/blog/${news.slug}`}>{news.title}</Link>
-                    </h3>
-                    <p className={styles.slideExcerpt}>{news.excerpt}</p>
-                    <div className={styles.slideFooter}>
-                      <time
-                        dateTime={news.publishedAt}
-                        className={styles.slideDate}
-                      >
-                        {new Date(news.publishedAt).toLocaleDateString(
-                          "ru-RU",
-                          {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          },
-                        )}
-                      </time>
-                      <Link
-                        href={`/blog/${news.slug}`}
-                        className={styles.readMoreLink}
-                      >
-                        Подробнее
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+          <div className={styles.dots}>
+            {news.map((_, i) => (
+              <button
+                key={i}
+                className={`${styles.dot} ${i === currentIndex ? styles.active : ""}`}
+                onClick={() => setCurrentIndex(i)}
+                aria-label={`Перейти к новости ${i + 1}`}
+                type="button"
+              />
+            ))}
           </div>
-
-          {/* Кнопка вперед */}
           <button
             onClick={nextSlide}
-            className={styles.sliderButton}
-            aria-label="Следующие новости"
+            className={styles.navButton}
+            aria-label="Следующая новость"
             type="button"
           >
             <ChevronRight size={20} />
           </button>
         </div>
-
-        {/* Индикаторы */}
-        {isMobile && (
-          <div className={styles.sliderIndicators} aria-hidden="true">
-            {recentNews.map((_, index) => (
-              <button
-                key={index}
-                className={`${styles.indicator} ${currentSlide === index ? styles.active : ""}`}
-                onClick={() => setCurrentSlide(index)}
-                aria-label={`Перейти к новости ${index + 1}`}
-                type="button"
-              />
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );
