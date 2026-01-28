@@ -1,6 +1,7 @@
 import { Hero } from "@/components/sections/hero/Hero";
 import { Features } from "@/components/sections/features/Features";
 import { HistorySection } from "@/components/sections/history/HistorySection";
+import { NewsSection } from "@/components/sections/news/NewsSection";
 import { LegendsSlider } from "@/components/sections/legends/LegendsSlider";
 import { ContactCTA } from "@/components/sections/cta/ContactCTA";
 
@@ -10,6 +11,7 @@ export default function Home() {
       <Hero />
       <Features />
       <HistorySection />
+      <NewsSection />
       <LegendsSlider />
       <ContactCTA />
     </main>

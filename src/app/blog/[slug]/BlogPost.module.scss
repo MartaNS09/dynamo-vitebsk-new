@@ -1,0 +1,487 @@
+.blogPostPage {
+  padding: 1.5rem 0 2.5rem;
+  background: var(--bg-primary);
+
+  @media (max-width: 768px) {
+    padding: 1rem 0 2rem;
+  }
+}
+
+// ===== КОНТЕЙНЕР =====
+.blogPostContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+
+  @media (max-width: 768px) {
+    padding: 0 1rem;
+  }
+}
+
+// ===== ХЛЕБНЫЕ КРОШКИ - СКРЫТЬ НА МОБИЛКЕ =====
+.breadcrumbs {
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+
+  .breadcrumbsList {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: var(--text-muted);
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &:not(:last-child)::after {
+        content: "/";
+        opacity: 0.5;
+        font-size: 0.75rem;
+      }
+
+      a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: var(--dynamo-blue);
+          background: var(--bg-secondary);
+        }
+      }
+
+      &:last-child {
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+    }
+  }
+}
+
+// ===== ЗАГОЛОВОК =====
+.postHeader {
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.6s ease-out;
+
+  .postCategory {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+    color: white;
+    animation: fadeInUp 0.5s ease-out;
+    background: var(--gradient-primary);
+  }
+
+  .postTitle {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+  }
+
+  .postMeta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+
+    .metaItem {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      svg {
+        width: 16px;
+        height: 16px;
+        opacity: 0.7;
+      }
+    }
+  }
+}
+
+// ===== ИЗОБРАЖЕНИЕ - АДАПТИВНОЕ С ФИКСОМ ДЛЯ ВЕРТИКАЛЬНЫХ =====
+.featuredImage {
+  margin: 0 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+  position: relative;
+
+  @media (max-width: 768px) {
+    margin: 0 0 1.25rem;
+  }
+
+  .imageWrapper {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+    position: relative;
+
+    @media (max-width: 768px) {
+      aspect-ratio: 4/3;
+    }
+
+    // Класс для вертикальных изображений
+    &.verticalImageWrapper {
+      aspect-ratio: auto !important;
+      min-height: 400px;
+      max-height: 600px;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      @media (max-width: 768px) {
+        min-height: 350px;
+        max-height: 500px;
+      }
+    }
+  }
+
+  .image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+
+    // Класс для вертикальных изображений
+    &.verticalImage {
+      width: auto !important;
+      height: auto !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      object-fit: contain !important;
+      position: relative !important;
+    }
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+}
+
+// ===== ФОТОГАЛЕРЕЯ =====
+.photoGallery {
+  margin: 2rem 0;
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+
+  @media (max-width: 768px) {
+    margin: 1.75rem 0;
+  }
+
+  .galleryTitle {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .galleryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 0.75rem;
+      padding: 0.25rem 0.5rem 1rem;
+      margin: 0 -0.5rem;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      &::after {
+        content: "";
+        flex: 0 0 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      gap: 0.625rem;
+    }
+
+    .galleryItem {
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg-secondary);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      @media (max-width: 768px) {
+        width: 280px;
+      }
+
+      @media (max-width: 480px) {
+        width: 240px;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+
+        .galleryImage {
+          transform: scale(1.05);
+        }
+      }
+
+      .galleryImage {
+        position: relative !important;
+        width: auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 300px !important;
+        object-fit: contain !important;
+        transition: transform 0.3s ease;
+      }
+    }
+  }
+}
+
+// ===== КОНТЕНТ =====
+.postContent {
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.6s ease-out 0.5s both;
+  font-family: "Plus Jakarta Sans", sans-serif;
+
+  > * {
+    margin-bottom: 1.25rem;
+  }
+
+  h2,
+  h3,
+  h4 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    margin-top: 1.75rem;
+    margin-bottom: 0.875rem;
+    color: var(--text-primary);
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-light);
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 60px;
+      height: 2px;
+      background: var(--gradient-primary);
+    }
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin-bottom: 1.25rem;
+  }
+
+  img {
+    border-radius: 10px;
+    margin: 1.25rem 0;
+    max-width: 100%;
+    height: auto;
+  }
+
+  ul,
+  ol {
+    margin: 1.25rem 0;
+    padding-left: 1.75rem;
+
+    li {
+      margin-bottom: 0.625rem;
+      position: relative;
+
+      &::marker {
+        color: var(--dynamo-blue);
+      }
+    }
+  }
+
+  blockquote {
+    border-left: 4px solid;
+    border-image: var(--gradient-primary) 1;
+    padding-left: 1.25rem;
+    margin: 1.75rem 0;
+    font-style: italic;
+    color: var(--text-secondary);
+    background: linear-gradient(
+      90deg,
+      rgba(var(--dynamo-blue-rgb), 0.05) 0%,
+      transparent 100%
+    );
+    padding: 1.25rem;
+    border-radius: 0 10px 10px 0;
+    animation: slideInLeft 0.5s ease-out;
+    position: relative;
+
+    &::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      font-size: 3.5rem;
+      color: rgba(var(--dynamo-blue-rgb), 0.1);
+      font-family: serif;
+    }
+
+    cite {
+      display: block;
+      margin-top: 0.75rem;
+      font-style: normal;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: right;
+    }
+  }
+}
+
+// ===== КНОПКА ВОЗВРАТА =====
+.backLinkContainer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-light);
+  animation: fadeInUp 0.6s ease-out 0.6s both;
+
+  .backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--dynamo-blue);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9375rem;
+    padding: 0.625rem 1.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: var(--bg-card);
+
+    &:hover {
+      color: white;
+      background: var(--gradient-primary);
+      border-color: transparent;
+      gap: 0.75rem;
+      transform: translateX(-4px);
+      box-shadow: 0 4px 12px rgba(var(--dynamo-blue-rgb), 0.2);
+    }
+  }
+}
+
+// ===== АНИМАЦИИ =====
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// ===== СТИЛИ ДЛЯ ТЕМНОЙ ТЕМЫ =====
+[data-theme="dark"] {
+  .postContent {
+    blockquote {
+      background: linear-gradient(
+        90deg,
+        rgba(var(--dynamo-blue-rgb), 0.1) 0%,
+        transparent 100%
+      );
+    }
+  }
+
+  .backLinkContainer {
+    border-top-color: var(--border-color);
+  }
+}
+
+// ===== АДАПТИВНОСТЬ =====
+@media (max-width: 768px) {
+  .blogPostPage {
+    font-size: 1rem;
+  }
+
+  .postHeader {
+    .postTitle {
+      font-size: clamp(1.5rem, 5vw, 1.875rem);
+    }
+
+    .postMeta {
+      font-size: 0.8125rem;
+      gap: 1rem;
+    }
+  }
+
+  .postContent {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+    }
+  }
+}
