@@ -8,29 +8,98 @@
   }
 }
 
-/* ===== КАТЕГОРИИ С ГОРИЗОНТАЛЬНЫМ СКРОЛЛОМ ===== */
-.categoryFilters {
-  margin: 3rem auto 2rem;
-  max-width: 1200px;
-  padding: 0 1rem;
-  animation: fadeInUp 0.5s ease-out;
+/* ===== СТИЛИ ДЛЯ ЗАГРУЗКИ ===== */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
 
-  @media (max-width: 768px) {
-    margin: 2rem auto 1.5rem;
-    padding: 0;
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--border-light);
+    border-top: 3px solid var(--dynamo-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.125rem;
+    margin: 0;
   }
 }
 
-.categoriesList {
-  display: flex;
-  gap: 0.75rem;
-  margin: 0;
-  list-style: none;
-  padding: 0;
-  justify-content: center;
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
-  @media (min-width: 769px) {
-    flex-wrap: wrap;
+/* ===== СЕКЦИЯ ФИЛЬТРОВ ===== */
+.filtersSection {
+  padding: 1.5rem 0;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 1rem;
+  position: sticky;
+  top: 80px;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+
+  @media (max-width: 768px) {
+    top: 60px;
+    padding: 0.75rem 0;
+    margin-bottom: 0.75rem;
+    position: static;
+    backdrop-filter: none;
+  }
+}
+
+.filtersContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+
+  @media (max-width: 768px) {
+    padding: 0 1rem;
+  }
+}
+
+.filtersTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+  text-align: center;
+
+  @media (min-width: 768px) {
+    text-align: left;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+
+  @media (min-width: 768px) {
+    justify-content: flex-start;
   }
 
   @media (max-width: 768px) {
@@ -38,112 +107,91 @@
     justify-content: flex-start;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 0.75rem 1rem;
-    margin: 0 -1rem;
+    padding: 0.5rem 0.5rem 0.75rem;
+    margin: 0 -0.5rem;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    -ms-overflow-style: none;
     scroll-behavior: smooth;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+
+    &::after {
+      content: "";
+      flex: 0 0 0.5rem;
+    }
 
     &::-webkit-scrollbar {
       display: none;
       height: 0;
       width: 0;
     }
+  }
+}
 
-    &::after {
-      content: "";
-      flex: 0 0 1rem;
-    }
+.filterButton {
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+  font-family: inherit;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 
-    // Индикация скролла через тень
-    box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.05) inset,
-      0 -2px 4px rgba(0, 0, 0, 0.05) inset;
+  &:hover {
+    border-color: var(--dynamo-blue);
+    color: var(--dynamo-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 85, 183, 0.1);
   }
 
-  .categoryButton {
-    padding: 0.75rem 1.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 1rem;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    position: relative;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--dynamo-blue);
+    outline-offset: 2px;
+  }
 
-    &:focus-visible {
-      outline: 3px solid var(--dynamo-blue);
-      outline-offset: 2px;
-    }
+  &.filterButtonActive {
+    background: var(--dynamo-blue);
+    color: white;
+    border-color: var(--dynamo-blue);
+    box-shadow: 0 4px 12px rgba(0, 85, 183, 0.2);
 
     &:hover {
-      border-color: var(--dynamo-blue);
-      color: var(--dynamo-blue);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    &.active {
-      background: var(--gradient-primary);
+      background: var(--dynamo-blue-light);
       color: white;
-      border-color: transparent;
-      font-weight: 600;
-      box-shadow:
-        0 4px 12px rgba(var(--dynamo-blue-rgb), 0.2),
-        0 2px 4px rgba(0, 0, 0, 0.1);
-
-      &:focus-visible {
-        outline-color: white;
-      }
+      transform: translateY(-1px);
     }
+  }
 
-    @media (max-width: 768px) {
-      padding: 0.625rem 1.125rem;
-      font-size: 0.9375rem;
-      flex-shrink: 0;
-      scroll-snap-align: start;
+  @media (max-width: 768px) {
+    padding: 0.625rem 1.125rem;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    min-width: auto;
 
-      &:active {
-        transform: scale(0.98);
-        transition: transform 0.1s ease;
-      }
+    &:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
     }
+  }
+
+  @media (max-width: 380px) {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
   }
 }
 
-/* Анимация для категорий */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Для темной темы */
-[data-theme="dark"] {
-  .categoriesList {
-    @media (max-width: 768px) {
-      box-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.2) inset,
-        0 -2px 4px rgba(0, 0, 0, 0.2) inset;
-    }
-  }
-}
-
-/* ===== ИНФО ФИЛЬТРА ===== */
+/* ===== ИНФО ФИЛЬТРА - ОПТИМАЛЬНЫЕ ОТСТУПЫ ===== */
 .filterInfo {
-  margin: 0 auto 2rem;
+  margin: 0.75rem auto 1.5rem;
   max-width: 1200px;
   padding: 0 1rem;
   font-size: 0.875rem;
@@ -156,12 +204,13 @@
     transparent 50%,
     rgba(var(--dynamo-blue-rgb), 0.03) 100%
   );
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
+  padding: 0.625rem 1rem;
+  border-radius: 6px;
   border: 1px solid var(--border-light);
 
   p {
     margin: 0;
+    line-height: 1.4;
   }
 
   strong {
@@ -170,8 +219,15 @@
   }
 
   @media (max-width: 768px) {
-    margin-bottom: 1.5rem;
+    margin: 0.5rem auto 1.25rem;
     text-align: center;
+    font-size: 0.8125rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+  }
+
+  @media (min-width: 769px) {
+    margin: 1rem auto 1.5rem;
   }
 }
 
@@ -188,6 +244,7 @@
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 1rem;
+    margin-top: 0.5rem;
   }
 }
 
@@ -382,6 +439,9 @@
     font-size: 0.9375rem;
     text-decoration: none;
     transition: all 0.3s ease;
+    cursor: pointer;
+    font-family: inherit;
+    outline: none;
 
     &:hover:not(.active) {
       border-color: var(--dynamo-blue);
@@ -412,8 +472,43 @@
   }
 }
 
+/* ===== АНИМАЦИИ ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ===== СТИЛИ ДЛЯ ТЕМНОЙ ТЕМЫ ===== */
 [data-theme="dark"] {
+  .filtersSection {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom-color: var(--border-color);
+    backdrop-filter: blur(10px);
+
+    @media (max-width: 768px) {
+      backdrop-filter: none;
+    }
+  }
+
+  .filterButton {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border-color);
+
+    &:hover {
+      background: rgba(var(--dynamo-blue-rgb), 0.1);
+    }
+
+    &.filterButtonActive {
+      background: var(--dynamo-blue);
+    }
+  }
+
   .blogCard {
     background: var(--bg-card);
     border-color: var(--border-color);
@@ -421,15 +516,6 @@
 
   .categoryTag {
     background: rgba(255, 255, 255, 0.1);
-  }
-
-  .categoryButton {
-    background: var(--bg-card);
-    border-color: var(--border-color);
-
-    &.active {
-      background: var(--gradient-primary);
-    }
   }
 
   .pageButton {
@@ -448,6 +534,12 @@
 
     strong {
       color: var(--dynamo-blue-light);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .filters {
+      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05);
     }
   }
 }

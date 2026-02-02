@@ -15,20 +15,23 @@ export const FooterBottom = () => {
       </div>
 
       <div className="footer__developer">
-        <p className="footer__dev-text">
-          Разработано для спорта{" "}
-          <a
-            href="https://ваша-компания.by"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer__dev-link"
-          >
-            Название Вашей Компании
-          </a>
-        </p>
         <Link href="/privacy" className="footer__policy-link">
           Политика конфиденциальности
         </Link>
+
+        <p className="footer__dev-text">
+          Разработано{" "}
+          <a
+            href="https://www.apsod.com"
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="footer__dev-link"
+            aria-label="Перейти на сайт разработчика APSOD (откроется в новом окне)"
+            title="Студия веб-разработки APSOD"
+          >
+            APSOD
+          </a>
+        </p>
       </div>
     </div>
   );
