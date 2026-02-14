@@ -1,20 +1,11 @@
-'use client';
+import { Metadata } from "next";
+import BlogTable from "@/components/admin/blog/BlogTable";
 
-export default function BlogPage() {
-  return (
-    <div className="content-header">
-      <h1>Блог</h1>
-      <p className="subtitle">Управление статьями блога</p>
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: '16px',
-        padding: '2rem',
-        marginTop: '2rem',
-        textAlign: 'center',
-        color: 'var(--text-muted)'
-      }}>
-        <p>Страница в разработке</p>
-      </div>
-    </div>
-  );
+export const metadata: Metadata = {
+  title: "Управление блогом | Панель управления",
+  description: "Управление статьями и новостями блога",
+};
+
+export default function BlogAdminPage() {
+  return <BlogTable />;
 }
