@@ -28,7 +28,7 @@ export interface SportSection {
 
   // Медиа
   coverImage: string;
-  heroImages?: string[]; // 🔴 ДОБАВЛЕНО: массив для херо с двумя фото
+  heroImages?: string[];
   gallery: string[];
 
   // Списки

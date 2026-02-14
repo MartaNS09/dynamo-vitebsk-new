@@ -1,4 +1,3 @@
-// utils/categories.ts
 export const CATEGORY_SLUGS = {
   Гимнастика: "gymnastics",
   Единоборства: "martial-arts",

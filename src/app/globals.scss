@@ -428,3 +428,49 @@ a {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
+
+// ===== СКРЫТИЕ ХЕДЕРА/ФУТЕРА ДЛЯ АДМИНКИ =====
+// Добавьте этот код в конец globals.scss
+
+// Скрываем хедер и футер когда есть .admin-wrapper
+body:has(.admin-wrapper) {
+  .page-wrapper {
+    display: block;
+  }
+
+  header,
+  footer {
+    display: none !important;
+  }
+
+  .main-content {
+    padding-top: 0 !important;
+  }
+
+  .cookie-consent {
+    display: none !important;
+  }
+}
+
+// Скрываем хедер и футер на странице логина
+body:has(.login-page) {
+  header,
+  footer {
+    display: none !important;
+  }
+
+  .main-content {
+    padding-top: 0 !important;
+  }
+
+  .cookie-consent {
+    display: none !important;
+  }
+}
+
+/* ===== ВАЖНО: НЕ СКРЫВАЕМ АДМИНСКИЙ ХЕДЕР! ===== */
+body:has(.admin-wrapper) header.admin-header {
+  display: flex !important; /* Переопределяем скрытие */
+  visibility: visible !important;
+  opacity: 1 !important;
+}

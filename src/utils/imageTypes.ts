@@ -1,15 +1,14 @@
-// utils/imageTypes.ts
 export type ImageType = "vertical" | "horizontal" | "square";
 
 export function getImageType(width: number, height: number): ImageType {
   const ratio = height / width;
 
   if (ratio > 1.2) {
-    return "vertical"; // Высота значительно больше ширины
+    return "vertical";
   } else if (ratio < 0.8) {
-    return "horizontal"; // Ширина значительно больше высоты
+    return "horizontal";
   } else {
-    return "square"; // Примерно квадратное
+    return "square";
   }
 }
 
