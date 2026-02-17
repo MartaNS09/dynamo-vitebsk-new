@@ -1,0 +1,399 @@
+@media (max-width: 1200px) {
+  .applications-table {
+    .table-header {
+      grid-template-columns: 35px 35px 90px 1.5fr 1fr 90px 90px !important;
+      font-size: 12px !important;
+      padding: 12px 12px !important;
+    }
+    .table-row {
+      grid-template-columns: 35px 35px 90px 1.5fr 1fr 90px 90px !important;
+      padding: 12px 12px !important;
+    }
+  }
+
+  .actions-group .action-btn {
+    width: 32px !important;
+    height: 32px !important;
+
+    svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+  }
+
+  .client-name {
+    font-size: 13px !important;
+  }
+
+  .contact-link {
+    font-size: 11px !important;
+  }
+
+  .sport-name {
+    font-size: 12px !important;
+  }
+
+  .abonement-info {
+    .abonement-name {
+      font-size: 11px !important;
+    }
+    .abonement-price {
+      font-size: 10px !important;
+    }
+  }
+
+  .status-badge {
+    padding: 3px 6px !important;
+    font-size: 11px !important;
+
+    svg {
+      display: none !important;
+    }
+  }
+}
+
+// Для средних планшетов (до 992px)
+@media (max-width: 992px) {
+  .applications-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    .table-header,
+    .table-row {
+      min-width: 900px !important;
+    }
+  }
+
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+
+    .stat-card {
+      padding: 15px !important;
+
+      .stat-icon {
+        width: 45px !important;
+        height: 45px !important;
+
+        svg {
+          width: 20px !important;
+          height: 20px !important;
+        }
+      }
+
+      .stat-value {
+        font-size: 22px !important;
+      }
+
+      .stat-label {
+        font-size: 12px !important;
+      }
+    }
+  }
+
+  .filters-panel {
+    flex-direction: column;
+    gap: 12px !important;
+
+    .search-section {
+      max-width: 100%;
+    }
+
+    .filter-group {
+      width: 100%;
+
+      select {
+        width: 100%;
+      }
+    }
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .expanded-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .quick-actions {
+    .status-select {
+      font-size: 13px !important;
+      padding: 10px !important;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .applications-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    h1 {
+      font-size: 24px !important;
+    }
+
+    .header-actions {
+      width: 100%;
+      display: flex;
+      gap: 10px;
+
+      .btn-primary {
+        flex: 1;
+        justify-content: center;
+        padding: 10px !important;
+        font-size: 13px !important;
+      }
+    }
+  }
+
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .bulk-actions {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px !important;
+
+    .selected-count {
+      font-size: 14px !important;
+    }
+
+    .bulk-buttons {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+
+      .bulk-btn {
+        padding: 8px !important;
+        font-size: 12px !important;
+
+        svg {
+          width: 14px !important;
+          height: 14px !important;
+        }
+      }
+    }
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .detail-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+
+    .header-actions {
+      width: 100%;
+      display: flex;
+      gap: 10px;
+
+      button {
+        flex: 1;
+        justify-content: center;
+        padding: 10px !important;
+        font-size: 13px !important;
+      }
+    }
+  }
+
+  .detail-card {
+    padding: 18px !important;
+
+    h2 {
+      font-size: 16px !important;
+    }
+  }
+
+  .info-item {
+    gap: 10px !important;
+
+    .info-label {
+      font-size: 11px !important;
+    }
+
+    .info-value {
+      font-size: 13px !important;
+    }
+  }
+
+  .detail-row {
+    flex-direction: column;
+    gap: 4px !important;
+
+    .row-label {
+      width: 100% !important;
+      font-size: 11px !important;
+    }
+
+    .row-value {
+      font-size: 13px !important;
+    }
+  }
+
+  .sidebar-card {
+    padding: 16px !important;
+
+    h3 {
+      font-size: 15px !important;
+    }
+  }
+
+  .history-item {
+    .history-status {
+      font-size: 12px !important;
+    }
+
+    .history-date {
+      font-size: 10px !important;
+    }
+  }
+
+  .add-note {
+    textarea {
+      min-height: 60px !important;
+      font-size: 13px !important;
+    }
+  }
+}
+
+// Для телефонов (до 480px)
+@media (max-width: 480px) {
+  .applications-admin {
+    padding: 10px !important;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+
+    svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+  }
+
+  .stats-cards {
+    grid-template-columns: 1fr !important;
+
+    .stat-card {
+      padding: 12px !important;
+    }
+  }
+
+  .bulk-buttons {
+    grid-template-columns: 1fr !important;
+
+    .bulk-btn {
+      width: 100%;
+    }
+  }
+
+  .pagination {
+    gap: 4px !important;
+
+    .pagination-btn {
+      min-width: 32px !important;
+      height: 32px !important;
+      font-size: 12px !important;
+    }
+  }
+
+  .expanded-section {
+    h4 {
+      font-size: 13px !important;
+      margin-bottom: 10px !important;
+    }
+
+    .client-message {
+      font-size: 12px !important;
+      padding: 10px !important;
+    }
+  }
+
+  .quick-actions {
+    .quick-action-btn {
+      font-size: 12px !important;
+      padding: 8px !important;
+    }
+  }
+
+  .back-btn {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .page-header {
+    h1 {
+      font-size: 20px !important;
+    }
+  }
+
+  .form-card {
+    padding: 16px !important;
+
+    h2 {
+      font-size: 16px !important;
+      margin-bottom: 16px !important;
+    }
+  }
+
+  .form-group {
+    label {
+      font-size: 12px !important;
+    }
+
+    input,
+    select,
+    textarea {
+      padding: 10px !important;
+      font-size: 13px !important;
+    }
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 10px !important;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .applications-admin {
+    padding: 8px !important;
+  }
+
+  .table-header {
+    font-size: 10px !important;
+  }
+
+  .client-name {
+    font-size: 11px !important;
+
+    svg {
+      display: none !important;
+    }
+  }
+
+  .contact-link {
+    font-size: 9px !important;
+  }
+
+  .status-badge {
+    font-size: 9px !important;
+    padding: 2px 4px !important;
+  }
+}

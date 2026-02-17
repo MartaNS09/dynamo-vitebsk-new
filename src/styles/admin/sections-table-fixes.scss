@@ -1,0 +1,87 @@
+.sections-table {
+  .col-info {
+    .section-preview {
+      .section-details {
+        .section-name {
+          font-size: 14px !important;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 250px;
+
+          a {
+            font-size: 14px !important;
+          }
+        }
+
+        .section-age {
+          font-size: 11px !important;
+          padding: 4px 10px !important;
+        }
+      }
+
+      .section-image {
+        width: 40px !important;
+        height: 40px !important;
+
+        .no-image {
+          font-size: 18px !important;
+        }
+      }
+    }
+  }
+
+  .col-abonements {
+    .abonements-info {
+      .abonements-count {
+        font-size: 13px !important;
+      }
+      .price-from {
+        font-size: 11px !important;
+      }
+    }
+  }
+
+  .col-category {
+    .category-badge {
+      font-size: 11px !important;
+      padding: 4px 10px !important;
+    }
+  }
+
+  .col-status {
+    .status-badge {
+      font-size: 11px !important;
+      padding: 6px 12px !important;
+    }
+  }
+
+  .col-actions {
+    .action-btn {
+      width: 32px !important;
+      height: 32px !important;
+
+      svg {
+        width: 14px !important;
+        height: 14px !important;
+      }
+    }
+  }
+}
+
+// Уменьшаем отступы между строками
+.table-row {
+  padding: 12px 16px !important;
+}
+
+// Сокращаем названия для мобильных
+@media (max-width: 1200px) {
+  .sections-table {
+    .table-header {
+      grid-template-columns: 40px minmax(200px, 2fr) 0.8fr 0.8fr 0.8fr 80px !important;
+    }
+    .table-row {
+      grid-template-columns: 40px minmax(200px, 2fr) 0.8fr 0.8fr 0.8fr 80px !important;
+    }
+  }
+}

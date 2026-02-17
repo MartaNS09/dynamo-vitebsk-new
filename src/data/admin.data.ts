@@ -5,8 +5,8 @@ export const mockDashboardStats: DashboardStats = {
   totalSections: 11,
   activeSections: 11,
   totalBlogPosts: 3,
-  totalVisitors: 1247, // 👈 ДОБАВЛЕНО
-  pendingApplications: 5, // 👈 ДОБАВЛЕНО
+  totalVisitors: 1247,
+  pendingApplications: 5,
   monthlyStats: [
     { name: "Янв", sections: 3, posts: 2 },
     { name: "Фев", sections: 2, posts: 1 },

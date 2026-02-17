@@ -183,6 +183,10 @@
   padding: 32px;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-light);
+
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
 }
 
 .contacts-card h2 {
@@ -212,6 +216,11 @@
   border-radius: 12px;
   color: var(--dynamo-blue);
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .contact-info {
@@ -234,6 +243,10 @@
 
   &:hover {
     color: var(--dynamo-blue);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
   }
 }
 
@@ -300,7 +313,65 @@
   }
 }
 
-// Темная тема
+/* ===== НОВЫЙ БЛОК ДЛЯ ВЫБРАННОГО АБОНЕМЕНТА ===== */
+.selected-abonement {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 170, 0.1),
+    rgba(0, 85, 183, 0.05)
+  );
+  border: 1px solid var(--dynamo-gold);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  animation: slideIn 0.3s ease;
+
+  .abonement-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--dynamo-gold);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .abonement-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .abonement-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .abonement-price {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dynamo-blue);
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== ТЕМНАЯ ТЕМА ===== */
 [data-theme="dark"] {
   .enrollment-page {
     background: linear-gradient(135deg, #0a0f1c 0%, #1a2332 100%);
@@ -324,5 +395,68 @@
 
   .info-box {
     background: rgba(255, 255, 255, 0.05);
+  }
+
+  .selected-abonement {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 212, 170, 0.2),
+      rgba(0, 85, 183, 0.1)
+    );
+  }
+}
+
+/* ===== МОБИЛЬНЫЕ УЛУЧШЕНИЯ ===== */
+@media (max-width: 768px) {
+  .enrollment-page {
+    padding: 40px 0;
+  }
+
+  .form-section {
+    h1 {
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+  }
+
+  .form-group {
+    input,
+    select,
+    textarea {
+      padding: 12px 14px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .enrollment-page {
+    padding: 30px 0;
+  }
+
+  .breadcrumbs {
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+  }
+
+  .contacts-card {
+    padding: 20px;
+
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
+  }
+
+  .contact-item {
+    gap: 12px;
+  }
+
+  .info-box {
+    padding: 16px;
+    margin-top: 30px;
   }
 }
