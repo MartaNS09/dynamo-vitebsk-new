@@ -8,7 +8,6 @@ import {
   Dumbbell,
   FileText,
   Users,
-  // Settings,
   BarChart3,
   Mail,
   LogOut,

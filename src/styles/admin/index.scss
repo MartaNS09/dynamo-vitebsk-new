@@ -1,6 +1,13 @@
-@import "./applications-mobile.scss";
-@import "./sections-responsive.scss";
+@import "./layout.scss";
+@import "./dashboard.scss";
+@import "./login.scss";
+@import "./blog/blog-admin.scss";
+@import "./sections.scss";
 @import "./applications-table.scss";
 @import "./application-detail.scss";
 @import "./new-application.scss";
 @import "./sections-table-fixes.scss";
+@import "./applications-mobile.scss";
+@import "./sections-responsive.scss";
+@import "./mobile-fixes.scss";
+@import "./edit-forms-responsive.scss";

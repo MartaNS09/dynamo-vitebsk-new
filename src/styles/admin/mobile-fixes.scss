@@ -1,0 +1,252 @@
+// Для планшетов
+@media (max-width: 992px) {
+  // Уменьшаем отступы
+  .admin-content {
+    padding: 1rem !important;
+  }
+
+  // Карточки статистики
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+
+    .stat-card {
+      padding: 16px !important;
+
+      .stat-icon {
+        width: 45px !important;
+        height: 45px !important;
+
+        svg {
+          width: 22px !important;
+          height: 22px !important;
+        }
+      }
+
+      .stat-value {
+        font-size: 22px !important;
+      }
+
+      .stat-label {
+        font-size: 12px !important;
+      }
+    }
+  }
+
+  // Фильтры
+  .filters-panel {
+    flex-direction: column !important;
+    gap: 12px !important;
+
+    .search-section {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+
+    .filter-group {
+      width: 100% !important;
+
+      select {
+        width: 100% !important;
+      }
+    }
+  }
+
+  // Таблицы - горизонтальный скролл
+  .sections-table,
+  .blog-table,
+  .applications-table {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+
+    .table-header,
+    .table-row {
+      min-width: 900px !important;
+    }
+  }
+
+  // Кнопки действий
+  .btn-primary,
+  .btn-secondary {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+
+  // Заголовки
+  h1 {
+    font-size: 24px !important;
+  }
+
+  h2 {
+    font-size: 20px !important;
+  }
+}
+
+// Для телефонов
+@media (max-width: 768px) {
+  // Хедер страниц
+  .sections-header,
+  .blog-header,
+  .applications-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+
+    .header-actions {
+      width: 100% !important;
+      display: flex !important;
+      gap: 8px !important;
+
+      .btn-primary {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 10px !important;
+      }
+    }
+  }
+
+  // Статистика
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  // Bulk actions
+  .bulk-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 12px !important;
+
+    .selected-count {
+      font-size: 14px !important;
+    }
+
+    .bulk-buttons {
+      width: 100% !important;
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 6px !important;
+
+      .bulk-btn {
+        padding: 8px !important;
+        font-size: 12px !important;
+
+        svg {
+          width: 14px !important;
+          height: 14px !important;
+        }
+      }
+    }
+  }
+
+  // Формы
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-card {
+    padding: 16px !important;
+
+    h2 {
+      font-size: 18px !important;
+    }
+  }
+
+  // Кнопки в формах
+  .form-actions {
+    flex-direction: column !important;
+
+    button {
+      width: 100% !important;
+      justify-content: center !important;
+    }
+  }
+
+  // Пагинация
+  .table-footer {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+
+    .pagination {
+      width: 100% !important;
+      justify-content: center !important;
+    }
+  }
+}
+
+// Для маленьких телефонов
+@media (max-width: 480px) {
+  .admin-content {
+    padding: 0.75rem !important;
+  }
+
+  .stats-cards {
+    grid-template-columns: 1fr !important;
+  }
+
+  .bulk-buttons {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pagination {
+    gap: 4px !important;
+
+    .pagination-btn {
+      min-width: 36px !important;
+      height: 36px !important;
+      font-size: 12px !important;
+    }
+  }
+
+  // Убираем иконки из некоторых мест
+  .client-name svg,
+  .date-info svg,
+  .contact-link svg {
+    display: none !important;
+  }
+
+  // Уменьшаем отступы
+  .table-row {
+    padding: 10px !important;
+  }
+
+  // Статусы компактнее
+  .status-badge {
+    padding: 3px 6px !important;
+    font-size: 10px !important;
+  }
+
+  // Заголовки меньше
+  h1 {
+    font-size: 20px !important;
+  }
+
+  .content-header h1 {
+    font-size: 20px !important;
+  }
+}
+
+// Для очень маленьких телефонов
+@media (max-width: 360px) {
+  .client-name {
+    font-size: 11px !important;
+  }
+
+  .contact-link {
+    font-size: 9px !important;
+  }
+
+  .status-badge {
+    font-size: 9px !important;
+  }
+
+  .pagination-btn {
+    min-width: 32px !important;
+    height: 32px !important;
+  }
+}
