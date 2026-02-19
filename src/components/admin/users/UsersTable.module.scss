@@ -1,0 +1,252 @@
+.tableWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  width: 100%;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--text-muted);
+    }
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+
+  th {
+    text-align: left;
+    padding: 1rem 1rem;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 1rem 1rem;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  td:first-child {
+    white-space: normal;
+    min-width: 250px;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr.inactive {
+    opacity: 0.6;
+    background: var(--bg-secondary);
+  }
+
+  tr:hover td {
+    background: var(--bg-secondary);
+  }
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--dynamo-blue), var(--accent-purple));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.userName {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.userEmail {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.userPosition {
+  font-size: 0.7rem;
+  color: var(--dynamo-blue);
+  background: rgba(var(--dynamo-blue-rgb), 0.1);
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  &.purple {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+  }
+
+  &.blue {
+    background: rgba(var(--dynamo-blue-rgb), 0.1);
+    color: var(--dynamo-blue);
+  }
+
+  &.green {
+    background: rgba(0, 212, 170, 0.1);
+    color: #00d4aa;
+  }
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+
+  &.active {
+    background: rgba(0, 212, 170, 0.1);
+    color: #00d4aa;
+  }
+
+  &.inactive {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+  }
+}
+
+.lastLogin,
+.createdAt {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.actionsHeader {
+  text-align: right;
+  padding-right: 1rem;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0.25rem;
+  border-radius: 8px;
+  z-index: 2;
+  position: relative;
+}
+
+.iconButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 3;
+
+  &:hover {
+    background: var(--bg-secondary);
+    color: var(--dynamo-blue);
+    border-color: var(--dynamo-blue);
+    transform: translateY(-2px);
+  }
+
+  &.danger:hover {
+    color: #ef4444;
+    border-color: #ef4444;
+  }
+
+  &.warning:hover {
+    color: #f59e0b;
+    border-color: #f59e0b;
+  }
+
+  &.success:hover {
+    color: #00d4aa;
+    border-color: #00d4aa;
+  }
+}
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+    border-radius: 0;
+  }
+
+  .table {
+    min-width: 900px;
+  }
+
+  .actions {
+    background: var(--bg-card);
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.05);
+  }
+}
