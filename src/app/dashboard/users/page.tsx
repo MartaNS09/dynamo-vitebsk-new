@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { UsersTable } from "@/components/admin/users/UsersTable";
 import { UserForm } from "@/components/admin/users/UserForm";
 import { UserFilters } from "@/components/admin/users/UserFilters";
-import { InviteUserForm } from "@/components/admin/users/InviteUserForm"; // ЭТОТ ИМПОРТ НУЖЕН!
+import { InviteUserForm } from "@/components/admin/users/InviteUserForm";
 import { useUsers } from "@/hooks/admin/useUsers";
 import { AdminUser } from "@/types/user.types";
-import { UserRole } from "@/types/auth.types"; // ЭТОТ ИМПОРТ НУЖЕН!
+import { UserRole } from "@/types/auth.types";
 import { UserPlus, Mail, RefreshCw } from "lucide-react";
 import styles from "./page.module.scss";
 
@@ -67,7 +67,16 @@ export default function UsersPage() {
     console.log("Сброс пароля для:", user);
   };
 
-  const handleFormSubmit = async (data: any) => {
+  // Строка 70 - заменён any на конкретный тип
+  const handleFormSubmit = async (data: {
+    name: string;
+    email: string;
+    role: UserRole;
+    phone?: string;
+    position?: string;
+    bio?: string;
+    isActive?: boolean;
+  }) => {
     if (mode === "create") {
       await createUser(data);
     } else if (mode === "edit" && selectedUser) {
@@ -77,7 +86,13 @@ export default function UsersPage() {
     setSelectedUser(null);
   };
 
-  const handleInviteSubmit = async (data: any) => {
+  // Строка 80 - заменён any на конкретный тип
+  const handleInviteSubmit = async (data: {
+    email: string;
+    name: string;
+    role: UserRole;
+    message?: string;
+  }) => {
     await inviteUser(data);
     setIsInviteOpen(false);
   };

@@ -1,17 +1,3 @@
-// @import "./layout.scss";
-// @import "./dashboard.scss";
-// @import "./login.scss";
-// @import "./blog/blog-admin.scss";
-// @import "./sections.scss";
-// @import "./applications-table.scss";
-// @import "./application-detail.scss";
-// @import "./new-application.scss";
-// @import "./sections-table-fixes.scss";
-// @import "./applications-mobile.scss";
-// @import "./sections-responsive.scss";
-// @import "./mobile-fixes.scss";
-// @import "./edit-forms-responsive.scss";
-
 // ЗАМЕНЯЕМ @import на @use
 // @use работает почти так же, но считается современным стандартом
 
@@ -28,6 +14,3 @@
 @use "sections-responsive";
 @use "mobile-fixes";
 @use "edit-forms-responsive";
-
-// Если вдруг появятся ошибки с переменными или миксинами,
-// просто верните обратно на @import - это займет 2 секунды

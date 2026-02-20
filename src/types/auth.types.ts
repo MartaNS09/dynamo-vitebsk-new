@@ -28,6 +28,16 @@ export interface AuthContextType {
   isAuthenticated: boolean;
 }
 
+// ===== СТАТИСТИКА =====
+export interface MonthlyStat {
+  month: string;
+  visits: number;
+  visitors: number;
+  applications: number;
+  posts: number;
+}
+
+// ЭТОТ ИНТЕРФЕЙС ДЛЯ StatsCards
 export interface DashboardStats {
   totalSections: number;
   activeSections: number;
@@ -35,14 +45,6 @@ export interface DashboardStats {
   totalVisitors: number;
   pendingApplications: number;
   monthlyStats: MonthlyStat[];
-}
-
-export interface MonthlyStat {
-  name: string;
-  sections: number;
-  posts: number;
-  visitors?: number;
-  applications?: number;
 }
 
 export interface ActivityLog {
