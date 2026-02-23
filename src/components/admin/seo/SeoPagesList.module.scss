@@ -1,0 +1,85 @@
+.pagesList {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.group {
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-light);
+  }
+}
+
+.groupTitle {
+  padding: 1rem 1.5rem;
+  background: var(--bg-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.groupPages {
+  display: flex;
+  flex-direction: column;
+}
+
+.pageButton {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+  position: relative;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--bg-secondary);
+  }
+
+  &.active {
+    background: rgba(var(--dynamo-blue-rgb), 0.05);
+    border-left: 3px solid var(--dynamo-blue);
+  }
+}
+
+.pageName {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.pagePath {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-right: 1rem;
+}
+
+.checkIcon {
+  color: var(--dynamo-blue);
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .pageButton {
+    padding: 0.875rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .pagePath {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0.25rem;
+  }
+}
