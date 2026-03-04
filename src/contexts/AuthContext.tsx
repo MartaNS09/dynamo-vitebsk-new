@@ -14,6 +14,7 @@ import {
   AuthContextType,
   UserRole,
 } from "@/types/auth.types";
+import { API_ENDPOINTS } from "@/config/api";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -47,69 +48,69 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials): Promise<void> => {
     console.log("Login attempt:", credentials.email);
     setIsLoading(true);
+
     try {
-      // Имитация запроса к API
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // РЕАЛЬНЫЙ ЗАПРОС К БЕКЕНДУ
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+        }),
+      });
 
-      let mockUser: AdminUser | null = null;
-
-      // Демо-авторизация по email и паролю
-      if (
-        credentials.email === "superadmin@dynamo-vitebsk.by" &&
-        credentials.password === "AdminDynamo2024!"
-      ) {
-        mockUser = {
-          id: "1",
-          name: "Супер Администратор",
-          email: "superadmin@dynamo-vitebsk.by",
-          role: UserRole.SUPER_ADMIN,
-          avatar: "",
-          lastLogin: new Date().toISOString(),
-          createdAt: "2024-01-01T00:00:00Z",
-        };
-      } else if (
-        credentials.email === "admin@dynamo-vitebsk.by" &&
-        credentials.password === "AdminDynamo2024!"
-      ) {
-        mockUser = {
-          id: "2",
-          name: "Администратор",
-          email: "admin@dynamo-vitebsk.by",
-          role: UserRole.ADMIN,
-          avatar: "",
-          lastLogin: new Date().toISOString(),
-          createdAt: "2024-01-01T00:00:00Z",
-        };
-      } else if (
-        credentials.email === "editor@dynamo-vitebsk.by" &&
-        credentials.password === "AdminDynamo2024!"
-      ) {
-        mockUser = {
-          id: "3",
-          name: "Редактор",
-          email: "editor@dynamo-vitebsk.by",
-          role: UserRole.EDITOR,
-          avatar: "",
-          lastLogin: new Date().toISOString(),
-          createdAt: "2024-01-01T00:00:00Z",
-        };
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Неверный email или пароль");
       }
 
-      if (!mockUser) {
-        console.error("Invalid credentials for:", credentials.email);
-        throw new Error("Неверный email или пароль");
+      const data = await response.json();
+
+      // Преобразуем ответ бекенда в формат AdminUser
+      // На бекенде роль приходит как "ADMIN", а в типах может быть "admin"
+      let userRole: UserRole;
+
+      switch (data.user.role) {
+        case "SUPER_ADMIN":
+          userRole = UserRole.SUPER_ADMIN;
+          break;
+        case "ADMIN":
+          userRole = UserRole.ADMIN;
+          break;
+        case "EDITOR":
+          userRole = UserRole.EDITOR;
+          break;
+        default:
+          // Если роль неизвестна, ставим EDITOR по умолчанию
+          userRole = UserRole.EDITOR;
       }
 
-      console.log("Login successful:", mockUser);
-      setUser(mockUser);
-      localStorage.setItem("admin_user", JSON.stringify(mockUser));
+      const newUser: AdminUser = {
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        role: userRole,
+        avatar: data.user.avatar || "",
+        lastLogin: new Date().toISOString(),
+        createdAt: data.user.createdAt || new Date().toISOString(),
+      };
 
-      // Редирект на дашборд после успешного логина
-      console.log("Redirecting to /dashboard");
+      console.log("Login successful:", newUser);
+      setUser(newUser);
+      localStorage.setItem("admin_user", JSON.stringify(newUser));
+
+      // Сохраняем токен для будущих запросов
+      localStorage.setItem("access_token", data.access_token);
+
       router.push("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      throw error;
+
+      // Показываем ошибку пользователю
+      throw new Error("Неверный email или пароль");
     } finally {
       setIsLoading(false);
     }
@@ -119,6 +120,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     console.log("Logout user:", user?.email);
     setUser(null);
     localStorage.removeItem("admin_user");
+    localStorage.removeItem("access_token");
+    router.push("/login");
   };
 
   const value: AuthContextType = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -12,18 +12,70 @@ import {
   Eye,
   Grid,
   List,
+  AlertCircle,
 } from "lucide-react";
 import { SportSection } from "@/types/sport-section.types";
-import { ALL_SECTIONS } from "@/data/sport-sections";
+import { getSections, deleteSection } from "@/lib/api/sections";
 import "@/styles/admin/sections.scss";
 
 export default function SectionsTable() {
-  const [sections, setSections] = useState<SportSection[]>(ALL_SECTIONS);
+  const [sections, setSections] = useState<SportSection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
+
+  // Загрузка секций из API
+  const loadSections = async () => {
+    try {
+      setLoading(true);
+      const data = await getSections();
+      setSections(data);
+      setError(null);
+    } catch (err) {
+      setError("Ошибка загрузки секций");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Удаление секции
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Вы уверены, что хотите удалить эту секцию?")) return;
+
+    try {
+      await deleteSection(id);
+      await loadSections(); // перезагружаем список
+    } catch (err) {
+      alert("Ошибка при удалении секции");
+      console.error(err);
+    }
+  };
+
+  // Массовое удаление
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Удалить ${selectedSections.length} секций?`)) return;
+
+    try {
+      for (const id of selectedSections) {
+        await deleteSection(id);
+      }
+      await loadSections();
+      setSelectedSections([]);
+    } catch (err) {
+      alert("Ошибка при массовом удалении");
+      console.error(err);
+    }
+  };
+
+  // Загружаем данные при монтировании
+  useEffect(() => {
+    loadSections();
+  }, []);
 
   // Уникальные категории
   const categories = [
@@ -45,39 +97,9 @@ export default function SectionsTable() {
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  // Обработчики
-  const handleDelete = (id: string) => {
-    if (window.confirm("Вы уверены, что хотите удалить эту секцию?")) {
-      setSections(sections.filter((s) => s.id !== id));
-    }
-  };
-
-  const handleBulkDelete = () => {
-    if (window.confirm(`Удалить ${selectedSections.length} секций?`)) {
-      setSections(sections.filter((s) => !selectedSections.includes(s.id)));
-      setSelectedSections([]);
-    }
-  };
-
-  const handleBulkActivate = () => {
-    setSections(
-      sections.map((s) =>
-        selectedSections.includes(s.id) ? { ...s, isActive: true } : s,
-      ),
-    );
-    setSelectedSections([]);
-  };
-
-  const handleBulkDeactivate = () => {
-    setSections(
-      sections.map((s) =>
-        selectedSections.includes(s.id) ? { ...s, isActive: false } : s,
-      ),
-    );
-    setSelectedSections([]);
-  };
-
-  const handleToggleActive = (id: string) => {
+  const handleToggleActive = async (id: string) => {
+    // Здесь должен быть вызов API для изменения статуса
+    // Пока просто обновляем локально
     setSections(
       sections.map((s) => (s.id === id ? { ...s, isActive: !s.isActive } : s)),
     );
@@ -103,6 +125,80 @@ export default function SectionsTable() {
     active: sections.filter((s) => s.isActive).length,
     withAbonements: sections.filter((s) => s.abonements?.length > 0).length,
   };
+
+  if (loading) {
+    return (
+      <div className="sections-loading">
+        <div className="loading-spinner"></div>
+        <p>Загрузка секций...</p>
+        <style jsx>{`
+          .sections-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+          }
+          .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #0055b7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+          }
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="sections-error">
+        <AlertCircle size={48} color="#ef4444" />
+        <h3>Ошибка загрузки</h3>
+        <p>{error}</p>
+        <button onClick={loadSections} className="retry-btn">
+          Попробовать снова
+        </button>
+        <style jsx>{`
+          .sections-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+          }
+          h3 {
+            margin: 16px 0 8px;
+            color: #111827;
+          }
+          p {
+            color: #6b7280;
+            margin-bottom: 16px;
+          }
+          .retry-btn {
+            padding: 8px 16px;
+            background: #0055b7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+          }
+          .retry-btn:hover {
+            background: #003d82;
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="sections-admin">
@@ -221,17 +317,8 @@ export default function SectionsTable() {
             Выбрано: {selectedSections.length}
           </span>
           <div className="bulk-buttons">
-            <button className="bulk-btn active" onClick={handleBulkActivate}>
-              ✅ Активировать
-            </button>
-            <button
-              className="bulk-btn inactive"
-              onClick={handleBulkDeactivate}
-            >
-              ⏸️ Деактивировать
-            </button>
             <button className="bulk-btn delete" onClick={handleBulkDelete}>
-              🗑️ Удалить
+              🗑️ Удалить выбранные
             </button>
           </div>
         </div>
@@ -259,181 +346,192 @@ export default function SectionsTable() {
           </div>
 
           <div className="table-body">
-            {filteredSections.map((section) => (
-              <div key={section.id} className="table-row">
-                {/* Чекбокс */}
-                <div className="col-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selectedSections.includes(section.id)}
-                    onChange={() => handleSelectSection(section.id)}
-                  />
-                </div>
+            {filteredSections.length === 0 ? (
+              <div className="empty-state">
+                <p>Секции не найдены</p>
+              </div>
+            ) : (
+              filteredSections.map((section) => (
+                <div key={section.id} className="table-row">
+                  {/* Чекбокс */}
+                  <div className="col-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={selectedSections.includes(section.id)}
+                      onChange={() => handleSelectSection(section.id)}
+                    />
+                  </div>
 
-                {/* Информация о секции */}
-                <div className="col-info">
-                  <div className="section-preview">
-                    <div className="section-image">
-                      {section.coverImage ? (
-                        <Image
-                          src={section.coverImage}
-                          alt={section.name}
-                          width={56}
-                          height={56}
-                        />
-                      ) : (
-                        <div className="no-image">🏋️</div>
-                      )}
-                    </div>
-                    <div className="section-details">
-                      <div className="section-name">
-                        <Link href={`/dashboard/sections/edit/${section.id}`}>
-                          {section.name}
-                        </Link>
+                  {/* Информация о секции */}
+                  <div className="col-info">
+                    <div className="section-preview">
+                      <div className="section-image">
+                        {section.coverImage ? (
+                          <Image
+                            src={section.coverImage}
+                            alt={section.name}
+                            width={56}
+                            height={56}
+                          />
+                        ) : (
+                          <div className="no-image">🏋️</div>
+                        )}
                       </div>
-                      <div className="section-age">👤 {section.ageInfo}</div>
+                      <div className="section-details">
+                        <div className="section-name">
+                          <Link href={`/dashboard/sections/edit/${section.id}`}>
+                            {section.name}
+                          </Link>
+                        </div>
+                        <div className="section-age">👤 {section.ageInfo}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Категория */}
+                  <div className="col-category">
+                    <span className="category-badge">
+                      {section.category || "—"}
+                    </span>
+                  </div>
+
+                  {/* Абонементы */}
+                  <div className="col-abonements">
+                    {section.abonements?.length ? (
+                      <div className="abonements-info">
+                        <span className="abonements-count">
+                          {section.abonements.length} абонем.
+                        </span>
+                        <span className="price-from">
+                          от{" "}
+                          {Math.min(...section.abonements.map((a) => a.price))}{" "}
+                          BYN
+                        </span>
+                      </div>
+                    ) : (
+                      "—"
+                    )}
+                  </div>
+
+                  {/* Статус */}
+                  <div className="col-status">
+                    <button
+                      className={`status-badge ${section.isActive ? "active" : "inactive"}`}
+                      onClick={() => handleToggleActive(section.id)}
+                    >
+                      {section.isActive ? "Активна" : "Неактивна"}
+                    </button>
+                  </div>
+
+                  {/* Действия */}
+                  <div className="col-actions">
+                    <div className="actions-group">
+                      <Link
+                        href={`/sports/${section.slug}`}
+                        target="_blank"
+                        className="action-btn view"
+                        title="Смотреть на сайте"
+                      >
+                        <Eye size={20} />
+                      </Link>
+                      <Link
+                        href={`/dashboard/sections/edit/${section.id}`}
+                        className="action-btn edit"
+                        title="Редактировать"
+                      >
+                        <Edit2 size={20} />
+                      </Link>
+                      <button
+                        className="action-btn delete"
+                        onClick={() => handleDelete(section.id)}
+                        title="Удалить"
+                      >
+                        <Trash2 size={20} />
+                      </button>
                     </div>
                   </div>
                 </div>
-
-                {/* Категория */}
-                <div className="col-category">
-                  <span className="category-badge">
-                    {section.category || "—"}
-                  </span>
-                </div>
-
-                {/* Абонементы */}
-                <div className="col-abonements">
-                  {section.abonements?.length ? (
-                    <div className="abonements-info">
-                      <span className="abonements-count">
-                        {section.abonements.length} абонем.
-                      </span>
-                      <span className="price-from">
-                        от {Math.min(...section.abonements.map((a) => a.price))}{" "}
-                        BYN
-                      </span>
-                    </div>
-                  ) : (
-                    "—"
-                  )}
-                </div>
-
-                {/* Статус */}
-                <div className="col-status">
+              ))
+            )}
+          </div>
+        </div>
+      ) : (
+        /* ===== GRID VIEW ===== */
+        <div className="sections-grid">
+          {filteredSections.length === 0 ? (
+            <div className="empty-state">Секции не найдены</div>
+          ) : (
+            filteredSections.map((section) => (
+              <div key={section.id} className="grid-card">
+                <div className="card-header">
+                  <div className="card-image">
+                    {section.coverImage ? (
+                      <Image
+                        src={section.coverImage}
+                        alt={section.name}
+                        width={320}
+                        height={180}
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div className="no-image-large">🏋️</div>
+                    )}
+                  </div>
+                  <div className="card-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={selectedSections.includes(section.id)}
+                      onChange={() => handleSelectSection(section.id)}
+                    />
+                  </div>
                   <button
-                    className={`status-badge ${section.isActive ? "active" : "inactive"}`}
+                    className={`card-status ${section.isActive ? "active" : "inactive"}`}
                     onClick={() => handleToggleActive(section.id)}
                   >
                     {section.isActive ? "Активна" : "Неактивна"}
                   </button>
                 </div>
 
-                {/* Действия - КРУПНЫЕ КНОПКИ */}
-                <div className="col-actions">
-                  <div className="actions-group">
-                    <Link
-                      href={`/sports/${section.slug}`}
-                      target="_blank"
-                      className="action-btn view"
-                      title="Смотреть на сайте"
-                    >
-                      <Eye size={20} />
+                <div className="card-body">
+                  <h3 className="card-title">
+                    <Link href={`/dashboard/sections/edit/${section.id}`}>
+                      {section.name}
                     </Link>
-                    <Link
-                      href={`/dashboard/sections/edit/${section.id}`}
-                      className="action-btn edit"
-                      title="Редактировать"
-                    >
-                      <Edit2 size={20} />
-                    </Link>
-                    <button
-                      className="action-btn delete"
-                      onClick={() => handleDelete(section.id)}
-                      title="Удалить"
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                  </h3>
+                  <p className="card-description">{section.shortDescription}</p>
+
+                  <div className="card-info">
+                    <span>👤 {section.ageInfo}</span>
+                    <span>🏷️ {section.category || "—"}</span>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        /* ===== GRID VIEW ===== */
-        <div className="sections-grid">
-          {filteredSections.map((section) => (
-            <div key={section.id} className="grid-card">
-              <div className="card-header">
-                <div className="card-image">
-                  {section.coverImage ? (
-                    <Image
-                      src={section.coverImage}
-                      alt={section.name}
-                      width={320}
-                      height={180}
-                      style={{ objectFit: "cover" }}
-                    />
-                  ) : (
-                    <div className="no-image-large">🏋️</div>
-                  )}
-                </div>
-                <div className="card-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selectedSections.includes(section.id)}
-                    onChange={() => handleSelectSection(section.id)}
-                  />
-                </div>
-                <button
-                  className={`card-status ${section.isActive ? "active" : "inactive"}`}
-                  onClick={() => handleToggleActive(section.id)}
-                >
-                  {section.isActive ? "Активна" : "Неактивна"}
-                </button>
-              </div>
 
-              <div className="card-body">
-                <h3 className="card-title">
-                  <Link href={`/dashboard/sections/edit/${section.id}`}>
-                    {section.name}
+                <div className="card-footer">
+                  <Link
+                    href={`/sports/${section.slug}`}
+                    target="_blank"
+                    className="card-action view"
+                  >
+                    <Eye size={18} />
+                    Смотреть
                   </Link>
-                </h3>
-                <p className="card-description">{section.shortDescription}</p>
-
-                <div className="card-info">
-                  <span>👤 {section.ageInfo}</span>
-                  <span>🏷️ {section.category || "—"}</span>
+                  <Link
+                    href={`/dashboard/sections/edit/${section.id}`}
+                    className="card-action edit"
+                  >
+                    <Edit2 size={18} />
+                    Редактировать
+                  </Link>
+                  <button
+                    className="card-action delete"
+                    onClick={() => handleDelete(section.id)}
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               </div>
-
-              <div className="card-footer">
-                <Link
-                  href={`/sports/${section.slug}`}
-                  target="_blank"
-                  className="card-action view"
-                >
-                  <Eye size={18} />
-                  Смотреть
-                </Link>
-                <Link
-                  href={`/dashboard/sections/edit/${section.id}`}
-                  className="card-action edit"
-                >
-                  <Edit2 size={18} />
-                  Редактировать
-                </Link>
-                <button
-                  className="card-action delete"
-                  onClick={() => handleDelete(section.id)}
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
 

@@ -8,7 +8,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useDropzone } from "react-dropzone";
-import { ALL_SECTIONS } from "@/data/sport-sections";
+import { updateSection, getSectionById } from "@/lib/api/sections";
 import "@/styles/admin/sections/sections-edit.scss";
 import { SportSection } from "@/types/sport-section.types";
 
@@ -193,12 +193,40 @@ export default function EditSectionPage({
     });
   }, [params]);
 
+  // Загрузка данных секции
   useEffect(() => {
-    if (id) {
-      const found = ALL_SECTIONS.find((s) => s.id === id);
-      if (found) {
-        setSection(found);
-      }
+    if (id && id !== "new") {
+      const loadSection = async () => {
+        try {
+          setLoading(true);
+          console.log("📥 Загружаем секцию с ID:", id);
+          const data = await getSectionById(id);
+          console.log("✅ Секция загружена:", data);
+          setSection(data);
+        } catch (error) {
+          console.error("❌ Ошибка загрузки секции:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadSection();
+    } else if (id === "new") {
+      console.log("🆕 Создание новой секции");
+      setSection({
+        id: "new",
+        name: "",
+        slug: "",
+        shortDescription: "",
+        fullDescription: "",
+        ageInfo: "",
+        category: "",
+        abonements: [],
+        trainers: [],
+        coverImage: "",
+        gallery: [],
+        isActive: true,
+      } as SportSection);
+      setLoading(false);
     }
   }, [id]);
 
@@ -231,6 +259,7 @@ export default function EditSectionPage({
 
   useEffect(() => {
     if (section) {
+      console.log("📝 Заполняем форму данными:", section);
       reset({
         name: section.name,
         slug: section.slug,
@@ -273,20 +302,30 @@ export default function EditSectionPage({
     );
   };
 
+  // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ onSubmit С ИСПОЛЬЗОВАНИЕМ API =====
   const onSubmit = async (data: SectionFormData) => {
+    console.log("🔥 onSubmit вызван!");
     setLoading(true);
     try {
-      console.log("Сохраняем секцию:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("📦 Данные для отправки:", data);
+
+      const token = localStorage.getItem("access_token");
+      console.log("🔑 Токен:", token ? "есть" : "нет");
+
+      // ИСПОЛЬЗУЕМ ГОТОВУЮ ФУНКЦИЮ ИЗ API
+      const result = await updateSection(id!, data);
+
+      console.log("✅ Сохранено:", result);
       router.push("/dashboard/sections");
     } catch (error) {
-      console.error("Ошибка сохранения:", error);
+      console.error("❌ Ошибка:", error);
+      alert("Ошибка при сохранении: " + (error as Error).message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!section) {
+  if (!section && id !== "new") {
     return (
       <div
         style={{
@@ -318,7 +357,7 @@ export default function EditSectionPage({
             Назад
           </button>
           <div className="title-section">
-            <h1>{section.name}</h1>
+            <h1>{id === "new" ? "Новая секция" : section?.name}</h1>
             {isDirty && (
               <span className="unsaved-badge">
                 <AlertCircle size={14} />
@@ -328,16 +367,28 @@ export default function EditSectionPage({
           </div>
         </div>
         <div className="header-actions">
-          <Link
-            href={`/sports/${section.slug}`}
-            target="_blank"
-            className="preview-btn"
-          >
-            <Eye size={18} />
-            Предпросмотр
-          </Link>
+          {section?.slug && (
+            <Link
+              href={`/sports/${section.slug}`}
+              target="_blank"
+              className="preview-btn"
+            >
+              <Eye size={18} />
+              Предпросмотр
+            </Link>
+          )}
           <button
-            onClick={handleSubmit(onSubmit)}
+            type="button"
+            onClick={async () => {
+              console.log("🖱️ Кнопка нажата!");
+
+              // Получаем данные из формы
+              const formData = watch();
+              console.log("📦 Данные из watch:", formData);
+
+              // Вызываем onSubmit напрямую
+              await onSubmit(formData);
+            }}
             disabled={loading}
             className="save-btn"
           >
@@ -936,33 +987,9 @@ export default function EditSectionPage({
           >
             Отмена
           </button>
-          <button
-            type="submit"
-            className="save-btn"
-            onClick={handleSubmit(onSubmit)}
-            disabled={loading}
-          >
-            <Save size={18} />
-            {loading ? "Сохранение..." : "Сохранить изменения"}
-          </button>
+          {/* КНОПКА УДАЛЕНА! */}
         </div>
       </div>
-
-      <style jsx>{`
-        .loading-spinner {
-          width: 48px;
-          height: 48px;
-          border: 3px solid #e5e7eb;
-          border-top-color: #0055b7;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </div>
   );
 }

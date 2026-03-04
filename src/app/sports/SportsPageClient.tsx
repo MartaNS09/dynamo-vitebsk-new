@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SportCard from "@/components/sport-section/SportCard";
-import { ALL_SECTIONS } from "@/data/sport-sections";
+import { getSections } from "@/lib/api/sections";
 import { getCategorySlug, getCategoryName } from "@/utils/categories";
 import styles from "./page.module.scss";
 
@@ -14,11 +14,31 @@ export function SportsPageClient() {
   const filtersSectionRef = useRef<HTMLElement>(null);
   const [isPending, startTransition] = useTransition();
 
+  // Состояние для секций из API
+  const [sections, setSections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   // Получаем категорию из URL и преобразуем slug в название
   const categorySlug = searchParams.get("category");
   const [activeFilter, setActiveFilter] = useState<string>(
     categorySlug ? getCategoryName(categorySlug) || "all" : "all",
   );
+
+  // Загружаем секции из API
+  useEffect(() => {
+    const loadSections = async () => {
+      try {
+        setLoading(true);
+        const data = await getSections();
+        setSections(data);
+      } catch (error) {
+        console.error("Ошибка загрузки секций:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadSections();
+  }, []);
 
   // 🔴 ИСПРАВЛЕНО: функция обновления URL
   const updateUrl = useCallback(
@@ -66,16 +86,16 @@ export function SportsPageClient() {
     [updateUrl],
   );
 
-  // Извлекаем уникальные категории
+  // Извлекаем уникальные категории из реальных данных
   const categories = Array.from(
-    new Set(ALL_SECTIONS.map((s) => s.category)),
-  ).filter(Boolean) as string[];
+    new Set(sections.map((s) => s.category).filter(Boolean)),
+  ) as string[];
 
   // Фильтруем секции (используем русские названия)
   const filteredSections =
     activeFilter === "all"
-      ? ALL_SECTIONS
-      : ALL_SECTIONS.filter((section) => section.category === activeFilter);
+      ? sections
+      : sections.filter((section) => section.category === activeFilter);
 
   // Рассчитываем заполнители для грида
   const itemsPerRow = 4;
@@ -89,6 +109,15 @@ export function SportsPageClient() {
       block: "start",
     });
   };
+
+  if (loading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.loadingSpinner}></div>
+        <p>Загрузка спортивных секций...</p>
+      </div>
+    );
+  }
 
   return (
     <>

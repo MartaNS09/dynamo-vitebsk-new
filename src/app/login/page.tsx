@@ -85,6 +85,7 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password" // ← добавьте эту строку
                   placeholder="••••••••"
                   value={credentials.password}
                   onChange={(e) =>
