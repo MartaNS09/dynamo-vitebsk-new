@@ -8,7 +8,21 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useDropzone } from "react-dropzone";
-import { updateSection, getSectionById } from "@/lib/api/sections";
+import {
+  updateSection,
+  getSectionById,
+  createSection,
+} from "@/lib/api/sections";
+import {
+  createAbonement,
+  updateAbonement,
+  deleteAbonement,
+} from "@/lib/api/abonements";
+import {
+  createTrainer,
+  updateTrainer,
+  deleteTrainer,
+} from "@/lib/api/trainers";
 import "@/styles/admin/sections/sections-edit.scss";
 import { SportSection } from "@/types/sport-section.types";
 
@@ -186,10 +200,13 @@ export default function EditSectionPage({
   const [id, setId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("main");
   const [expandedAbonements, setExpandedAbonements] = useState<string[]>([]);
+  const [originalTrainers, setOriginalTrainers] = useState<any[]>([]);
+  const [originalAbonements, setOriginalAbonements] = useState<any[]>([]);
 
   useEffect(() => {
     params.then(({ id }) => {
       setId(id);
+      console.log("📌 ID секции:", id);
     });
   }, [params]);
 
@@ -203,6 +220,8 @@ export default function EditSectionPage({
           const data = await getSectionById(id);
           console.log("✅ Секция загружена:", data);
           setSection(data);
+          setOriginalTrainers(data.trainers || []);
+          setOriginalAbonements(data.abonements || []);
         } catch (error) {
           console.error("❌ Ошибка загрузки секции:", error);
         } finally {
@@ -302,20 +321,136 @@ export default function EditSectionPage({
     );
   };
 
-  // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ onSubmit С ИСПОЛЬЗОВАНИЕМ API =====
+  // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ onSubmit =====
   const onSubmit = async (data: SectionFormData) => {
     console.log("🔥 onSubmit вызван!");
     setLoading(true);
     try {
-      console.log("📦 Данные для отправки:", data);
-
       const token = localStorage.getItem("access_token");
       console.log("🔑 Токен:", token ? "есть" : "нет");
 
-      // ИСПОЛЬЗУЕМ ГОТОВУЮ ФУНКЦИЮ ИЗ API
-      const result = await updateSection(id!, data);
+      // 1. СОХРАНЯЕМ СЕКЦИЮ (без абонементов и тренеров)
+      const sectionData = {
+        name: data.name,
+        slug: data.slug,
+        shortDescription: data.shortDescription,
+        fullDescription: data.fullDescription,
+        ageInfo: data.ageInfo,
+        category: data.category,
+        schedule: data.schedule,
+        location: data.location,
+        isActive: data.isActive,
+        coverImage: data.coverImage,
+        heroImages: data.gallery, // Используем gallery как heroImages
+        gallery: data.gallery,
+      };
 
-      console.log("✅ Сохранено:", result);
+      let sectionId = id;
+
+      if (id === "new") {
+        // Создаем новую секцию
+        const newSection = await createSection(sectionData);
+        sectionId = newSection.id;
+        console.log("✅ Создана секция:", newSection);
+      } else {
+        // Обновляем существующую секцию
+        await updateSection(id!, sectionData);
+        console.log("✅ Обновлена секция");
+      }
+
+      // ===== 2. СОХРАНЯЕМ АБОНЕМЕНТЫ =====
+      if (data.abonements && data.abonements.length > 0) {
+        console.log("💾 Сохраняем абонементы:", data.abonements.length);
+
+        // Получаем список ID абонементов из формы (только существующие, не новые)
+        const currentAbonementIds = data.abonements
+          .map((a) => a.id)
+          .filter((id) => !id.startsWith("abonement-"));
+
+        // Удаляем абонементы, которых нет в форме
+        if (originalAbonements.length > 0 && id !== "new") {
+          for (const originalAbonement of originalAbonements) {
+            if (!currentAbonementIds.includes(originalAbonement.id)) {
+              console.log("🗑️ Удаляем абонемент:", originalAbonement.id);
+              await deleteAbonement(originalAbonement.id);
+            }
+          }
+        }
+
+        // Создаем или обновляем абонементы из формы
+        for (const abonement of data.abonements) {
+          // Убираем id из данных, пусть сервер сам генерирует
+          const { id, ...abonementData } = abonement;
+          const dataToSend = {
+            ...abonementData,
+            sectionId: sectionId,
+          };
+
+          if (abonement.id.startsWith("abonement-")) {
+            // Новый абонемент
+            await createAbonement(dataToSend);
+            console.log("✅ Создан абонемент");
+          } else {
+            // Существующий абонемент
+            await updateAbonement(abonement.id, dataToSend);
+            console.log("✅ Обновлен абонемент");
+          }
+        }
+      } else if (originalAbonements.length > 0 && id !== "new") {
+        // Если абонементов нет в форме, удаляем всех
+        for (const originalAbonement of originalAbonements) {
+          console.log("🗑️ Удаляем абонемент (всех):", originalAbonement.id);
+          await deleteAbonement(originalAbonement.id);
+        }
+      }
+
+      // ===== 3. СОХРАНЯЕМ ТРЕНЕРОВ =====
+      if (data.trainers && data.trainers.length > 0) {
+        console.log("💾 Сохраняем тренеров:", data.trainers.length);
+
+        // Получаем список ID тренеров из формы (только существующие, не новые)
+        const currentTrainerIds = data.trainers
+          .map((t) => t.id)
+          .filter((id) => !id.startsWith("trainer-"));
+
+        // Удаляем тренеров, которых нет в форме
+        if (originalTrainers.length > 0 && id !== "new") {
+          for (const originalTrainer of originalTrainers) {
+            if (!currentTrainerIds.includes(originalTrainer.id)) {
+              console.log("🗑️ Удаляем тренера:", originalTrainer.id);
+              await deleteTrainer(originalTrainer.id);
+            }
+          }
+        }
+
+        // Создаем или обновляем тренеров из формы
+        for (const trainer of data.trainers) {
+          // Убираем id из данных для новых тренеров
+          const { id, ...trainerData } = trainer;
+          const dataToSend = {
+            ...trainerData,
+            sectionId: sectionId,
+          };
+
+          if (trainer.id.startsWith("trainer-")) {
+            // Новый тренер
+            await createTrainer(dataToSend);
+            console.log("✅ Создан тренер");
+          } else {
+            // Существующий тренер
+            await updateTrainer(trainer.id, dataToSend);
+            console.log("✅ Обновлен тренер");
+          }
+        }
+      } else if (originalTrainers.length > 0 && id !== "new") {
+        // Если тренеров нет в форме, удаляем всех
+        for (const originalTrainer of originalTrainers) {
+          console.log("🗑️ Удаляем тренера (всех):", originalTrainer.id);
+          await deleteTrainer(originalTrainer.id);
+        }
+      }
+
+      console.log("🎉 ВСЕ ДАННЫЕ УСПЕШНО СОХРАНЕНЫ!");
       router.push("/dashboard/sections");
     } catch (error) {
       console.error("❌ Ошибка:", error);
@@ -379,16 +514,7 @@ export default function EditSectionPage({
           )}
           <button
             type="button"
-            onClick={async () => {
-              console.log("🖱️ Кнопка нажата!");
-
-              // Получаем данные из формы
-              const formData = watch();
-              console.log("📦 Данные из watch:", formData);
-
-              // Вызываем onSubmit напрямую
-              await onSubmit(formData);
-            }}
+            onClick={handleSubmit(onSubmit)}
             disabled={loading}
             className="save-btn"
           >
@@ -987,7 +1113,6 @@ export default function EditSectionPage({
           >
             Отмена
           </button>
-          {/* КНОПКА УДАЛЕНА! */}
         </div>
       </div>
     </div>

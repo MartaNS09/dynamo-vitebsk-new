@@ -24,6 +24,11 @@ import {
 } from "lucide-react";
 import "@/styles/admin/sections/sections-edit.scss";
 
+// ИМПОРТЫ ДЛЯ API
+import { createSection } from "@/lib/api/sections";
+import { createAbonement } from "@/lib/api/abonements";
+import { createTrainer } from "@/lib/api/trainers";
+
 // =============================================
 // СХЕМА ВАЛИДАЦИИ - ВСЕ ПОЛЯ ОБЯЗАТЕЛЬНЫЕ С ДЕФОЛТНЫМИ ЗНАЧЕНИЯМИ
 // =============================================
@@ -38,6 +43,7 @@ const newSectionSchema = z.object({
   location: z.string().optional(),
   isActive: z.boolean(),
   coverImage: z.string(),
+  heroImages: z.array(z.string()).optional(),
   gallery: z.array(z.string()),
   abonements: z.array(
     z.object({
@@ -186,6 +192,7 @@ export default function NewSectionPage() {
       location: "",
       isActive: true,
       coverImage: "",
+      heroImages: [],
       gallery: [],
       abonements: [],
       trainers: [],
@@ -216,21 +223,72 @@ export default function NewSectionPage() {
     );
   };
 
+  // ===== ИСПРАВЛЕННЫЙ onSubmit =====
   const onSubmit = async (data: NewSectionFormData) => {
+    console.log("🔥 Создание новой секции");
     setLoading(true);
     try {
-      const newSection = {
-        id: String(Date.now()),
-        ...data,
+      const token = localStorage.getItem("access_token");
+      console.log("🔑 Токен:", token ? "есть" : "нет");
+
+      // 1. СОЗДАЕМ СЕКЦИЮ (без абонементов и тренеров)
+      const sectionData = {
+        name: data.name,
+        slug: data.slug,
+        shortDescription: data.shortDescription,
+        fullDescription: data.fullDescription,
+        ageInfo: data.ageInfo,
+        category: data.category,
+        schedule: data.schedule,
+        location: data.location,
+        isActive: data.isActive,
+        coverImage: data.coverImage,
+        heroImages: data.heroImages || [],
+        gallery: data.gallery || [],
       };
-      console.log("Новая секция:", newSection);
 
-      // TODO: Отправить на сервер
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("📦 Отправляем данные секции:", sectionData);
 
+      // Создаем секцию
+      const newSection = await createSection(sectionData);
+      const sectionId = newSection.id;
+      console.log("✅ Создана секция с ID:", sectionId);
+
+      // 2. СОЗДАЕМ АБОНЕМЕНТЫ
+      if (data.abonements && data.abonements.length > 0) {
+        console.log("💾 Сохраняем абонементы:", data.abonements.length);
+
+        for (const abonement of data.abonements) {
+          const abonementData = {
+            ...abonement,
+            sectionId: sectionId,
+          };
+
+          await createAbonement(abonementData);
+          console.log("✅ Создан абонемент");
+        }
+      }
+
+      // 3. СОЗДАЕМ ТРЕНЕРОВ
+      if (data.trainers && data.trainers.length > 0) {
+        console.log("💾 Сохраняем тренеров:", data.trainers.length);
+
+        for (const trainer of data.trainers) {
+          const trainerData = {
+            ...trainer,
+            sectionId: sectionId,
+          };
+
+          await createTrainer(trainerData);
+          console.log("✅ Создан тренер");
+        }
+      }
+
+      console.log("🎉 НОВАЯ СЕКЦИЯ УСПЕШНО СОЗДАНА!");
       router.push("/dashboard/sections");
     } catch (error) {
-      console.error(error);
+      console.error("❌ Ошибка:", error);
+      alert("Ошибка при создании секции: " + (error as Error).message);
     } finally {
       setLoading(false);
     }
@@ -862,15 +920,7 @@ export default function NewSectionPage() {
           >
             Отмена
           </button>
-          <button
-            type="submit"
-            className="save-btn"
-            onClick={handleSubmit(onSubmit)}
-            disabled={loading}
-          >
-            <Save size={18} />
-            {loading ? "Создание..." : "Создать секцию"}
-          </button>
+          {/* КНОПКА СОХРАНЕНИЯ ТОЛЬКО В ХЕДЕРЕ */}
         </div>
       </div>
     </div>

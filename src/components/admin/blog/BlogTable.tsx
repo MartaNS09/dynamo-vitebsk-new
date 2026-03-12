@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,55 +14,43 @@ import {
   Grid,
   List,
 } from "lucide-react";
-import { sortedBlogPosts } from "@/data/blog-posts";
+import { useBlog } from "@/hooks/admin/useBlog";
 import { BlogPost } from "@/types/blog.types";
-import "@/styles/admin/blog/blog-admin.scss";
+import "@/styles/admin/blog/blog.scss";
 
 export default function BlogTable() {
-  const [posts, setPosts] = useState<BlogPost[]>(sortedBlogPosts);
+  const { posts, loading, error, removePost } = useBlog();
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
 
-  // Уникальные категории
-  const categories = ["all", ...new Set(posts.map((p) => p.category.slug))];
+  // Категории для фильтра (исправлено!)
+  const categories = [
+    { id: "all", name: "Все категории" },
+    { id: "competitions", name: "Соревнования" },
+    { id: "interviews", name: "Интервью" },
+    { id: "articles", name: "Статьи" },
+  ];
 
   // Фильтрация постов
-  const filteredPosts = posts.filter((post) => {
-    const matchesSearch =
-      post.title.toLowerCase().includes(search.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "all" || post.category.slug === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  useEffect(() => {
+    const filtered = posts.filter((post) => {
+      const matchesSearch =
+        post.title.toLowerCase().includes(search.toLowerCase()) ||
+        post.excerpt?.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory =
+        categoryFilter === "all" || post.category?.id === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+    setFilteredPosts(filtered);
+  }, [posts, search, categoryFilter]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Вы уверены, что хотите удалить эту статью?")) {
-      setPosts(posts.filter((p) => p.id !== id));
+      await removePost(id);
     }
-  };
-
-  const handleBulkDelete = () => {
-    if (window.confirm(`Удалить ${selectedPosts.length} статей?`)) {
-      setPosts(posts.filter((p) => !selectedPosts.includes(p.id)));
-      setSelectedPosts([]);
-    }
-  };
-
-  const handleSelectAll = () => {
-    if (selectedPosts.length === filteredPosts.length) {
-      setSelectedPosts([]);
-    } else {
-      setSelectedPosts(filteredPosts.map((p) => p.id));
-    }
-  };
-
-  const handleSelectPost = (id: string) => {
-    setSelectedPosts((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    );
   };
 
   const stats = {
@@ -70,6 +58,24 @@ export default function BlogTable() {
     featured: posts.filter((p) => p.isFeatured).length,
     pinned: posts.filter((p) => p.isPinned).length,
   };
+
+  if (loading) {
+    return (
+      <div className="blog-loading">
+        <div className="loading-spinner"></div>
+        <p>Загрузка постов...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="blog-error">
+        <p>Ошибка: {error}</p>
+        <button onClick={() => window.location.reload()}>Повторить</button>
+      </div>
+    );
+  }
 
   return (
     <div className="blog-admin">
@@ -110,7 +116,6 @@ export default function BlogTable() {
             <span className="stat-label">Закрепленные</span>
           </div>
         </div>
-        {/* УДАЛЕНА карточка с просмотрами */}
       </div>
 
       {/* Фильтры */}
@@ -134,10 +139,11 @@ export default function BlogTable() {
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
             >
-              <option value="all">Все категории</option>
-              <option value="competitions">Соревнования</option>
-              <option value="interviews">Интервью</option>
-              <option value="articles">Статьи</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -158,39 +164,16 @@ export default function BlogTable() {
         </div>
       </div>
 
-      {/* Bulk actions */}
-      {selectedPosts.length > 0 && (
-        <div className="bulk-actions">
-          <span className="selected-count">
-            Выбрано: {selectedPosts.length}
-          </span>
-          <div className="bulk-buttons">
-            <button className="bulk-btn delete" onClick={handleBulkDelete}>
-              <Trash2 size={16} />
-              Удалить
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Таблица постов */}
+      {/* Таблица */}
       {viewMode === "list" ? (
         <div className="blog-table">
           <div className="table-header">
             <div className="col-checkbox">
-              <input
-                type="checkbox"
-                checked={
-                  selectedPosts.length === filteredPosts.length &&
-                  filteredPosts.length > 0
-                }
-                onChange={handleSelectAll}
-              />
+              <input type="checkbox" />
             </div>
             <div className="col-info">Статья</div>
             <div className="col-category">Категория</div>
             <div className="col-date">Дата</div>
-            {/* УДАЛЕНА колонка Просмотры */}
             <div className="col-status">Статус</div>
             <div className="col-actions"></div>
           </div>
@@ -199,22 +182,20 @@ export default function BlogTable() {
             {filteredPosts.map((post) => (
               <div key={post.id} className="table-row">
                 <div className="col-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selectedPosts.includes(post.id)}
-                    onChange={() => handleSelectPost(post.id)}
-                  />
+                  <input type="checkbox" />
                 </div>
 
                 <div className="col-info">
                   <div className="post-preview">
                     <div className="post-image">
-                      <Image
-                        src={post.featuredImage.url}
-                        alt={post.title}
-                        width={56}
-                        height={56}
-                      />
+                      {post.featuredImage?.url && (
+                        <Image
+                          src={post.featuredImage.url}
+                          alt={post.title}
+                          width={56}
+                          height={56}
+                        />
+                      )}
                     </div>
                     <div className="post-details">
                       <div className="post-title">
@@ -240,9 +221,11 @@ export default function BlogTable() {
                 <div className="col-category">
                   <span
                     className="category-badge"
-                    style={{ backgroundColor: post.category.color }}
+                    style={{
+                      backgroundColor: post.category?.color || "#0055b7",
+                    }}
                   >
-                    {post.category.name}
+                    {post.category?.name || "Без категории"}
                   </span>
                 </div>
 
@@ -253,10 +236,12 @@ export default function BlogTable() {
                   </span>
                 </div>
 
-                {/* УДАЛЕН блок col-views */}
-
                 <div className="col-status">
-                  <span className="status-badge active">Опубликовано</span>
+                  <span
+                    className={`status-badge ${post.published ? "published" : "draft"}`}
+                  >
+                    {post.published ? "Опубликовано" : "Черновик"}
+                  </span>
                 </div>
 
                 <div className="col-actions">
@@ -265,21 +250,18 @@ export default function BlogTable() {
                       href={`/blog/${post.slug}`}
                       target="_blank"
                       className="action-btn view"
-                      title="Смотреть на сайте"
                     >
                       <Eye size={20} />
                     </Link>
                     <Link
                       href={`/dashboard/blog/edit/${post.id}`}
                       className="action-btn edit"
-                      title="Редактировать"
                     >
                       <Edit2 size={20} />
                     </Link>
                     <button
                       className="action-btn delete"
                       onClick={() => handleDelete(post.id)}
-                      title="Удалить"
                     >
                       <Trash2 size={20} />
                     </button>
@@ -296,28 +278,22 @@ export default function BlogTable() {
             <div key={post.id} className="grid-card">
               <div className="card-header">
                 <div className="card-image">
-                  <Image
-                    src={post.featuredImage.url}
-                    alt={post.title}
-                    width={320}
-                    height={180}
-                  />
-                </div>
-                <div className="card-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selectedPosts.includes(post.id)}
-                    onChange={() => handleSelectPost(post.id)}
-                  />
+                  {post.featuredImage?.url && (
+                    <Image
+                      src={post.featuredImage.url}
+                      alt={post.title}
+                      width={320}
+                      height={180}
+                    />
+                  )}
                 </div>
                 <span
                   className="card-category"
-                  style={{ backgroundColor: post.category.color }}
+                  style={{ backgroundColor: post.category?.color || "#0055b7" }}
                 >
-                  {post.category.name}
+                  {post.category?.name || "Без категории"}
                 </span>
               </div>
-
               <div className="card-body">
                 <h3 className="card-title">
                   <Link href={`/dashboard/blog/edit/${post.id}`}>
@@ -326,57 +302,14 @@ export default function BlogTable() {
                 </h3>
                 <p className="card-excerpt">{post.excerpt}</p>
                 <div className="card-meta">
-                  <span>
-                    <Calendar size={14} />
-                    {new Date(post.publishedAt).toLocaleDateString("ru-RU")}
-                  </span>
-                  {/* УДАЛЕНЫ просмотры в мета-информации */}
+                  <Calendar size={14} />
+                  {new Date(post.publishedAt).toLocaleDateString("ru-RU")}
                 </div>
-              </div>
-
-              <div className="card-footer">
-                <Link
-                  href={`/blog/${post.slug}`}
-                  target="_blank"
-                  className="card-action view"
-                >
-                  <Eye size={16} />
-                  Смотреть
-                </Link>
-                <Link
-                  href={`/dashboard/blog/edit/${post.id}`}
-                  className="card-action edit"
-                >
-                  <Edit2 size={16} />
-                  Редактировать
-                </Link>
-                <button
-                  className="card-action delete"
-                  onClick={() => handleDelete(post.id)}
-                >
-                  <Trash2 size={16} />
-                </button>
               </div>
             </div>
           ))}
         </div>
       )}
-
-      {/* Пагинация */}
-      <div className="table-footer">
-        <div className="pagination-info">
-          Показано {filteredPosts.length} из {posts.length} статей
-        </div>
-        <div className="pagination">
-          <button className="pagination-btn" disabled>
-            ‹
-          </button>
-          <button className="pagination-btn active">1</button>
-          <button className="pagination-btn">2</button>
-          <button className="pagination-btn">3</button>
-          <button className="pagination-btn">›</button>
-        </div>
-      </div>
     </div>
   );
 }

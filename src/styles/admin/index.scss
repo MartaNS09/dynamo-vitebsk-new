@@ -4,7 +4,8 @@
 @use "layout";
 @use "dashboard";
 @use "login";
-@use "blog/blog-admin";
+// @use "blog/blog-admin";
+@use "blog/blog"; // ✅ ПРАВИЛЬНО (файл называется blog.scss)
 @use "sections";
 @use "applications-table";
 @use "application-detail";

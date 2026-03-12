@@ -1621,3 +1621,77 @@
     transform: translateX(5px);
   }
 }
+// новое
+
+// ========== ФИКСЫ ДЛЯ НОВОЙ СЕКЦИИ ==========
+// Принудительно ограничиваем ширину контента
+.contentLayout {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  overflow: hidden;
+}
+
+.descriptionSection {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.descriptionContent {
+  width: 100%;
+  max-width: 100%;
+
+  p,
+  div,
+  h2,
+  h3,
+  ul,
+  ol {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+}
+
+// Фикс для сетки абонементов
+.abonementsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 1.5rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 2rem 0 !important;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.abonementCard {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+// Фикс для тренеров
+.trainersSection {
+  width: 100%;
+  max-width: 100%;
+}
+
+.trainersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.trainerCompact {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
