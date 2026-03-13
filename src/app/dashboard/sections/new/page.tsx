@@ -30,7 +30,7 @@ import { createAbonement } from "@/lib/api/abonements";
 import { createTrainer } from "@/lib/api/trainers";
 
 // =============================================
-// СХЕМА ВАЛИДАЦИИ - ВСЕ ПОЛЯ ОБЯЗАТЕЛЬНЫЕ С ДЕФОЛТНЫМИ ЗНАЧЕНИЯМИ
+// СХЕМА ВАЛИДАЦИИ
 // =============================================
 const newSectionSchema = z.object({
   name: z.string().min(3, "Название минимум 3 символа"),
@@ -67,7 +67,6 @@ const newSectionSchema = z.object({
   ),
 });
 
-// ВАЖНО: Явно указываем тип формы
 type NewSectionFormData = z.infer<typeof newSectionSchema>;
 
 const CATEGORIES = [
@@ -171,7 +170,6 @@ export default function NewSectionPage() {
   const [activeTab, setActiveTab] = useState("main");
   const [expandedAbonements, setExpandedAbonements] = useState<string[]>([]);
 
-  // ✅ ИСПРАВЛЕНО: Явно указываем тип для useForm
   const {
     register,
     control,
@@ -223,7 +221,6 @@ export default function NewSectionPage() {
     );
   };
 
-  // ===== ИСПРАВЛЕННЫЙ onSubmit =====
   const onSubmit = async (data: NewSectionFormData) => {
     console.log("🔥 Создание новой секции");
     setLoading(true);
@@ -231,7 +228,6 @@ export default function NewSectionPage() {
       const token = localStorage.getItem("access_token");
       console.log("🔑 Токен:", token ? "есть" : "нет");
 
-      // 1. СОЗДАЕМ СЕКЦИЮ (без абонементов и тренеров)
       const sectionData = {
         name: data.name,
         slug: data.slug,
@@ -249,36 +245,29 @@ export default function NewSectionPage() {
 
       console.log("📦 Отправляем данные секции:", sectionData);
 
-      // Создаем секцию
       const newSection = await createSection(sectionData);
       const sectionId = newSection.id;
       console.log("✅ Создана секция с ID:", sectionId);
 
-      // 2. СОЗДАЕМ АБОНЕМЕНТЫ
       if (data.abonements && data.abonements.length > 0) {
         console.log("💾 Сохраняем абонементы:", data.abonements.length);
-
         for (const abonement of data.abonements) {
           const abonementData = {
             ...abonement,
             sectionId: sectionId,
           };
-
           await createAbonement(abonementData);
           console.log("✅ Создан абонемент");
         }
       }
 
-      // 3. СОЗДАЕМ ТРЕНЕРОВ
       if (data.trainers && data.trainers.length > 0) {
         console.log("💾 Сохраняем тренеров:", data.trainers.length);
-
         for (const trainer of data.trainers) {
           const trainerData = {
             ...trainer,
             sectionId: sectionId,
           };
-
           await createTrainer(trainerData);
           console.log("✅ Создан тренер");
         }
@@ -855,7 +844,8 @@ export default function NewSectionPage() {
           </div>
         )}
 
-        {/* МЕДИА */}
+        {/* МЕДИА - РАБОЧАЯ ВЕРСИЯ (КОПИРУЕМ ИЗ edit) */}
+        {/* МЕДИА - КРАСИВАЯ ВЕРСИЯ */}
         {activeTab === "media" && (
           <div className="tab-content">
             <div className="media-section">
@@ -864,39 +854,85 @@ export default function NewSectionPage() {
                 <p className="section-description">
                   Добавьте фотографии секции
                 </p>
-                <div className="gallery-grid">
-                  {watch("gallery")?.map((image, index) => (
-                    <div key={index} className="gallery-item">
-                      <Image
-                        src={image}
-                        alt={`Gallery ${index + 1}`}
-                        width={200}
-                        height={150}
-                        style={{
-                          width: "100%",
-                          height: "120px",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        className="remove-gallery-item"
-                        onClick={() => {
-                          const newGallery = watch("gallery").filter(
-                            (_, i) => i !== index,
-                          );
-                          setValue("gallery", newGallery);
-                        }}
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ))}
-                  <div className="gallery-upload">
-                    <Upload size={24} color="#9ca3af" />
-                    <p>Добавить изображение</p>
-                  </div>
+
+                {/* КРАСИВАЯ КНОПКА ЗАГРУЗКИ */}
+                <div style={{ marginBottom: "20px" }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    id="gallery-upload"
+                    style={{ display: "none" }}
+                    onChange={async (e) => {
+                      const files = e.target.files;
+                      if (!files || files.length === 0) return;
+
+                      const currentGallery = watch("gallery") || [];
+                      const newGallery = [...currentGallery];
+
+                      for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const reader = new FileReader();
+                        reader.onload = (readerEvent) => {
+                          newGallery.push(readerEvent.target?.result as string);
+                          setValue("gallery", [...newGallery]);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="add-gallery-btn"
+                    onClick={() =>
+                      document.getElementById("gallery-upload")?.click()
+                    }
+                  >
+                    <Upload size={18} />
+                    Добавить изображения
+                  </button>
                 </div>
+
+                {/* ГАЛЕРЕЯ */}
+                {watch("gallery") && watch("gallery").length > 0 ? (
+                  <div className="gallery-grid">
+                    {watch("gallery").map((image, index) => (
+                      <div key={index} className="gallery-item">
+                        <Image
+                          src={image}
+                          alt={`Gallery ${index + 1}`}
+                          width={200}
+                          height={150}
+                          style={{
+                            width: "100%",
+                            height: "120px",
+                            objectFit: "cover",
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="remove-gallery-item"
+                          onClick={() => {
+                            const newGallery = watch("gallery").filter(
+                              (_, i) => i !== index,
+                            );
+                            setValue("gallery", newGallery);
+                          }}
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="gallery-empty">
+                    <Upload size={32} color="#9ca3af" />
+                    <p>Нет изображений в галерее</p>
+                    <p>
+                      Нажмите кнопку "Добавить изображения" чтобы загрузить фото
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -920,7 +956,6 @@ export default function NewSectionPage() {
           >
             Отмена
           </button>
-          {/* КНОПКА СОХРАНЕНИЯ ТОЛЬКО В ХЕДЕРЕ */}
         </div>
       </div>
     </div>

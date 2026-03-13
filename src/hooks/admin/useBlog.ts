@@ -3,8 +3,6 @@ import { BlogPost, BlogCategory } from "@/types/blog.types";
 import {
   getBlogPosts,
   getBlogPostById,
-  createBlogPost,
-  updateBlogPost,
   deleteBlogPost,
   getBlogCategories,
 } from "@/lib/api/blog";
@@ -53,39 +51,13 @@ export function useBlog() {
     }
   };
 
-  const savePost = async (id: string | null, data: Partial<BlogPost>) => {
-    setLoading(true);
-    try {
-      if (id && id !== "new") {
-        await updateBlogPost(id, data);
-      } else {
-        await createBlogPost(data);
-      }
-      await loadPosts();
-      setError(null);
-      return true;
-    } catch (err) {
-      setError("Ошибка сохранения поста");
-      console.error(err);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const removePost = async (id: string) => {
-    setLoading(true);
     try {
       await deleteBlogPost(id);
       await loadPosts();
-      setError(null);
-      return true;
     } catch (err) {
       setError("Ошибка удаления поста");
       console.error(err);
-      return false;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -100,8 +72,8 @@ export function useBlog() {
     loading,
     error,
     loadPosts,
+    loadCategories,
     loadPost,
-    savePost,
     removePost,
   };
 }

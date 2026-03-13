@@ -5,7 +5,8 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { blogCategories, sortedBlogPosts } from "@/data/blog-posts";
+import { getPublishedPosts } from "@/lib/api/blog"; // ИСПОЛЬЗУЕМ API!
+import { BlogPost } from "@/types/blog.types";
 import { BlogHero } from "@/components/blog/BlogHero";
 import styles from "./Blog.module.scss";
 
@@ -84,9 +85,11 @@ function PaginationComponent({
 
 function CategoryFiltersComponent({
   activeCategory,
+  categories,
   onFilter,
 }: {
   activeCategory: string;
+  categories: { id: string; name: string; slug: string; color: string }[];
   onFilter: (category: string) => void;
 }) {
   return (
@@ -104,28 +107,27 @@ function CategoryFiltersComponent({
           >
             Все
           </button>
-          {blogCategories
-            .filter((cat) =>
-              ["Соревнования", "Интервью", "Статьи"].includes(cat.name),
-            )
-            .map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => onFilter(cat.slug)}
-                className={`${styles.filterButton} ${activeCategory === cat.slug ? styles.filterButtonActive : ""}`}
-                aria-label={cat.name}
-                aria-current={activeCategory === cat.slug ? "page" : undefined}
-              >
-                {cat.name}
-              </button>
-            ))}
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => onFilter(cat.slug)}
+              className={`${styles.filterButton} ${activeCategory === cat.slug ? styles.filterButtonActive : ""}`}
+              aria-label={cat.name}
+              aria-current={activeCategory === cat.slug ? "page" : undefined}
+            >
+              {cat.name}
+            </button>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function BlogCard({ post }: { post: (typeof sortedBlogPosts)[0] }) {
+function BlogCard({ post }: { post: BlogPost }) {
+  const featuredImage = post.featuredImage;
+  const category = post.category;
+
   return (
     <article className={styles.blogCard}>
       <div className={styles.cardImageWrapper}>
@@ -134,21 +136,25 @@ function BlogCard({ post }: { post: (typeof sortedBlogPosts)[0] }) {
           aria-label={post.title}
           title={`Читать: ${post.title}`}
         >
-          <Image
-            src={post.featuredImage.url}
-            alt={post.featuredImage.alt}
-            width={post.featuredImage.width}
-            height={post.featuredImage.height}
-            className={styles.cardImage}
-            loading="lazy"
-          />
+          {featuredImage && (
+            <Image
+              src={featuredImage.url}
+              alt={featuredImage.alt || post.title}
+              width={featuredImage.width || 400}
+              height={featuredImage.height || 300}
+              className={styles.cardImage}
+              loading="lazy"
+            />
+          )}
         </Link>
-        <span
-          className={styles.categoryTag}
-          style={{ backgroundColor: post.category.color }}
-        >
-          {post.category.name}
-        </span>
+        {category && (
+          <span
+            className={styles.categoryTag}
+            style={{ backgroundColor: category.color }}
+          >
+            {category.name}
+          </span>
+        )}
       </div>
 
       <div className={styles.cardContent}>
@@ -169,7 +175,7 @@ function BlogCard({ post }: { post: (typeof sortedBlogPosts)[0] }) {
           </Link>
         </h2>
 
-        <p className={styles.cardExcerpt}>{post.excerpt}</p>
+        {post.excerpt && <p className={styles.cardExcerpt}>{post.excerpt}</p>}
 
         <Link
           href={`/blog/${post.slug}`}
@@ -189,6 +195,8 @@ function BlogPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const categorySlug = searchParams.get("category") || "all";
   const pageParam = searchParams.get("page") || "1";
@@ -199,11 +207,38 @@ function BlogPageContent() {
   // Используем ref для отслеживания предыдущих значений
   const prevSearchParamsRef = useRef(searchParams.toString());
 
+  // Загружаем посты из API
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const data = await getPublishedPosts();
+        setPosts(data);
+      } catch (error) {
+        console.error("Ошибка загрузки постов:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPosts();
+  }, []);
+
+  // Получаем уникальные категории из загруженных постов
+  const categories = posts
+    .map((post) => post.category)
+    .filter(
+      (category): category is NonNullable<typeof category> =>
+        category !== null && category !== undefined,
+    )
+    .filter(
+      (category, index, self) =>
+        index === self.findIndex((c) => c.id === category.id),
+    );
+
   // Фильтрация и пагинация
   const filteredPosts =
     activeCategory === "all"
-      ? sortedBlogPosts
-      : sortedBlogPosts.filter((post) => post.category.slug === activeCategory);
+      ? posts
+      : posts.filter((post) => post.category?.slug === activeCategory);
 
   const totalPosts = filteredPosts.length;
   const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
@@ -245,16 +280,14 @@ function BlogPageContent() {
     [activeCategory, updateUrl],
   );
 
-  // Синхронизация с URL - исправленная версия
+  // Синхронизация с URL
   useEffect(() => {
     const currentParams = searchParams.toString();
 
-    // Проверяем, изменились ли параметры
     if (currentParams !== prevSearchParamsRef.current) {
       const slug = searchParams.get("category") || "all";
       const page = searchParams.get("page") || "1";
 
-      // Используем setTimeout для избежания синхронного обновления в эффекте
       const timer = setTimeout(() => {
         if (slug !== activeCategory) {
           setActiveCategory(slug);
@@ -266,10 +299,18 @@ function BlogPageContent() {
       }, 0);
 
       prevSearchParamsRef.current = currentParams;
-
       return () => clearTimeout(timer);
     }
   }, [searchParams, activeCategory, currentPage]);
+
+  if (loading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+        <p>Загружаем новости...</p>
+      </div>
+    );
+  }
 
   return (
     <main className="main-content" id="main-content">
@@ -279,6 +320,7 @@ function BlogPageContent() {
         {/* Секция фильтров */}
         <CategoryFiltersComponent
           activeCategory={activeCategory}
+          categories={categories}
           onFilter={handleFilter}
         />
 
@@ -289,7 +331,9 @@ function BlogPageContent() {
               Показано: <strong>{paginatedPosts.length}</strong> из{" "}
               <strong>{totalPosts}</strong> новостей
               {activeCategory !== "all" &&
-                ` в категории "${blogCategories.find((c) => c.slug === activeCategory)?.name}"`}
+                ` в категории "${
+                  categories.find((c) => c.slug === activeCategory)?.name
+                }"`}
             </p>
           </div>
 
