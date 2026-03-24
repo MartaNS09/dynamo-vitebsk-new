@@ -74,11 +74,39 @@ export default function NewApplicationPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 🔥 ИСПРАВЛЕННАЯ ФУНКЦИЯ HANDLE SUBMIT
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Отправить на бэкенд
-    console.log("Новая заявка:", formData);
-    router.push("/dashboard/applications");
+
+    try {
+      const response = await fetch("http://localhost:3001/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email || null,
+          childAge: formData.childAge ? parseInt(formData.childAge) : null,
+          message: formData.message || null,
+          sport: formData.sport || null,
+          source: "admin",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Ошибка при создании заявки");
+      }
+
+      const result = await response.json();
+      console.log("✅ Заявка создана из админки:", result);
+
+      router.push("/dashboard/applications");
+    } catch (error) {
+      console.error("❌ Ошибка:", error);
+      alert("Ошибка при создании заявки");
+    }
   };
 
   return (

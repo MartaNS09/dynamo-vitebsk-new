@@ -1,44 +1,32 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { SeoData, SeoFormData, SeoPage } from "@/types/seo.types";
+import { SeoData, SeoFormData } from "@/types/seo.types";
 import { SEO_PAGES, DEFAULT_SEO } from "@/constants/seo";
+import { API_BASE_URL } from "@/config/api";
 
-// МОК-ДАННЫЕ (пока нет API)
-const MOCK_SEO_DATA: SeoData[] = [
-  {
-    id: "1",
-    page: "home",
-    path: "/",
-    title: "Динамо Витебск | Спортивная школа олимпийского резерва",
-    description:
-      "Официальный сайт СДЮШОР Динамо Витебск. Спортивные секции для детей и подростков, профессиональные тренеры, участие в соревнованиях.",
-    keywords:
-      "Динамо Витебск, спортивная школа, секции для детей, спорт Витебск",
-    ogImage: "/images/og/home-og.jpg",
-    ogTitle: "Динамо Витебск - официальный сайт",
-    ogDescription: "Спортивная школа олимпийского резерва в Витебске",
-    robots: "index, follow",
-    isActive: true,
-    updatedAt: new Date().toISOString(),
-    updatedBy: "admin@dynamo-vitebsk.by",
-  },
-  {
-    id: "2",
-    page: "sports",
-    path: "/sports",
-    title: "Спортивные секции | Динамо Витебск",
-    description:
-      "Спортивные секции для детей и подростков в Витебске. Футбол, плавание, дзюдо, гимнастика и другие виды спорта.",
-    keywords:
-      "спортивные секции Витебск, секции для детей, спорт для подростков",
-    ogImage: "/images/og/sports-og.jpg",
-    robots: "index, follow",
-    isActive: true,
-    updatedAt: new Date().toISOString(),
-    updatedBy: "admin@dynamo-vitebsk.by",
-  },
-];
+// const getAuthToken = () => {
+//   if (typeof window !== "undefined") {
+//     return localStorage.getItem("token");
+//   }
+//   return null;
+// };
+
+const getAuthToken = () => {
+  if (typeof window !== "undefined") {
+    // Ищем оба варианта - и token, и access_token
+    const token =
+      localStorage.getItem("token") || localStorage.getItem("access_token");
+    console.log("Token from localStorage:", token ? "есть" : "нет");
+    return token;
+  }
+  return null;
+};
+
+const getHeaders = () => ({
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${getAuthToken()}`,
+});
 
 export const useSeo = () => {
   const [seoData, setSeoData] = useState<SeoData[]>([]);
@@ -48,27 +36,63 @@ export const useSeo = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Загрузка SEO данных
   const loadSeoData = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setSeoData(MOCK_SEO_DATA);
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error("Не авторизован");
+      }
+
+      const response = await fetch(`${API_BASE_URL}/seo`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Требуется авторизация");
+        }
+        if (response.status === 403) {
+          throw new Error("Недостаточно прав");
+        }
+        throw new Error(`Ошибка загрузки: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setSeoData(data);
     } catch (err) {
-      setError("Ошибка загрузки SEO данных");
-      console.error(err);
+      setError(
+        err instanceof Error ? err.message : "Ошибка загрузки SEO данных",
+      );
+      console.error("SEO load error:", err);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Получить SEO для выбранной страницы
-  const getCurrentSeo = useCallback((): SeoData | undefined => {
-    return seoData.find((item) => item.page === selectedPage);
-  }, [seoData, selectedPage]);
+  const getSeoForPage = useCallback(
+    async (page: string): Promise<SeoData | null> => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/seo/${page}`);
 
-  // Сохранить SEO
+        if (response.status === 204 || !response.ok) {
+          return null;
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (err) {
+        console.error(`Error loading SEO for page ${page}:`, err);
+        return null;
+      }
+    },
+    [],
+  );
+
   const saveSeo = useCallback(
     async (data: SeoFormData) => {
       setSaving(true);
@@ -76,54 +100,55 @@ export const useSeo = () => {
       setSuccess(null);
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        // Ищем существующую запись
-        const existingIndex = seoData.findIndex(
-          (item) => item.page === selectedPage,
-        );
-
-        const newSeoData: SeoData = {
-          id:
-            existingIndex >= 0
-              ? seoData[existingIndex].id
-              : Date.now().toString(),
-          ...data,
-          updatedAt: new Date().toISOString(),
-          updatedBy: "admin@dynamo-vitebsk.by", // Здесь будет реальный пользователь
-        };
-
-        if (existingIndex >= 0) {
-          // Обновляем существующую
-          const updated = [...seoData];
-          updated[existingIndex] = newSeoData;
-          setSeoData(updated);
-        } else {
-          // Добавляем новую
-          setSeoData([...seoData, newSeoData]);
+        const token = getAuthToken();
+        if (!token) {
+          throw new Error("Не авторизован");
         }
 
-        setSuccess("SEO настройки сохранены");
+        const response = await fetch(`${API_BASE_URL}/seo/${selectedPage}`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify(data),
+        });
 
-        // Очищаем сообщение через 3 секунды
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.message || "Ошибка сохранения");
+        }
+
+        const savedData = await response.json();
+
+        setSeoData((prev) => {
+          const index = prev.findIndex((item) => item.page === selectedPage);
+          if (index >= 0) {
+            const updated = [...prev];
+            updated[index] = savedData;
+            return updated;
+          }
+          return [...prev, savedData];
+        });
+
+        setSuccess("SEO настройки успешно сохранены");
         setTimeout(() => setSuccess(null), 3000);
       } catch (err) {
-        setError("Ошибка сохранения");
-        console.error(err);
+        setError(err instanceof Error ? err.message : "Ошибка сохранения");
+        console.error("SEO save error:", err);
       } finally {
         setSaving(false);
       }
     },
-    [seoData, selectedPage],
+    [selectedPage],
   );
 
-  // Сбросить к дефолтным значениям
-  const resetToDefault = useCallback(() => {
+  // ИСПРАВЛЕНО: теперь возвращает SeoFormData, а не Promise
+  const resetToDefault = useCallback((): SeoFormData => {
+    const pageInfo = SEO_PAGES.find((p) => p.id === selectedPage);
     const defaults =
       DEFAULT_SEO[selectedPage as keyof typeof DEFAULT_SEO] || {};
+
     return {
       page: selectedPage,
-      path: SEO_PAGES.find((p) => p.id === selectedPage)?.path || "/",
+      path: pageInfo?.path || "/",
       title: defaults.title || "",
       description: defaults.description || "",
       keywords: defaults.keywords || "",
@@ -136,6 +161,8 @@ export const useSeo = () => {
     };
   }, [selectedPage]);
 
+  const currentSeo = seoData.find((item) => item.page === selectedPage);
+
   useEffect(() => {
     loadSeoData();
   }, [loadSeoData]);
@@ -144,13 +171,14 @@ export const useSeo = () => {
     seoData,
     selectedPage,
     setSelectedPage,
-    currentSeo: getCurrentSeo(),
+    currentSeo,
     loading,
     saving,
     error,
     success,
     saveSeo,
-    resetToDefault,
+    resetToDefault, // Теперь правильный тип
+    getSeoForPage,
     refresh: loadSeoData,
   };
 };

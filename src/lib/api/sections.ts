@@ -28,27 +28,45 @@ export async function getSectionBySlug(slug: string): Promise<SportSection> {
   return res.json();
 }
 
-// Создать новую секцию
+// Создать новую секцию (с улучшенным логированием)
 export async function createSection(
   data: Partial<SportSection>,
 ): Promise<SportSection> {
   const token = localStorage.getItem("access_token");
+  console.log("📤 НАЧАЛО СОЗДАНИЯ СЕКЦИИ");
+  console.log("🔑 Токен:", token ? "есть (длина " + token.length + ")" : "нет");
+  console.log("📦 Данные для отправки:", JSON.stringify(data, null, 2));
 
-  const res = await fetch(`${API_BASE_URL}/sections`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  });
+  try {
+    const res = await fetch(`${API_BASE_URL}/sections`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
 
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.message || "Ошибка создания секции");
+    console.log("📥 Статус ответа:", res.status);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("❌ Текст ошибки:", errorText);
+      try {
+        const errorJson = JSON.parse(errorText);
+        throw new Error(errorJson.message || `Ошибка ${res.status}`);
+      } catch {
+        throw new Error(`Ошибка ${res.status}: ${errorText}`);
+      }
+    }
+
+    const result = await res.json();
+    console.log("✅ Секция успешно создана:", result);
+    return result;
+  } catch (error) {
+    console.error("❌ Исключение при создании секции:", error);
+    throw error;
   }
-
-  return res.json();
 }
 
 // Обновить секцию

@@ -21,19 +21,26 @@ import {
   RefreshCw,
   Plus,
 } from "lucide-react";
-import { Application, ApplicationStatus } from "@/types/application.types";
+import { Application } from "@/types/application.types";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
+import { updateApplication, deleteApplication } from "@/lib/api/applications";
+import {
+  getStatusName,
+  getStatusLabel,
+  getStatusColor,
+} from "@/types/application";
 import "@/styles/admin/applications-table.scss";
 
 interface ApplicationsTableProps {
   applications: Application[];
-  onStatusChange?: (id: string, status: ApplicationStatus) => void;
+  onStatusChange?: (id: string, status: string) => void;
   onDelete?: (id: string) => void;
+  onRefresh?: () => void;
 }
 
 const statusConfig: Record<
-  ApplicationStatus,
+  string,
   { label: string; color: string; icon: React.ComponentType<{ size?: number }> }
 > = {
   new: { label: "Новая", color: "#0055b7", icon: Clock },
@@ -47,13 +54,57 @@ export function ApplicationsTable({
   applications,
   onStatusChange,
   onDelete,
+  onRefresh,
 }: ApplicationsTableProps) {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">(
-    "all",
-  );
+  const [statusFilter, setStatusFilter] = useState<string | "all">("all");
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+  // Массовое изменение статуса
+  const handleBulkStatusChange = async (status: string) => {
+    const statusMap: Record<string, string> = {
+      new: "cmmvw8foo0000pxcafe77n38k",
+      in_progress: "cmmvw8fp50001pxcagnwe94re",
+      contacted: "cmmvw8fpf0002pxcazmkczu3d",
+      completed: "cmmvw8fpk0003pxcav65ar7cy",
+      cancelled: "cmmvw8fpn0004pxca1i2ubgmv",
+    };
+
+    const statusId = statusMap[status];
+    if (!statusId) return;
+
+    for (const id of selectedRows) {
+      try {
+        await updateApplication(id, { statusId: statusId });
+      } catch (error) {
+        console.error(`Ошибка обновления заявки ${id}:`, error);
+      }
+    }
+
+    alert(`Статус изменен для ${selectedRows.length} заявок`);
+    setSelectedRows([]);
+    if (onRefresh) onRefresh();
+    else window.location.reload();
+  };
+
+  // Массовое удаление
+  const handleBulkDelete = async () => {
+    if (!confirm(`Удалить ${selectedRows.length} заявок?`)) return;
+
+    for (const id of selectedRows) {
+      try {
+        await deleteApplication(id);
+      } catch (error) {
+        console.error(`Ошибка удаления заявки ${id}:`, error);
+      }
+    }
+
+    alert(`Удалено ${selectedRows.length} заявок`);
+    setSelectedRows([]);
+    if (onRefresh) onRefresh();
+    else window.location.reload();
+  };
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) =>
@@ -82,13 +133,37 @@ export function ApplicationsTable({
       app.sport?.toLowerCase().includes(search.toLowerCase()) ||
       app.email?.toLowerCase().includes(search.toLowerCase());
 
-    const matchesStatus = statusFilter === "all" || app.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || getStatusName(app.status) === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusBadge = (status: ApplicationStatus) => {
-    const config = statusConfig[status];
+  const getStatusBadge = (statusObj: any) => {
+    const statusName = getStatusName(statusObj);
+    const config = statusName
+      ? statusConfig[statusName as keyof typeof statusConfig]
+      : null;
+
+    if (!config) {
+      return (
+        <span
+          className="status-badge"
+          style={{
+            backgroundColor: "#6b728010",
+            color: "#6b7280",
+            borderColor: "#6b728020",
+            padding: "4px 8px",
+            borderRadius: "4px",
+            fontSize: "12px",
+            fontWeight: "500",
+            display: "inline-block",
+          }}
+        >
+          {statusObj?.label || String(statusName || "Неизвестно")}
+        </span>
+      );
+    }
 
     return (
       <span
@@ -111,7 +186,6 @@ export function ApplicationsTable({
 
   return (
     <div className="applications-admin">
-      {/* Хедер */}
       <div className="applications-header">
         <div className="header-left">
           <h1>Заявки на запись</h1>
@@ -125,7 +199,6 @@ export function ApplicationsTable({
         </div>
       </div>
 
-      {/* Статистика */}
       <div className="stats-cards">
         {[
           { status: "new", icon: Clock, label: "Новые" },
@@ -139,7 +212,10 @@ export function ApplicationsTable({
             </div>
             <div className="stat-info">
               <div className="stat-value">
-                {applications.filter((a) => a.status === status).length}
+                {
+                  applications.filter((a) => getStatusName(a.status) === status)
+                    .length
+                }
               </div>
               <div className="stat-label">{label}</div>
             </div>
@@ -147,7 +223,6 @@ export function ApplicationsTable({
         ))}
       </div>
 
-      {/* Фильтры */}
       <div className="filters-panel">
         <div className="search-section">
           <div className="search-box">
@@ -164,10 +239,8 @@ export function ApplicationsTable({
           <div className="filter-group">
             <Filter size={16} />
             <select
-              value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value as ApplicationStatus | "all")
-              }
+              value={statusFilter as string}
+              onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="all">Все статусы</option>
               <option value="new">Новые</option>
@@ -180,19 +253,24 @@ export function ApplicationsTable({
         </div>
       </div>
 
-      {/* Bulk actions */}
       {selectedRows.length > 0 && (
         <div className="bulk-actions">
           <span className="selected-count">Выбрано: {selectedRows.length}</span>
           <div className="bulk-buttons">
-            <button className="bulk-btn active">
+            <button
+              className="bulk-btn active"
+              onClick={() => handleBulkStatusChange("in_progress")}
+            >
               <CheckCircle size={16} />В работу
             </button>
-            <button className="bulk-btn contacted">
+            <button
+              className="bulk-btn contacted"
+              onClick={() => handleBulkStatusChange("contacted")}
+            >
               <Phone size={16} />
               Связались
             </button>
-            <button className="bulk-btn delete">
+            <button className="bulk-btn delete" onClick={handleBulkDelete}>
               <Trash2 size={16} />
               Удалить
             </button>
@@ -200,7 +278,6 @@ export function ApplicationsTable({
         </div>
       )}
 
-      {/* Таблица */}
       <div className="applications-table">
         <div className="table-header">
           <div className="col-checkbox">
@@ -326,7 +403,6 @@ export function ApplicationsTable({
                 </div>
               </div>
 
-              {/* Раскрывающаяся строка */}
               {expandedRows.includes(app.id) && (
                 <div className="table-row expanded">
                   <div className="col-expand"></div>
@@ -346,12 +422,15 @@ export function ApplicationsTable({
                       <div className="expanded-section">
                         <h4>История статусов</h4>
                         <div className="status-history">
-                          {app.statusHistory.map((history, idx) => (
+                          {(typeof app.statusHistory === "string"
+                            ? JSON.parse(app.statusHistory)
+                            : app.statusHistory || []
+                          ).map((history: any, idx: number) => (
                             <div key={idx} className="history-item">
                               {getStatusBadge(history.status)}
                               <div className="history-date">
                                 {format(
-                                  new Date(history.changedAt),
+                                  new Date(history.changedAt || history.date),
                                   "dd MMM HH:mm",
                                 )}
                               </div>
@@ -365,12 +444,9 @@ export function ApplicationsTable({
                         <div className="quick-actions">
                           <select
                             className="status-select"
-                            value={app.status}
+                            value={getStatusName(app.status) || ""}
                             onChange={(e) =>
-                              onStatusChange?.(
-                                app.id,
-                                e.target.value as ApplicationStatus,
-                              )
+                              onStatusChange?.(app.id, e.target.value)
                             }
                           >
                             <option value="new">Новая</option>
@@ -394,7 +470,6 @@ export function ApplicationsTable({
         </div>
       </div>
 
-      {/* Пагинация */}
       <div className="table-footer">
         <div className="pagination-info">
           Показано 1-{filteredApplications.length} из {applications.length}

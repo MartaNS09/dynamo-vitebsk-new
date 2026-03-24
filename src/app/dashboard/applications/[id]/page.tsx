@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -15,9 +15,13 @@ import {
   RefreshCw,
   Save,
   Trash2,
-  Download,
+  // Download,
 } from "lucide-react";
-import { mockApplications } from "@/data/applications";
+import {
+  getApplication,
+  updateApplication,
+  deleteApplication,
+} from "@/lib/api/applications";
 import { Application, ApplicationStatus } from "@/types/application.types";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -34,8 +38,10 @@ const statusConfig = {
 export default function ApplicationDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = use(params);
+
   const router = useRouter();
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,16 +49,40 @@ export default function ApplicationDetailPage({
   const [selectedStatus, setSelectedStatus] =
     useState<ApplicationStatus>("new");
 
-  useEffect(() => {
-    setTimeout(() => {
-      const app = mockApplications.find((a) => a.id === params.id);
-      if (app) {
-        setApplication(app);
-        setSelectedStatus(app.status);
+  const getAbonement = () => {
+    if (!application?.selectedAbonement) return null;
+
+    if (typeof application.selectedAbonement === "string") {
+      try {
+        return JSON.parse(application.selectedAbonement);
+      } catch {
+        console.error("Ошибка парсинга selectedAbonement");
+        return null;
       }
-      setLoading(false);
-    }, 300);
-  }, [params.id]);
+    }
+    return application.selectedAbonement;
+  };
+
+  const abonement = getAbonement();
+
+  useEffect(() => {
+    const loadApplication = async () => {
+      try {
+        console.log("📥 Загружаем заявку с ID:", id);
+        const data = await getApplication(id);
+        setApplication(data);
+        // Получаем имя статуса (если объект - берем name, если строка - саму строку)
+        const statusName =
+          typeof data.status === "object" ? data.status.name : data.status;
+        setSelectedStatus(statusName || "new");
+      } catch (error) {
+        console.error("❌ Ошибка загрузки заявки:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadApplication();
+  }, [id]);
 
   const handleAddNote = () => {
     if (!newNote.trim() || !application) return;
@@ -72,23 +102,84 @@ export default function ApplicationDetailPage({
     setNewNote("");
   };
 
-  const handleStatusChange = () => {
-    if (!application || selectedStatus === application.status) return;
+  const handleStatusChange = async () => {
+    if (!application) return;
 
-    setApplication({
-      ...application,
-      status: selectedStatus,
-      updatedAt: new Date().toISOString(),
-      statusHistory: [
-        ...application.statusHistory,
-        {
-          status: selectedStatus,
-          changedAt: new Date().toISOString(),
-          changedBy: "current_user",
-          changedByName: "Текущий пользователь",
-        },
-      ],
+    // Получаем текущее имя статуса
+    const currentStatusName =
+      typeof application.status === "object"
+        ? application.status.name
+        : application.status;
+
+    if (selectedStatus === currentStatusName) return;
+
+    console.log("🔄 Меняем статус:", {
+      id: id,
+      currentStatus: currentStatusName,
+      newStatus: selectedStatus,
     });
+
+    try {
+      // Маппинг статусов (ID из базы данных)
+      const statusMap: Record<string, string> = {
+        new: "cmmvw8foo0000pxcafe77n38k",
+        in_progress: "cmmvw8fp50001pxcagnwe94re",
+        contacted: "cmmvw8fpf0002pxcazmkczu3d",
+        completed: "cmmvw8fpk0003pxcav65ar7cy",
+        cancelled: "cmmvw8fpn0004pxca1i2ubgmv",
+      };
+
+      const statusId = statusMap[selectedStatus];
+
+      if (!statusId) {
+        console.error("Не найден ID статуса для:", selectedStatus);
+        alert("Не удалось обновить статус: ID статуса не найден");
+        return;
+      }
+
+      await updateApplication(id, { statusId: statusId });
+
+      // Обновляем локальное состояние
+      setApplication({
+        ...application,
+        status: {
+          ...(typeof application.status === "object" && application.status
+            ? application.status
+            : {}),
+          name: selectedStatus,
+          label: statusConfig[selectedStatus]?.label || selectedStatus,
+        },
+        updatedAt: new Date().toISOString(),
+        statusHistory: [
+          ...(application.statusHistory || []),
+          {
+            status: selectedStatus,
+            changedAt: new Date().toISOString(),
+            changedBy: "current_user",
+            changedByName: "Текущий пользователь",
+          },
+        ],
+      });
+
+      alert("Статус успешно изменен!");
+    } catch (error) {
+      console.error("Ошибка обновления статуса:", error);
+      alert("Не удалось обновить статус");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!application) return;
+
+    if (confirm("Вы уверены, что хотите удалить заявку?")) {
+      try {
+        await deleteApplication(id);
+        router.push("/dashboard/applications");
+      } catch (error) {
+        console.error("Ошибка удаления:", error);
+        alert("Не удалось удалить заявку");
+      }
+    }
   };
 
   if (loading) {
@@ -108,31 +199,35 @@ export default function ApplicationDetailPage({
     );
   }
 
-  const StatusIcon = statusConfig[application.status].icon;
+  const statusName =
+    typeof application.status === "object"
+      ? application.status.name
+      : application.status;
+  const StatusIcon = statusConfig[statusName || "new"]?.icon || Clock;
 
   return (
     <div className="application-detail">
-      {/* Хедер */}
       <div className="detail-header">
         <button onClick={() => router.back()} className="back-btn">
           <ArrowLeft size={20} />
           Назад к заявкам
         </button>
         <div className="header-actions">
-          <button className="btn-secondary">
-            <Download size={18} />
-            Экспорт
+          <button
+            onClick={() => router.push(`/dashboard/applications/${id}/edit`)}
+            className="btn-secondary"
+          >
+            <Save size={18} />
+            Редактировать
           </button>
-          <button className="btn-danger">
+          <button className="btn-danger" onClick={handleDelete}>
             <Trash2 size={18} />
             Удалить
           </button>
         </div>
       </div>
 
-      {/* Основной контент */}
       <div className="detail-grid">
-        {/* Левая колонка - информация о клиенте */}
         <div className="detail-main">
           <div className="detail-card">
             <div className="card-header">
@@ -140,13 +235,13 @@ export default function ApplicationDetailPage({
               <div
                 className="status-badge"
                 style={{
-                  background: `${statusConfig[application.status].color}10`,
-                  color: statusConfig[application.status].color,
-                  border: `1px solid ${statusConfig[application.status].color}20`,
+                  background: `${statusConfig[statusName || "new"].color}10`,
+                  color: statusConfig[statusName || "new"].color,
+                  border: `1px solid ${statusConfig[statusName || "new"].color}20`,
                 }}
               >
                 <StatusIcon size={16} />
-                {statusConfig[application.status].label}
+                {statusConfig[statusName || "new"].label}
               </div>
             </div>
 
@@ -210,17 +305,17 @@ export default function ApplicationDetailPage({
                 </span>
               </div>
 
-              {application.selectedAbonement && (
+              {abonement && (
                 <div className="detail-row abonement-row">
                   <span className="row-label">Выбранный абонемент:</span>
                   <div className="abonement-detail">
-                    <div className="abonement-name">
-                      {application.selectedAbonement.name}
-                    </div>
-                    <div className="abonement-price">
-                      {application.selectedAbonement.price} BYN /{" "}
-                      {application.selectedAbonement.duration}
-                    </div>
+                    <div className="abonement-name">{abonement.name}</div>
+                    <div className="abonement-price">{abonement.price} BYN</div>
+                    {abonement.duration && (
+                      <div className="abonement-duration">
+                        {abonement.duration}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -245,7 +340,9 @@ export default function ApplicationDetailPage({
                       ? "Страница секции"
                       : application.source === "abonement_page"
                         ? "Страница абонемента"
-                        : "Другое"}
+                        : application.source === "admin"
+                          ? "Админка"
+                          : "Другое"}
                 </span>
               </div>
 
@@ -258,7 +355,6 @@ export default function ApplicationDetailPage({
             </div>
           </div>
 
-          {/* Заметки менеджера */}
           <div className="detail-card">
             <h2>Заметки менеджера</h2>
 
@@ -295,7 +391,6 @@ export default function ApplicationDetailPage({
           </div>
         </div>
 
-        {/* Правая колонка - статус и история */}
         <div className="detail-sidebar">
           <div className="sidebar-card">
             <h3>Изменить статус</h3>
@@ -317,7 +412,7 @@ export default function ApplicationDetailPage({
             <button
               className="save-status-btn"
               onClick={handleStatusChange}
-              disabled={selectedStatus === application.status}
+              disabled={selectedStatus === statusName}
             >
               <Save size={16} />
               Сохранить статус
@@ -328,36 +423,40 @@ export default function ApplicationDetailPage({
             <h3>История статусов</h3>
 
             <div className="history-list">
-              {application.statusHistory.map((history, index) => {
-                const Icon = statusConfig[history.status].icon;
-                return (
-                  <div key={index} className="history-item">
-                    <div
-                      className="history-icon"
-                      style={{
-                        background: `${statusConfig[history.status].color}10`,
-                        color: statusConfig[history.status].color,
-                      }}
-                    >
-                      <Icon size={14} />
-                    </div>
-                    <div className="history-content">
-                      <div className="history-status">
-                        {statusConfig[history.status].label}
+              {application.statusHistory &&
+                application.statusHistory.map((history, index) => {
+                  const historyStatusName =
+                    typeof history.status === "object"
+                      ? history.status.name
+                      : history.status;
+                  const Icon = statusConfig[historyStatusName]?.icon || Clock;
+                  return (
+                    <div key={index} className="history-item">
+                      <div
+                        className="history-icon"
+                        style={{
+                          background: `${statusConfig[historyStatusName]?.color || "#000"}10`,
+                          color:
+                            statusConfig[historyStatusName]?.color || "#000",
+                        }}
+                      >
+                        <Icon size={14} />
                       </div>
-                      <div className="history-date">
-                        {format(
-                          new Date(history.changedAt),
-                          "dd MMM yyyy, HH:mm",
-                        )}
+                      <div className="history-content">
+                        <div className="history-status">
+                          {statusConfig[historyStatusName]?.label ||
+                            historyStatusName}
+                        </div>
+                        <div className="history-date">
+                          {format(
+                            new Date(history.changedAt),
+                            "dd MMM yyyy, HH:mm",
+                          )}
+                        </div>
                       </div>
-                      {history.comment && (
-                        <div className="history-comment">{history.comment}</div>
-                      )}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
           </div>
         </div>

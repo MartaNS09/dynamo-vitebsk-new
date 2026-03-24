@@ -222,7 +222,14 @@ export default function NewSectionPage() {
   };
 
   const onSubmit = async (data: NewSectionFormData) => {
-    console.log("🔥 Создание новой секции");
+    // 🔥 ДОБАВЛЕННЫЕ ЛОГИ
+    console.log("🔥 onSubmit сработал в форме создания секции!");
+    console.log("📋 Данные формы:", data);
+    console.log(
+      "🔑 Токен из localStorage:",
+      localStorage.getItem("access_token") ? "есть" : "нет",
+    );
+
     setLoading(true);
     try {
       const token = localStorage.getItem("access_token");

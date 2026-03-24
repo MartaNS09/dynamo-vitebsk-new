@@ -87,23 +87,27 @@ export function NewsSection() {
             <article key={item.id} className={styles.newsCard}>
               <div className={styles.imageContainer}>
                 <Link href={`/blog/${item.slug}`}>
-                  <Image
-                    src={item.featuredImage.url}
-                    alt={item.featuredImage.alt}
-                    width={400}
-                    height={250}
-                    className={styles.image}
-                    loading="lazy"
-                    sizes="(max-width: 768px) 100vw, 400px"
-                    quality={85}
-                  />
+                  {item.featuredImage && (
+                    <Image
+                      src={item.featuredImage.url}
+                      alt={item.featuredImage.alt || item.title}
+                      width={400}
+                      height={250}
+                      className={styles.image}
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 400px"
+                      quality={85}
+                    />
+                  )}
                 </Link>
-                <span
-                  className={styles.category}
-                  style={{ backgroundColor: item.category.color }}
-                >
-                  {item.category.name}
-                </span>
+                {item.category && (
+                  <span
+                    className={styles.category}
+                    style={{ backgroundColor: item.category.color }}
+                  >
+                    {item.category.name}
+                  </span>
+                )}
               </div>
 
               <div className={styles.content}>
@@ -140,7 +144,9 @@ export function NewsSection() {
                 onClick={() => setCurrentIndex(i)}
                 aria-label={`Перейти к новости ${i + 1}`}
                 type="button"
-              />
+              >
+                {i === currentIndex ? `Новость ${i + 1}` : `Новость ${i + 1}`}
+              </button>
             ))}
           </div>
           <button

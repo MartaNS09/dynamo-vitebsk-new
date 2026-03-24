@@ -1,8 +1,5 @@
-import {
-  Application,
-  ApplicationStatus,
-  ApplicationSource,
-} from "@/types/application.types";
+import { Application, ApplicationSource } from "@/types/application.types";
+import { getStatusName } from "@/types/application";
 
 // Генерация случайных дат за последние 30 дней
 const getRandomDate = (daysAgo: number) => {
@@ -11,18 +8,53 @@ const getRandomDate = (daysAgo: number) => {
   return date.toISOString();
 };
 
-const statuses: ApplicationStatus[] = [
-  "new",
-  "new",
-  "new",
-  "new",
-  "in_progress",
-  "in_progress",
-  "in_progress",
-  "contacted",
-  "contacted",
-  "completed",
-  "cancelled",
+const statusObjects = [
+  { id: "status_new", name: "new", label: "Новая", color: "#3b82f6" },
+  { id: "status_new", name: "new", label: "Новая", color: "#3b82f6" },
+  { id: "status_new", name: "new", label: "Новая", color: "#3b82f6" },
+  { id: "status_new", name: "new", label: "Новая", color: "#3b82f6" },
+  {
+    id: "status_in_progress",
+    name: "in_progress",
+    label: "В обработке",
+    color: "#f59e0b",
+  },
+  {
+    id: "status_in_progress",
+    name: "in_progress",
+    label: "В обработке",
+    color: "#f59e0b",
+  },
+  {
+    id: "status_in_progress",
+    name: "in_progress",
+    label: "В обработке",
+    color: "#f59e0b",
+  },
+  {
+    id: "status_contacted",
+    name: "contacted",
+    label: "Связались",
+    color: "#00d4aa",
+  },
+  {
+    id: "status_contacted",
+    name: "contacted",
+    label: "Связались",
+    color: "#00d4aa",
+  },
+  {
+    id: "status_completed",
+    name: "completed",
+    label: "Завершена",
+    color: "#10b981",
+  },
+  {
+    id: "status_cancelled",
+    name: "cancelled",
+    label: "Отменена",
+    color: "#ef4444",
+  },
 ];
 
 const sources: ApplicationSource[] = [
@@ -59,8 +91,8 @@ export const mockApplications: Application[] = Array.from(
   (_, i) => {
     const id = `app_${String(i + 1).padStart(3, "0")}`;
     const createdAt = getRandomDate(30);
-    const statusIndex = Math.floor(Math.random() * statuses.length);
-    const status = statuses[statusIndex];
+    const statusIndex = Math.floor(Math.random() * statusObjects.length);
+    let status = statusObjects[statusIndex];
     const sourceIndex = Math.floor(Math.random() * sources.length);
     const source = sources[sourceIndex];
     const sportIndex = Math.floor(Math.random() * sports.length);
@@ -79,8 +111,15 @@ export const mockApplications: Application[] = Array.from(
         }
       : undefined;
 
-    const finalStatus =
-      hasAbonement && status === "new" ? "in_progress" : status;
+    // Если есть абонемент и статус new, меняем на in_progress
+    if (hasAbonement && getStatusName(status) === "new") {
+      status = {
+        id: "status_in_progress",
+        name: "in_progress",
+        label: "В обработке",
+        color: "#f59e0b",
+      };
+    }
 
     return {
       id,
@@ -97,13 +136,19 @@ export const mockApplications: Application[] = Array.from(
       source,
       sectionId: `section_${sportIndex + 1}`,
       sectionName: sport,
-      status: finalStatus,
-      // ИСПРАВЛЕНО: явно указываем тип
+      status: status,
       statusHistory: [
         {
-          status: "new" as ApplicationStatus,
+          status: {
+            id: "status_new",
+            name: "new",
+            label: "Новая",
+            color: "#3b82f6",
+          },
           changedAt: createdAt,
           comment: "Заявка создана",
+          changedBy: "system",
+          changedByName: "Система",
         },
       ],
       managerNotes:
@@ -128,18 +173,20 @@ export const mockApplications: Application[] = Array.from(
 
 export const getApplicationStats = () => {
   const total = mockApplications.length;
-  const new_count = mockApplications.filter((a) => a.status === "new").length;
+  const new_count = mockApplications.filter(
+    (a) => getStatusName(a.status) === "new",
+  ).length;
   const inProgress = mockApplications.filter(
-    (a) => a.status === "in_progress",
+    (a) => getStatusName(a.status) === "in_progress",
   ).length;
   const contacted = mockApplications.filter(
-    (a) => a.status === "contacted",
+    (a) => getStatusName(a.status) === "contacted",
   ).length;
   const completed = mockApplications.filter(
-    (a) => a.status === "completed",
+    (a) => getStatusName(a.status) === "completed",
   ).length;
   const cancelled = mockApplications.filter(
-    (a) => a.status === "cancelled",
+    (a) => getStatusName(a.status) === "cancelled",
   ).length;
 
   return {
