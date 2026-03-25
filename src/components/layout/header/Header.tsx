@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { HeaderTop } from "./HeaderTop/HeaderTop";
 import { Logo } from "./Logo/Logo";
 import { DesktopNav } from "./DesktopNav/DesktopNav";
@@ -9,6 +10,7 @@ import { SearchIcon } from "@/components/icons";
 import "./Header.scss";
 
 export const Header = () => {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -20,56 +22,56 @@ export const Header = () => {
     const handleScroll = () => {
       if (!ticking) {
         rafId = requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 20);
+          setIsScrolled(window.scrollY > 50);
           ticking = false;
         });
         ticking = true;
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
       cancelAnimationFrame(rafId);
     };
   }, []);
 
-  const handleSearch = useCallback((value: string) => {
-    console.log("Search:", value);
-    if (window.innerWidth <= 768) {
-      setIsSearchOpen(false);
-    }
-  }, []);
+  const handleSearch = useCallback(
+    (value: string) => {
+      console.log("Search:", value);
+      if (value && value.trim()) {
+        router.push(`/search?q=${encodeURIComponent(value.trim())}`);
+      }
+      if (window.innerWidth <= 768) {
+        setIsSearchOpen(false);
+      }
+    },
+    [router],
+  );
 
   const handleMenuToggle = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
-  }, []);
+    if (isSearchOpen) setIsSearchOpen(false);
+  }, [isSearchOpen]);
 
   const handleSearchToggle = useCallback(() => {
     setIsSearchOpen((prev) => !prev);
-  }, []);
+    if (isMenuOpen) setIsMenuOpen(false);
+  }, [isMenuOpen]);
 
   const handleNavClick = useCallback(() => {
-    requestAnimationFrame(() => {
-      setIsMenuOpen(false);
-      setIsSearchOpen(false);
-    });
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
   }, []);
 
   return (
-    <header
-      className={`header ${isScrolled ? "header--scrolled" : ""}`}
-      role="banner"
-      aria-label="Основная навигация"
-    >
+    <header className={`header ${isScrolled ? "header--scrolled" : ""}`}>
       <HeaderTop />
-
       <div className="header__main">
         <div className="container">
           <div className="header__content">
             <Logo onClick={handleNavClick} />
-            <DesktopNav onNavClick={handleNavClick} />{" "}
-            {/* ← ИСПОЛЬЗУЕМ СТАРЫЙ! */}
+            <DesktopNav onNavClick={handleNavClick} />
             <div className="header__search">
               <Search variant="desktop" onSearch={handleSearch} />
             </div>
@@ -82,28 +84,30 @@ export const Header = () => {
               >
                 <SearchIcon />
               </button>
-
               <button
                 className={`header__menu-toggle ${
                   isMenuOpen ? "header__menu-toggle--active" : ""
                 }`}
                 onClick={handleMenuToggle}
-                aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+                aria-label="Меню"
                 aria-expanded={isMenuOpen}
               >
-                <span className="header__menu-icon"></span>
+                <span className="header__menu-icon" />
               </button>
             </div>
           </div>
-
-          <MobileMenu
-            isOpen={isMenuOpen}
-            onClose={handleNavClick}
-            isSearchOpen={isSearchOpen}
-            onSearch={handleSearch}
-          />
         </div>
       </div>
+      <MobileMenu isOpen={isMenuOpen} onNavClick={handleNavClick} />
+      {isSearchOpen && (
+        <div className="header__search-mobile header__search-mobile--open">
+          <Search
+            variant="mobile"
+            onSearch={handleSearch}
+            onClear={() => setIsSearchOpen(false)}
+          />
+        </div>
+      )}
     </header>
   );
 };

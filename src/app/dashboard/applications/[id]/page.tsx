@@ -129,7 +129,8 @@ export default function ApplicationDetailPage({
         cancelled: "cmmvw8fpn0004pxca1i2ubgmv",
       };
 
-      const statusId = statusMap[selectedStatus];
+      // const statusId = statusMap[selectedStatus];
+      const statusId = statusMap[selectedStatus as keyof typeof statusMap];
 
       if (!statusId) {
         console.error("Не найден ID статуса для:", selectedStatus);
