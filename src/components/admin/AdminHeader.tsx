@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bell, LogOut, Menu, Shield } from "lucide-react";
+import { LogOut, Menu, Shield } from "lucide-react";
 import { AdminUser } from "@/types/auth.types";
 import { useAuth } from "@/contexts/AuthContext";
+import NotificationBell from "./notifications/NotificationBell";
 
 interface AdminHeaderProps {
   user: AdminUser | null;
@@ -12,13 +13,8 @@ interface AdminHeaderProps {
   sidebarOpen: boolean;
 }
 
-export default function AdminHeader({
-  user,
-  onMenuClick,
-  // sidebarOpen,
-}: AdminHeaderProps) {
+export default function AdminHeader({ user, onMenuClick }: AdminHeaderProps) {
   const { logout } = useAuth();
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   const getRoleName = (role: string) => {
     switch (role) {
@@ -49,63 +45,14 @@ export default function AdminHeader({
       </div>
 
       <div className="header-right">
-        {/* ===== КОЛОКОЛЬЧИК ===== */}
-        <div className="notifications">
-          {/* ТОЛЬКО ОДНА КНОПКА! */}
-          <button
-            className="notification-btn"
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            aria-label="Уведомления"
-          >
-            <Bell size={20} />
-            <span className="notification-badge">3</span>
-          </button>
+        {/* Уведомления */}
+        <NotificationBell />
 
-          {notificationsOpen && (
-            <div className="notifications-dropdown">
-              <div className="notifications-header">
-                <h4>Уведомления</h4>
-                <span>3 новых</span>
-              </div>
-              <div className="notifications-list">
-                <div className="notification-item unread">
-                  <div className="notification-content">
-                    <p className="notification-title">Новая заявка</p>
-                    <p className="notification-text">
-                      Иванов Иван оставил заявку на секцию
-                    </p>
-                    <span className="notification-time">5 минут назад</span>
-                  </div>
-                </div>
-                <div className="notification-item unread">
-                  <div className="notification-content">
-                    <p className="notification-title">Обновление контента</p>
-                    <p className="notification-text">
-                      Статья &quot;Новости спорта&quot; требует модерации
-                    </p>
-                    <span className="notification-time">1 час назад</span>
-                  </div>
-                </div>
-                <div className="notification-item">
-                  <div className="notification-content">
-                    <p className="notification-title">Системное уведомление</p>
-                    <p className="notification-text">
-                      Резервное копирование выполнено успешно
-                    </p>
-                    <span className="notification-time">2 часа назад</span>
-                  </div>
-                </div>
-              </div>
-              <div className="notifications-footer">
-                <button>Все уведомления</button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Профиль пользователя */}
+        {/* Профиль пользователя - используем класс user-menu как в старых стилях */}
         <div className="user-menu">
-          <div className="avatar">{user?.name?.charAt(0) || "A"}</div>
+          <div className="avatar">
+            {user?.name?.charAt(0) || user?.email?.charAt(0) || "A"}
+          </div>
           <div className="user-info">
             <span className="user-name">{user?.name || "Администратор"}</span>
             <span className="user-role">{getRoleName(user?.role || "")}</span>
