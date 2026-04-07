@@ -4,26 +4,29 @@ import { Suspense } from "react";
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Mail,
-  Phone,
-  User,
-  Calendar,
-  Users,
-  CreditCard,
-} from "lucide-react";
+import { Mail, Phone, User, Calendar, Users, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/Button/Button";
 import { ALL_SECTIONS } from "@/data/sport-sections";
+import TrainerSelector from "@/components/enrollment/TrainerSelector";
+import TrainerAbonementSelector from "@/components/enrollment/TrainerAbonementSelector";
+import PaymentInstructions from "@/components/enrollment/PaymentInstructions";
+import {
+  getTrainerAbonementByName,
+  TrainerAbonement,
+} from "@/data/trainer-abonement-data";
 import "./page.scss";
 
 function EnrollmentForm() {
   const searchParams = useSearchParams();
 
-  const sportFromUrl = searchParams.get("sport");
-  const abonementId = searchParams.get("abonement");
-  const abonementPrice = searchParams.get("price");
+  // Параметры из URL
+  const sportFromUrl = searchParams.get("sport") || searchParams.get("section");
+  const abonementId =
+    searchParams.get("abonement") || searchParams.get("abonementId");
+  const abonementPrice =
+    searchParams.get("price") || searchParams.get("abonementPrice");
   const abonementName = searchParams.get("abonementName");
+  const trainerIdFromUrl = searchParams.get("trainerId");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -35,42 +38,66 @@ function EnrollmentForm() {
     abonementName: abonementName || "",
     abonementPrice: abonementPrice || "",
     message: "",
+    paymentAccount: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSection, setSelectedSection] = useState<any>(null);
+  const [selectedTrainer, setSelectedTrainer] = useState<any>(null);
+  const [selectedAbonement, setSelectedAbonement] =
+    useState<TrainerAbonement | null>(null);
+  const [selectedTrainerAbonement, setSelectedTrainerAbonement] =
+    useState<TrainerAbonement | null>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
-
-  // МАППИНГ ID АБОНЕМЕНТОВ (slug -> реальный ID)
-  const abonementIdMap: Record<string, string> = {
-    "kickboxing-2": "cmmx50m8l00074hcaywyhwr3a",
-    "gymnastics-1": "cmmx50m7c00004hca1enay9dk",
-    "gymnastics-2": "cmmx50m7g00014hca6nlsghyy",
-    "kickboxing-1": "cmmx50m8b00064hcadbr8zy72",
-    "kickboxing-3": "cmmx50m8n00084hca5ke47lt3",
-    "kickboxing-4": "cmmx50m8u00094hcaek2otkeu",
-    "kickboxing-5": "cmmx50m91000a4hcanjtmx7qm",
-    "vajra-yoga-1": "cmmx50m9o000e4hcahjcxyhul",
-    "vajra-yoga-2": "cmmx50m9t000f4hcaw9jun6m5",
-    "vajra-yoga-3": "cmmx50ma0000g4hcaihrrufz1",
-    "judo-1": "cmmx50mag000i4hcay90rtru6",
-    "judo-2": "cmmx50mak000j4hcae6zho5cs",
-    "judo-3": "cmmx50mam000k4hca38dl5gwl",
-    "viet-vo-dao-1": "cmmx50mb5000n4hca5kmwsrpe",
-    "shooting-1": "cmmx50mbl000p4hca6ojcuphx",
-    "shooting-2": "cmmx50mbo000q4hcablpm5a2p",
-    "choreography-1": "cmmx50mch000v4hca1qvzdqi7",
-    "developing-gymnastics-1": "cmmx50md4000w4hcaxpkmudjr",
-    "developing-gymnastics-2": "cmmx50md6000x4hca2qv1sr48",
-    "freestyle-1": "cmmx50mdm000y4hcay6dd8559",
-    "fireman-1": "cmmx50mdz00114hcawcubidjl",
-  };
 
   useEffect(() => {
     if (formData.sport) {
       const section = ALL_SECTIONS.find((s) => s.name === formData.sport);
       setSelectedSection(section || null);
+    }
+  }, [formData.sport]);
+
+  // Сохраняем абонемент из URL при загрузке
+  useEffect(() => {
+    if (abonementName && abonementPrice) {
+      setFormData((prev) => ({
+        ...prev,
+        abonementId: abonementId || "",
+        abonementName: abonementName,
+        abonementPrice: abonementPrice,
+      }));
+    }
+  }, [abonementName, abonementPrice, abonementId]);
+
+  // Если передан абонемент из URL, пытаемся найти его данные
+  useEffect(() => {
+    if (abonementName && abonementPrice) {
+      setSelectedAbonement({
+        id: abonementId || "temp",
+        name: abonementName,
+        price: Number(abonementPrice),
+        duration: "1 месяц",
+        paymentAccount: "",
+      });
+    }
+  }, [abonementName, abonementPrice, abonementId]);
+
+  // Сбрасываем выбранный абонемент и тренера при смене секции
+  useEffect(() => {
+    if (formData.sport) {
+      // Сбрасываем выбранный абонемент
+      setSelectedAbonement(null);
+      setSelectedTrainerAbonement(null);
+      setSelectedTrainer(null);
+
+      // Сбрасываем данные абонемента в форме
+      setFormData((prev) => ({
+        ...prev,
+        abonementId: "",
+        abonementName: "",
+        abonementPrice: "",
+      }));
     }
   }, [formData.sport]);
 
@@ -123,21 +150,12 @@ function EnrollmentForm() {
     if (!validateForm()) return;
     setIsSubmitting(true);
 
-    // ПОИСК АБОНЕМЕНТА
-    let selectedAbonementFull = null;
-    if (formData.abonementId && selectedSection?.abonements) {
-      const realId = abonementIdMap[formData.abonementId];
-      selectedAbonementFull = selectedSection.abonements.find(
-        (a: any) => a.id === realId || a.id === formData.abonementId,
-      );
-    }
-
     console.log("📋 Отправка заявки:", {
       sport: formData.sport,
       sectionId: selectedSection?.id,
       sectionName: selectedSection?.name,
-      abonementId: formData.abonementId,
-      selectedAbonementFull,
+      selectedTrainer,
+      selectedAbonement,
     });
 
     try {
@@ -154,14 +172,23 @@ function EnrollmentForm() {
           source: "enrollment_form",
           sectionId: selectedSection?.id || null,
           sectionName: selectedSection?.name || null,
-          selectedAbonement: selectedAbonementFull
+          selectedAbonement: selectedAbonement
             ? {
-                id: selectedAbonementFull.id,
-                name: selectedAbonementFull.name,
-                price: selectedAbonementFull.price,
-                duration: selectedAbonementFull.duration,
+                id: selectedAbonement.id,
+                name: selectedAbonement.name,
+                price: selectedAbonement.price,
+                duration: selectedAbonement.duration,
+                paymentAccount: selectedAbonement.paymentAccount,
               }
             : null,
+          selectedTrainer: selectedTrainer
+            ? {
+                id: selectedTrainer.id,
+                name: selectedTrainer.name,
+                position: selectedTrainer.position,
+              }
+            : null,
+          paymentAccount: selectedAbonement?.paymentAccount || null,
         }),
       });
 
@@ -180,7 +207,11 @@ function EnrollmentForm() {
           abonementName: "",
           abonementPrice: "",
           message: "",
+          paymentAccount: "",
         });
+        setSelectedTrainer(null);
+        setSelectedAbonement(null);
+        setSelectedTrainerAbonement(null);
       } else {
         throw new Error(result.message || "Ошибка при отправке");
       }
@@ -349,6 +380,103 @@ function EnrollmentForm() {
                 </select>
               </div>
             </div>
+
+            {/* Выбор тренера - для общей формы (БЕЗ предвыбранного абонемента) */}
+            {selectedSection?.id && !formData.abonementPrice && (
+              <TrainerSelector
+                sectionId={selectedSection.id}
+                onSelect={(trainer, paymentAccount) => {
+                  setSelectedTrainer(trainer);
+                  if (paymentAccount && selectedAbonement) {
+                    setSelectedAbonement({
+                      ...selectedAbonement,
+                      paymentAccount: paymentAccount,
+                    });
+                  }
+                }}
+                selectedTrainerId={trainerIdFromUrl || undefined}
+              />
+            )}
+
+            {/* Выбор тренера - для формы с предвыбранным абонементом (из секции) */}
+            {selectedSection?.id && formData.abonementPrice && (
+              <TrainerSelector
+                sectionId={selectedSection.id}
+                abonementPrice={Number(formData.abonementPrice)}
+                onSelect={(trainer, paymentAccount) => {
+                  setSelectedTrainer(trainer);
+                  if (paymentAccount && selectedAbonement) {
+                    setSelectedAbonement({
+                      ...selectedAbonement,
+                      paymentAccount: paymentAccount,
+                    });
+                  } else if (paymentAccount && !selectedAbonement) {
+                    setSelectedAbonement({
+                      id: abonementId || "temp",
+                      name: formData.abonementName || "",
+                      price: Number(formData.abonementPrice) || 0,
+                      duration: "1 месяц",
+                      paymentAccount: paymentAccount,
+                    });
+                  }
+                }}
+                selectedTrainerId={trainerIdFromUrl || undefined}
+              />
+            )}
+
+            {/* Выбор абонемента - только для общей формы (БЕЗ предвыбранного абонемента) */}
+            {selectedTrainer && !formData.abonementPrice && (
+              <TrainerAbonementSelector
+                trainerName={selectedTrainer.name}
+                sectionId={selectedSection.id}
+                onSelect={(abonement) => {
+                  setSelectedTrainerAbonement(abonement);
+                  if (abonement) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      abonementId: abonement.id,
+                      abonementName: abonement.name,
+                      abonementPrice: String(abonement.price),
+                    }));
+                    setSelectedAbonement(abonement);
+                  }
+                }}
+              />
+            )}
+
+            {/* Инструкция по оплате */}
+            {selectedTrainer && selectedAbonement && (
+              <PaymentInstructions
+                trainerName={selectedTrainer.name}
+                paymentAccount={selectedAbonement.paymentAccount}
+                abonementName={selectedAbonement.name}
+                abonementPrice={selectedAbonement.price}
+                instructions={`
+                  <h4>Абонемент: ${selectedAbonement?.name || formData.abonementName} - ${selectedAbonement?.price || formData.abonementPrice} BYN</h4>
+                  <h4>Как оплатить через систему «Расчет» (ЕРИП)</h4>
+                  <ol>
+                    <li>Выберите пункт "Система «Расчет» (ЕРИП)"</li>
+                    <li>Выберите "Образование и развитие"</li>
+                    <li>Выберите "Спорт и физическое развитие"</li>
+                    <li>Выберите "Физкультурные центры"</li>
+                    <li>Выберите "Витебская обл."</li>
+                    <li>Выберите "СДЮШОР БФСО Динамо"</li>
+                    <li>Выберите "Физкультурно-оздоровит.услуги"</li>
+                    <li><strong>Введите номер счета: ${selectedAbonement?.paymentAccount || ""}</strong></li>
+                    <li>Введите свои данные (фамилию, имя, отчество)</li>
+                    <li>Проверьте правильность информации</li>
+                    <li>Совершите платеж</li>
+                  </ol>
+                  <p><strong>Справки по тел. 37-36-35</strong></p>
+                  <p><strong>ИЛИ оплатите по коду услуги:</strong></p>
+                  <ol>
+                    <li>Выберите пункт "Система «Расчет» (ЕРИП)"</li>
+                    <li>Выберите "Оплата в ЕРИП по коду услуги"</li>
+                    <li>Введите код <strong>207383</strong></li>
+                  </ol>
+                `}
+              />
+            )}
 
             <input
               type="hidden"

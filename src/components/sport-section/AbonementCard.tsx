@@ -1,3 +1,4 @@
+// 7 апреля
 "use client";
 
 import React from "react";
@@ -63,9 +64,7 @@ export default function AbonementCard({
       {/* Кнопка */}
       <div className={styles.actions}>
         <a
-          href={`/enrollment?section=${encodeURIComponent(
-            sectionName
-          )}&abonement=${abonement.id}`}
+          href={`/enrollment?section=${encodeURIComponent(sectionName)}&abonementId=${abonement.id}&abonementName=${encodeURIComponent(abonement.name)}&abonementPrice=${abonement.price}`}
           className={styles.enrollButton}
           onClick={(e) => {
             e.stopPropagation();
