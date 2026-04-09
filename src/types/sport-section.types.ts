@@ -7,6 +7,7 @@ export interface Abonement {
   duration: string;
   features: string[];
   isPopular?: boolean;
+  // paymentAccount?: string; // ← ДОБАВИТЬ ЭТУ СТРОКУ
 }
 
 export interface Trainer {
@@ -15,6 +16,7 @@ export interface Trainer {
   position: string;
   photo?: string;
   description?: string;
+  // paymentAccount?: string; // ← ДОБАВИТЬ ЭТУ СТРОКУ
 }
 
 export interface SportSection {

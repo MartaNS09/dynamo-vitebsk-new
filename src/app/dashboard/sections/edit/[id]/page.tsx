@@ -896,7 +896,7 @@ export default function EditSectionPage({
           </div>
         )}
 
-        {/* ТРЕНЕРЫ */}
+        {/* ТРЕНЕРЫ - РАБОЧАЯ ВЕРСИЯ БЕЗ НОМЕРА СЧЕТА */}
         {activeTab === "trainers" && (
           <div className="tab-content">
             <div className="trainers-section">
@@ -1026,8 +1026,7 @@ export default function EditSectionPage({
           </div>
         )}
 
-        {/* МЕДИА - ИСПРАВЛЕННАЯ ВЕРСИЯ */}
-
+        {/* МЕДИА */}
         {activeTab === "media" && (
           <div className="tab-content">
             <div className="media-section">
@@ -1037,7 +1036,6 @@ export default function EditSectionPage({
                   Добавьте фотографии секции
                 </p>
 
-                {/* КРАСИВАЯ КНОПКА ЗАГРУЗКИ */}
                 <div style={{ marginBottom: "20px" }}>
                   <input
                     type="file"
@@ -1075,7 +1073,6 @@ export default function EditSectionPage({
                   </button>
                 </div>
 
-                {/* ГАЛЕРЕЯ */}
                 {watch("gallery") && watch("gallery").length > 0 ? (
                   <div className="gallery-grid">
                     {watch("gallery").map((image, index) => (

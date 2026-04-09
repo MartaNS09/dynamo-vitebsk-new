@@ -63,6 +63,7 @@ const newSectionSchema = z.object({
       name: z.string(),
       position: z.string(),
       photo: z.string().optional(),
+      // paymentAccount: z.string().optional(), // ЭТУ СТРОКУ НАДО ДОБАВИТЬ
     }),
   ),
 });
@@ -936,7 +937,8 @@ export default function NewSectionPage() {
                     <Upload size={32} color="#9ca3af" />
                     <p>Нет изображений в галерее</p>
                     <p>
-                      Нажмите кнопку "Добавить изображения" чтобы загрузить фото
+                      Нажмите кнопку &quot;Добавить изображения&quot; чтобы
+                      загрузить фото
                     </p>
                   </div>
                 )}

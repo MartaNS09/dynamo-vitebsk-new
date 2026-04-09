@@ -321,6 +321,27 @@ export default function ApplicationDetailPage({
                 </div>
               )}
 
+              {/* Выбранный тренер */}
+              {application.selectedTrainer && (
+                <div className="detail-row">
+                  <span className="row-label">Выбранный тренер:</span>
+                  <span className="row-value">
+                    {application.selectedTrainer.name} -{" "}
+                    {application.selectedTrainer.position}
+                  </span>
+                </div>
+              )}
+
+              {/* Номер счета для оплаты */}
+              {(application as any).paymentAccount && (
+                <div className="detail-row">
+                  <span className="row-label">Номер счета в ЕРИП:</span>
+                  <span className="row-value">
+                    {(application as any).paymentAccount}
+                  </span>
+                </div>
+              )}
+
               <div className="detail-row">
                 <span className="row-label">Дата заявки:</span>
                 <span className="row-value">
