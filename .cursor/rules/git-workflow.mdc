@@ -1,15 +1,15 @@
 ---
-description: Единый рабочий процесс Git для фронтенда — одна ветка main, без расходящихся remote-историй
+description: Git: канонический remote — Dmitry716/dynamo-vitebsk-vps
 alwaysApply: true
 ---
 
 # Git / ветки (Dynamo frontend)
 
-- **Один «источник правды» для продакшена и GitHub Actions:** remote `origin` → ветка **`main`** (`MartaNS09/dynamo-vitebsk-new`). Деплой на VPS настроен на `git pull` / `reset` с **`origin/main`**.
-- **Не вести параллельно две несовместимые линии коммитов** (как `origin/main` и `origin-vps/main` с разными merge-base без общего rebase). Новые фичи: короткоживущие ветки `feat/…` или `fix/…` от **актуального `main`**, PR/merge в `main`, затем `git push origin main`.
-- **Перед сменой ветки / merge:** `git fetch origin` и `git status` (чистое дерево или осознанный коммит/stash).
-- **Слияние:** предпочитать `rebase` ветки задачи на `origin/main` и fast-forward, либо один merge commit с осознанным разрешением конфликтов. Избегать `merge` двух давно разошедшихся `main` без rebase.
-- **После правок:** один осмысленный коммит (или логичная серия), проверка `npm run build` локально при существенных изменениях, затем **`git push origin main`**.
-- **Второй remote** (`origin-vps`) — только если команда договорилась о зеркалировании; иначе не пушить туда вместо `origin`, чтобы не плодить две «главных» ветки.
+- **Канон для пуша:** `origin` → **`https://github.com/Dmitry716/dynamo-vitebsk-vps`**, ветка **`main`**. Обычно: `git push origin main`.
+- **Дополнительно:** remote **`marta`** → `MartaNS09/dynamo-vitebsk-new` (зеркало/коллаборация при необходимости: `git push marta main`).
+- **Расходящиеся `main` на двух remote** — не норма: при необходимости выровнять одну линию (`rebase`/`merge`) или осознанно **`--force-with-lease`** на канонический remote после `fetch`.
+- **Перед merge/push:** `git fetch origin` и чистое дерево (`git status`).
+- **Задачи:** короткие ветки `feat/…` / `fix/…` от актуального `origin/main`, потом merge в `main` и пуш.
+- **Перед релизом:** по возможности `npm run build`.
 
-Когда ассистент вносит изменения в репозиторий: работать от **`main`**, не создавать расходящуюся «вечную» ветку, не предлагать ручной деплой вместо выравнивания `main`, если для этого нет веской причины (секреты, доступы).
+VPS-деплой: подтянуть код с **`origin/main`** (Dmitry), не путать с устаревшей копией Marta, если она отстаёт.
