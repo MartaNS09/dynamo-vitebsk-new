@@ -22,7 +22,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const seo = await getSeoForPage(`sports-${slug}`);
+  const seo = (await getSeoForPage(`sports-${slug}`)) || (await getSeoForPage("sports-single"));
 
   try {
     const section = await getSectionBySlug(slug);

@@ -3,6 +3,12 @@ import { SeoData, SeoFormData } from "@/types/seo.types";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const NORMALIZED_API_BASE_URL = API_BASE_URL.replace(/\/+$/, "");
 
+async function disableServerCaching() {
+  if (typeof window !== "undefined") return;
+  const { unstable_noStore } = await import("next/cache");
+  unstable_noStore();
+}
+
 function normalizeSeoData(raw: Partial<SeoData>): SeoData {
   return {
     id: raw.id || "",
@@ -24,6 +30,7 @@ function normalizeSeoData(raw: Partial<SeoData>): SeoData {
 
 export async function getAllSeo(): Promise<SeoData[]> {
   try {
+    await disableServerCaching();
     const response = await fetch(`${NORMALIZED_API_BASE_URL}/seo`, {
       cache: "no-store",
     });
@@ -44,6 +51,7 @@ export async function getAllSeo(): Promise<SeoData[]> {
 
 export async function getSeoForPage(page: string): Promise<SeoData | null> {
   try {
+    await disableServerCaching();
     const response = await fetch(`${NORMALIZED_API_BASE_URL}/seo/${page}`, {
       cache: "no-store",
     });

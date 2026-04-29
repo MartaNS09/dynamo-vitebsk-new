@@ -13,7 +13,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const normalizedSlug = slug.toLowerCase();
-  const seo = await getSeoForPage(`departments-${normalizedSlug}`);
+  const seo =
+    (await getSeoForPage(`departments-${normalizedSlug}`)) ||
+    (await getSeoForPage("departments-single"));
   const dept = ALL_DEPARTMENTS.find(
     (d) => d.seoSlug.toLowerCase() === normalizedSlug
   );

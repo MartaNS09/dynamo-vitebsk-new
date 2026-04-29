@@ -2,13 +2,51 @@ import { Metadata } from "next";
 import Link from "next/link";
 import DepartmentsHero from "./components/DepartmentsHero";
 import { ALL_DEPARTMENTS } from "@/data/departments";
+import { getSeoForPage } from "@/lib/api/seo";
 import styles from "./page.module.scss";
 
-export const metadata: Metadata = {
+const FALLBACK_DEPARTMENTS_METADATA: Metadata = {
   title: "Спортивные отделения | СДЮШОР Динамо Витебск",
-  description:
-    "10 профессиональных спортивных отделений с многолетней историей",
+  description: "10 профессиональных спортивных отделений с многолетней историей",
+  alternates: {
+    canonical: "/departments",
+  },
+  openGraph: {
+    title: "Спортивные отделения | СДЮШОР Динамо Витебск",
+    description: "10 профессиональных спортивных отделений с многолетней историей",
+    url: "/departments",
+    type: "website",
+  },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoForPage("departments");
+
+  if (!seo || !seo.isActive) {
+    return FALLBACK_DEPARTMENTS_METADATA;
+  }
+
+  return {
+    title: seo.title || FALLBACK_DEPARTMENTS_METADATA.title,
+    description: seo.description || FALLBACK_DEPARTMENTS_METADATA.description,
+    keywords: seo.keywords || undefined,
+    alternates: {
+      canonical: seo.canonical || seo.path || "/departments",
+    },
+    robots: seo.robots || undefined,
+    openGraph: {
+      title:
+        seo.ogTitle || seo.title || "Спортивные отделения | СДЮШОР Динамо Витебск",
+      description:
+        seo.ogDescription ||
+        seo.description ||
+        "10 профессиональных спортивных отделений с многолетней историей",
+      url: seo.canonical || seo.path || "/departments",
+      images: seo.ogImage ? [seo.ogImage] : undefined,
+      type: "website",
+    },
+  };
+}
 
 export default function DepartmentsPage() {
   return (

@@ -23,7 +23,7 @@ export async function generateMetadata({
 }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = blogPosts.find((p) => p.slug === slug);
-  const seo = await getSeoForPage(`blog-${slug}`);
+  const seo = (await getSeoForPage(`blog-${slug}`)) || (await getSeoForPage("blog-single"));
 
   if (!post) {
     return {
