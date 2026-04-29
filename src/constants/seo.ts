@@ -4,7 +4,6 @@ import { SeoFormData } from "@/types/seo.types"; // <-- ДОБАВЬ ЭТОТ И
 export const SEO_PAGES: SeoPage[] = [
   // Главные страницы
   { id: "home", name: "Главная страница", path: "/", group: "main" },
-  { id: "about", name: "О школе", path: "/about", group: "main" },
   { id: "history", name: "История", path: "/history", group: "main" },
   {
     id: "trainers",
@@ -26,13 +25,13 @@ export const SEO_PAGES: SeoPage[] = [
     id: "departments",
     name: "Отделения",
     path: "/departments",
-    group: "departments",
+    group: "sections",
   },
   {
     id: "departments-single",
     name: "Страница отделения",
     path: "/departments/[slug]",
-    group: "departments",
+    group: "sections",
   },
 
   // Блог
@@ -67,7 +66,6 @@ export const SEO_PAGES: SeoPage[] = [
 export const SEO_GROUPS = [
   { id: "main", name: "Основные страницы" },
   { id: "sections", name: "Секции и спорт" },
-  { id: "departments", name: "Отделения" },
   { id: "blog", name: "Блог" },
   { id: "info", name: "Информационные" },
   { id: "system", name: "Системные" },
@@ -87,12 +85,6 @@ export const DEFAULT_SEO: Record<string, Partial<SeoFormData>> = {
       "Официальный сайт СДЮШОР Динамо Витебск. Спортивные секции для детей и подростков, профессиональные тренеры, участие в соревнованиях.",
     keywords:
       "Динамо Витебск, спортивная школа, секции для детей, спорт Витебск",
-  },
-  about: {
-    title: "О школе | Динамо Витебск",
-    description:
-      "История и достижения спортивной школы Динамо Витебск. Наши тренеры и воспитанники.",
-    keywords: "история Динамо Витебск, достижения, тренеры",
   },
 };
 
