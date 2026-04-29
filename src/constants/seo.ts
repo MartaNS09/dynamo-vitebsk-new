@@ -66,6 +66,8 @@ export const SEO_PAGES: SeoPage[] = [
 export const SEO_GROUPS = [
   { id: "main", name: "Основные страницы" },
   { id: "sections", name: "Секции и спорт" },
+  // Должна совпадать с group у динамических страниц в dashboard/seo/page.tsx (dynamicDepartmentPages)
+  { id: "departments", name: "Страницы отделений" },
   { id: "blog", name: "Блог" },
   { id: "info", name: "Информационные" },
   { id: "system", name: "Системные" },
