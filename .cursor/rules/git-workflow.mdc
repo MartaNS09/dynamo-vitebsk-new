@@ -12,4 +12,4 @@ alwaysApply: true
 - **Задачи:** короткие ветки `feat/…` / `fix/…` от актуального `origin/main`, потом merge в `main` и пуш.
 - **Перед релизом:** по возможности `npm run build`.
 
-VPS-деплой: подтянуть код с **`origin/main`** (Dmitry), не путать с устаревшей копией Marta, если она отстаёт.
+VPS (194.62.19.203, `/var/www/dynamo-vitebsk-new`): `origin` = **SSH** `git@github.com:Dmitry716/dynamo-vitebsk-vps.git`. Доступ к GitHub — **read-only deploy key** в настройках репо: ключ `~root/.ssh/dynamo_vitebsk_deploy` на сервере, в `~/.ssh/config` для `Host github.com` указан этот `IdentityFile`. Деплой: `git fetch origin && git reset --hard origin/main` (или pull), затем `npm ci`, `npm run build`, `pm2 restart dynamo-frontend`. Remote **`marta`** — запасной HTTPS, если SSH ещё не настроен.
