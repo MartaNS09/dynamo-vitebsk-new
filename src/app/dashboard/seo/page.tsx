@@ -8,6 +8,10 @@ import { SeoPagesList } from "@/components/admin/seo/SeoPagesList";
 import { SeoForm } from "@/components/admin/seo/SeoForm";
 import { useSeo } from "@/hooks/admin/useSeo";
 import { SEO_PAGES } from "@/constants/seo";
+import { SeoPage as SeoPageType } from "@/types/seo.types";
+import { getSections } from "@/lib/api/sections";
+import { ALL_DEPARTMENTS } from "@/data/departments";
+import { blogPosts } from "@/data/blog-posts";
 import { RefreshCw, CheckCircle, AlertCircle, Shield } from "lucide-react";
 import styles from "./page.module.scss";
 
@@ -22,12 +26,60 @@ export default function SeoPage() {
     currentSeo,
     loading,
     saving,
+    initializing,
     error,
     success,
     saveSeo,
     resetToDefault,
+    initializeDefaults,
     refresh,
   } = useSeo();
+  const [dynamicSectionPages, setDynamicSectionPages] = React.useState<
+    SeoPageType[]
+  >([]);
+  const dynamicDepartmentPages = React.useMemo(
+    () =>
+      ALL_DEPARTMENTS.filter((department) => Boolean(department.seoSlug)).map(
+        (department) => ({
+          id: `departments-${department.seoSlug.toLowerCase()}`,
+          name: department.title,
+          path: `/departments/${department.seoSlug.toLowerCase()}`,
+          group: "departments" as const,
+        }),
+      ),
+    [],
+  );
+  const dynamicBlogPages = React.useMemo(
+    () =>
+      blogPosts
+        .filter((post) => Boolean(post.slug))
+        .map((post) => ({
+          id: `blog-${post.slug}`,
+          name: `Блог: ${post.title}`,
+          path: `/blog/${post.slug}`,
+          group: "blog" as const,
+        })),
+    [],
+  );
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const sections = await getSections();
+        const pages = sections
+          .filter((section) => Boolean(section.slug))
+          .map((section) => ({
+            id: `sports-${section.slug}`,
+            name: section.name,
+            path: `/sports/${section.slug}`,
+            group: "sections" as const,
+          }));
+        setDynamicSectionPages(pages);
+      } catch {
+        setDynamicSectionPages([]);
+      }
+    })();
+  }, []);
 
   // Проверка прав доступа
   React.useEffect(() => {
@@ -55,7 +107,22 @@ export default function SeoPage() {
     {} as Record<string, boolean>,
   );
 
-  const pageInfo = SEO_PAGES.find((p) => p.id === selectedPage);
+  const allPages = React.useMemo(() => {
+    const staticWithoutTemplate = SEO_PAGES.filter(
+      (page) =>
+        page.id !== "sports-single" &&
+        page.id !== "departments-single" &&
+        page.id !== "blog-single",
+    );
+    return [
+      ...staticWithoutTemplate,
+      ...dynamicSectionPages,
+      ...dynamicDepartmentPages,
+      ...dynamicBlogPages,
+    ];
+  }, [dynamicBlogPages, dynamicDepartmentPages, dynamicSectionPages]);
+
+  const pageInfo = allPages.find((p) => p.id === selectedPage);
 
   if (loading) {
     return (
@@ -75,11 +142,20 @@ export default function SeoPage() {
             Настройка мета-тегов для всех страниц сайта
           </p>
         </div>
-
-        <button className={styles.refreshButton} onClick={refresh}>
-          <RefreshCw size={18} />
-          Обновить
-        </button>
+        <div className={styles.headerActions}>
+          <button
+            className={styles.refreshButton}
+            onClick={initializeDefaults}
+            disabled={initializing}
+          >
+            <RefreshCw size={18} />
+            {initializing ? "Инициализация..." : "Инициализировать дефолты"}
+          </button>
+          <button className={styles.refreshButton} onClick={refresh}>
+            <RefreshCw size={18} />
+            Обновить
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -101,13 +177,14 @@ export default function SeoPage() {
           selectedPage={selectedPage}
           onSelectPage={setSelectedPage}
           hasData={hasData}
+          pages={allPages}
         />
 
         <SeoForm
           initialData={currentSeo}
           pageInfo={pageInfo}
           onSave={saveSeo}
-          onReset={resetToDefault}
+          onReset={() => resetToDefault(pageInfo?.path)}
           saving={saving}
         />
       </div>

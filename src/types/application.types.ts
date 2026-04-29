@@ -31,6 +31,9 @@ export interface Application {
     name: string;
     price: number;
     duration: string;
+    trainerId?: string;
+    trainerName?: string;
+    accountNumber?: string;
   };
 
   // Откуда пришла заявка

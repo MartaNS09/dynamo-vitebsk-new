@@ -15,6 +15,12 @@ export interface Trainer {
   position: string;
   photo?: string;
   description?: string;
+  paymentAccounts?: TrainerPaymentAccount[];
+}
+
+export interface TrainerPaymentAccount {
+  sessions: string;
+  accountNumber: string;
 }
 
 export interface SportSection {

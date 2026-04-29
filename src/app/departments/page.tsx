@@ -26,7 +26,7 @@ export default function DepartmentsPage() {
             {ALL_DEPARTMENTS.map((dept) => (
               <Link
                 key={dept.id}
-                href={`/departments/${dept.seoSlug}`}
+                href={`/departments/${dept.seoSlug.toLowerCase()}`}
                 className={styles.departmentCard}
               >
                 <div className={styles.cardImage}>

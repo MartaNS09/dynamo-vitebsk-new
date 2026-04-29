@@ -1,38 +1,33 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import BlogForm from "@/components/admin/blog/BlogForm";
-import { blogPosts } from "@/data/blog-posts";
+import { BlogPost } from "@/types/blog.types";
+import { getBlogPostById } from "@/lib/api/blog";
 
-interface EditBlogPostPageProps {
-  params: Promise<{ id: string }>;
-}
+export default function EditBlogPostPage() {
+  const params = useParams<{ id: string }>();
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export async function generateMetadata({
-  params,
-}: EditBlogPostPageProps): Promise<Metadata> {
-  const { id } = await params;
-  const post = blogPosts.find((p) => p.id === id);
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getBlogPostById(params.id);
+        setPost(data);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [params.id]);
 
-  if (!post) {
-    return {
-      title: "Статья не найдена",
-    };
+  if (loading) {
+    return <div className="loading-spinner" />;
   }
 
-  return {
-    title: `Редактирование: ${post.title}`,
-    description: `Редактирование статьи "${post.title}"`,
-  };
-}
-
-export default async function EditBlogPostPage({
-  params,
-}: EditBlogPostPageProps) {
-  const { id } = await params;
-  const post = blogPosts.find((p) => p.id === id);
-
   if (!post) {
-    notFound();
+    return <div>Статья не найдена</div>;
   }
 
   return <BlogForm post={post} />;

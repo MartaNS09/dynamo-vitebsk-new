@@ -3,48 +3,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { SeoData, SeoFormData, SeoPage } from "@/types/seo.types";
 import { SEO_PAGES, DEFAULT_SEO } from "@/constants/seo";
-
-// МОК-ДАННЫЕ (пока нет API)
-const MOCK_SEO_DATA: SeoData[] = [
-  {
-    id: "1",
-    page: "home",
-    path: "/",
-    title: "Динамо Витебск | Спортивная школа олимпийского резерва",
-    description:
-      "Официальный сайт СДЮШОР Динамо Витебск. Спортивные секции для детей и подростков, профессиональные тренеры, участие в соревнованиях.",
-    keywords:
-      "Динамо Витебск, спортивная школа, секции для детей, спорт Витебск",
-    ogImage: "/images/og/home-og.jpg",
-    ogTitle: "Динамо Витебск - официальный сайт",
-    ogDescription: "Спортивная школа олимпийского резерва в Витебске",
-    robots: "index, follow",
-    isActive: true,
-    updatedAt: new Date().toISOString(),
-    updatedBy: "admin@dynamo-vitebsk.by",
-  },
-  {
-    id: "2",
-    page: "sports",
-    path: "/sports",
-    title: "Спортивные секции | Динамо Витебск",
-    description:
-      "Спортивные секции для детей и подростков в Витебске. Футбол, плавание, дзюдо, гимнастика и другие виды спорта.",
-    keywords:
-      "спортивные секции Витебск, секции для детей, спорт для подростков",
-    ogImage: "/images/og/sports-og.jpg",
-    robots: "index, follow",
-    isActive: true,
-    updatedAt: new Date().toISOString(),
-    updatedBy: "admin@dynamo-vitebsk.by",
-  },
-];
+import {
+  getAllSeo,
+  initializeDefaultSeo,
+  upsertSeoForPage,
+} from "@/lib/api/seo";
 
 export const useSeo = () => {
   const [seoData, setSeoData] = useState<SeoData[]>([]);
   const [selectedPage, setSelectedPage] = useState<string>("home");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [initializing, setInitializing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -53,8 +23,8 @@ export const useSeo = () => {
     setLoading(true);
     setError(null);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setSeoData(MOCK_SEO_DATA);
+      const data = await getAllSeo();
+      setSeoData(data);
     } catch (err) {
       setError("Ошибка загрузки SEO данных");
       console.error(err);
@@ -76,31 +46,15 @@ export const useSeo = () => {
       setSuccess(null);
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        // Ищем существующую запись
-        const existingIndex = seoData.findIndex(
-          (item) => item.page === selectedPage,
-        );
-
-        const newSeoData: SeoData = {
-          id:
-            existingIndex >= 0
-              ? seoData[existingIndex].id
-              : Date.now().toString(),
-          ...data,
-          updatedAt: new Date().toISOString(),
-          updatedBy: "admin@dynamo-vitebsk.by", // Здесь будет реальный пользователь
-        };
+        const saved = await upsertSeoForPage(selectedPage, data);
+        const existingIndex = seoData.findIndex((item) => item.page === selectedPage);
 
         if (existingIndex >= 0) {
-          // Обновляем существующую
           const updated = [...seoData];
-          updated[existingIndex] = newSeoData;
+          updated[existingIndex] = saved;
           setSeoData(updated);
         } else {
-          // Добавляем новую
-          setSeoData([...seoData, newSeoData]);
+          setSeoData([...seoData, saved]);
         }
 
         setSuccess("SEO настройки сохранены");
@@ -118,12 +72,15 @@ export const useSeo = () => {
   );
 
   // Сбросить к дефолтным значениям
-  const resetToDefault = useCallback(() => {
+  const resetToDefault = useCallback(
+    (pagePath?: string) => {
     const defaults =
       DEFAULT_SEO[selectedPage as keyof typeof DEFAULT_SEO] || {};
+      const fallbackPath =
+        pagePath || SEO_PAGES.find((p) => p.id === selectedPage)?.path || "/";
     return {
       page: selectedPage,
-      path: SEO_PAGES.find((p) => p.id === selectedPage)?.path || "/",
+        path: fallbackPath,
       title: defaults.title || "",
       description: defaults.description || "",
       keywords: defaults.keywords || "",
@@ -133,8 +90,30 @@ export const useSeo = () => {
       robots: "index, follow",
       canonical: "",
       isActive: true,
-    };
-  }, [selectedPage]);
+      };
+    },
+    [selectedPage],
+  );
+
+  const initializeDefaults = useCallback(async () => {
+    setInitializing(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const result = await initializeDefaultSeo();
+      await loadSeoData();
+      setSuccess(
+        `Инициализация завершена: добавлено ${result.created}, уже существовало ${result.existed}`,
+      );
+      setTimeout(() => setSuccess(null), 4000);
+    } catch (err) {
+      setError("Ошибка инициализации SEO");
+      console.error(err);
+    } finally {
+      setInitializing(false);
+    }
+  }, [loadSeoData]);
 
   useEffect(() => {
     loadSeoData();
@@ -147,10 +126,12 @@ export const useSeo = () => {
     currentSeo: getCurrentSeo(),
     loading,
     saving,
+    initializing,
     error,
     success,
     saveSeo,
     resetToDefault,
+    initializeDefaults,
     refresh: loadSeoData,
   };
 };

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import SportSectionPageClient from "./page.client";
 import { SportSection, Abonement, Trainer } from "@/types/sport-section.types";
 import { getSectionBySlug } from "@/lib/api/sections";
+import { getSeoForPage } from "@/lib/api/seo";
 
 // Экспортируем тип для использования в клиентском компоненте
 export interface SectionWithData extends SportSection {
@@ -21,6 +22,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const seo = await getSeoForPage(`sports-${slug}`);
 
   try {
     const section = await getSectionBySlug(slug);
@@ -29,6 +31,38 @@ export async function generateMetadata({
       return {
         title: "Секция не найдена",
         description: "Данной спортивной секции не существует",
+      };
+    }
+
+    if (seo?.isActive) {
+      return {
+        title: seo.title || `${section.name} | СДЮШОР Динамо Витебск`,
+        description: seo.description || section.shortDescription,
+        keywords: seo.keywords || undefined,
+        alternates: {
+          canonical: seo.canonical || `/sports/${section.slug}`,
+        },
+        robots: seo.robots || undefined,
+        openGraph: {
+          title: seo.ogTitle || seo.title || `${section.name} | Динамо Витебск`,
+          description: seo.ogDescription || seo.description || section.shortDescription,
+          url: seo.canonical || `/sports/${section.slug}`,
+          images: seo.ogImage
+            ? [
+                {
+                  url: seo.ogImage,
+                  alt: section.name,
+                },
+              ]
+            : [
+                {
+                  url: section.coverImage || "",
+                  width: 1200,
+                  height: 630,
+                  alt: section.name,
+                },
+              ],
+        },
       };
     }
 

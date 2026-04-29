@@ -13,6 +13,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { ALL_SECTIONS } from "@/data/sport-sections";
+import { createApplication } from "@/lib/api/applications";
 import "@/styles/admin/new-application.scss";
 
 export default function NewApplicationPage() {
@@ -74,10 +75,17 @@ export default function NewApplicationPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Отправить на бэкенд
-    console.log("Новая заявка:", formData);
+    await createApplication({
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email || undefined,
+      childAge: formData.childAge ? Number(formData.childAge) : undefined,
+      sport: formData.sport || undefined,
+      message: formData.message || undefined,
+      source: "other",
+    });
     router.push("/dashboard/applications");
   };
 

@@ -2,45 +2,38 @@
 
 import { useState, useEffect } from "react";
 import { ApplicationsTable } from "@/components/admin/applications/ApplicationsTable";
-import { mockApplications, getApplicationStats } from "@/data/applications";
 import { Application, ApplicationStatus } from "@/types/application.types";
+import {
+  deleteApplication,
+  getApplications,
+  updateApplicationStatus,
+} from "@/lib/api/applications";
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setApplications(mockApplications);
-      setLoading(false);
-    }, 500);
+    (async () => {
+      try {
+        const data = await getApplications();
+        setApplications(data);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  const handleStatusChange = (id: string, status: ApplicationStatus) => {
+  const handleStatusChange = async (id: string, status: ApplicationStatus) => {
+    const updated = await updateApplicationStatus(id, status);
     setApplications((prev) =>
-      prev.map((app) =>
-        app.id === id
-          ? {
-              ...app,
-              status,
-              updatedAt: new Date().toISOString(),
-              statusHistory: [
-                ...app.statusHistory,
-                {
-                  status,
-                  changedAt: new Date().toISOString(),
-                  changedBy: "current_user",
-                  changedByName: "Текущий пользователь",
-                },
-              ],
-            }
-          : app,
-      ),
+      prev.map((app) => (app.id === id ? updated : app)),
     );
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Вы уверены, что хотите удалить заявку?")) {
+      await deleteApplication(id);
       setApplications((prev) => prev.filter((app) => app.id !== id));
     }
   };

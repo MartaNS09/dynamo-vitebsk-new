@@ -3,42 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { AdminUser, UserFilters } from "@/types/user.types";
 import { UserRole } from "@/types/auth.types";
-
-// ВРЕМЕННЫЕ МОК-ДАННЫЕ (пока нет API)
-const MOCK_USERS: AdminUser[] = [
-  {
-    id: "1",
-    email: "admin@dynamo-vitebsk.by",
-    name: "Иван Петров",
-    role: UserRole.SUPER_ADMIN,
-    position: "Главный администратор",
-    lastLogin: "2026-02-18T10:30:00Z",
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-    isActive: true,
-  },
-  {
-    id: "2",
-    email: "editor@dynamo-vitebsk.by",
-    name: "Анна Смирнова",
-    role: UserRole.EDITOR,
-    position: "Редактор контента",
-    lastLogin: "2026-02-17T15:45:00Z",
-    createdAt: "2025-02-15T00:00:00Z",
-    updatedAt: "2025-02-15T00:00:00Z",
-    isActive: true,
-  },
-  {
-    id: "3",
-    email: "inactive@dynamo-vitebsk.by",
-    name: "Петр Иванов",
-    role: UserRole.ADMIN,
-    position: "Бывший администратор",
-    createdAt: "2025-01-10T00:00:00Z",
-    updatedAt: "2025-03-01T00:00:00Z",
-    isActive: false,
-  },
-];
+import {
+  createUser as apiCreateUser,
+  deleteUser as apiDeleteUser,
+  getUsers,
+  inviteUser as apiInviteUser,
+  updateUser as apiUpdateUser,
+} from "@/lib/api/users";
 
 // Типы для данных форм
 interface CreateUserData {
@@ -79,10 +50,8 @@ export const useUsers = () => {
   const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
-      // Имитация загрузки
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      let filtered = [...MOCK_USERS];
+      const loaded = await getUsers();
+      let filtered = [...loaded];
 
       // Фильтрация по роли
       if (filters.role) {
@@ -115,31 +84,40 @@ export const useUsers = () => {
 
   // Создание пользователя
   const createUser = async (data: CreateUserData) => {
-    console.log("Создание пользователя:", data);
+    await apiCreateUser({
+      ...data,
+      password: "Admin123456!",
+    });
     await loadUsers();
   };
 
   // Обновление пользователя
   const updateUser = async (id: string, data: UpdateUserData) => {
-    console.log("Обновление пользователя:", id, data);
+    await apiUpdateUser(id, data);
     await loadUsers();
   };
 
   // Удаление пользователя
   const deleteUser = async (id: string) => {
-    console.log("Удаление пользователя:", id);
+    await apiDeleteUser(id);
     await loadUsers();
   };
 
   // Изменение статуса
   const toggleUserStatus = async (id: string, isActive: boolean) => {
-    console.log("Изменение статуса:", id, isActive);
+    await apiUpdateUser(id, { isActive });
     await loadUsers();
   };
 
   // Приглашение пользователя
   const inviteUser = async (data: InviteUserData) => {
-    console.log("Приглашение пользователя:", data);
+    const invited = await apiInviteUser(data);
+    if (typeof window !== "undefined") {
+      window.alert(
+        `Пользователь приглашен.\nВременный пароль: ${invited.tempPassword}`,
+      );
+    }
+    await loadUsers();
   };
 
   useEffect(() => {

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { SEO_PAGES, SEO_GROUPS } from "@/constants/seo";
+import { SeoPage } from "@/types/seo.types";
 import { Check } from "lucide-react";
 import styles from "./SeoPagesList.module.scss";
 
@@ -9,16 +10,19 @@ interface SeoPagesListProps {
   selectedPage: string;
   onSelectPage: (pageId: string) => void;
   hasData: Record<string, boolean>;
+  pages?: SeoPage[];
 }
 
 export const SeoPagesList: React.FC<SeoPagesListProps> = ({
   selectedPage,
   onSelectPage,
   hasData,
+  pages,
 }) => {
+  const sourcePages = pages || SEO_PAGES;
   const pagesByGroup = SEO_GROUPS.map((group) => ({
     ...group,
-    pages: SEO_PAGES.filter((p) => p.group === group.id),
+    pages: sourcePages.filter((p) => p.group === group.id),
   }));
 
   return (

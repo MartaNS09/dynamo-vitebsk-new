@@ -26,13 +26,13 @@ export const SEO_PAGES: SeoPage[] = [
     id: "departments",
     name: "Отделения",
     path: "/departments",
-    group: "sections",
+    group: "departments",
   },
   {
     id: "departments-single",
     name: "Страница отделения",
     path: "/departments/[slug]",
-    group: "sections",
+    group: "departments",
   },
 
   // Блог
@@ -67,6 +67,7 @@ export const SEO_PAGES: SeoPage[] = [
 export const SEO_GROUPS = [
   { id: "main", name: "Основные страницы" },
   { id: "sections", name: "Секции и спорт" },
+  { id: "departments", name: "Отделения" },
   { id: "blog", name: "Блог" },
   { id: "info", name: "Информационные" },
   { id: "system", name: "Системные" },

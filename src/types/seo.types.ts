@@ -33,7 +33,7 @@ export interface SeoPage {
   id: string;
   name: string;
   path: string;
-  group: "main" | "sections" | "blog" | "info" | "system";
+  group: "main" | "sections" | "departments" | "blog" | "info" | "system";
 }
 
 export interface SeoValidationErrors {

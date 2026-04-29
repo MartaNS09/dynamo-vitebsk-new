@@ -52,8 +52,33 @@ export function ApplicationsTable({
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">(
     "all",
   );
+  const [sectionFilter, setSectionFilter] = useState<string>("all");
+  const [trainerFilter, setTrainerFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"date" | "section" | "trainer">("date");
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+  const sections = [
+    "all",
+    ...Array.from(
+      new Set(
+        applications
+          .map((app) => app.sectionName || app.sport)
+          .filter(Boolean) as string[],
+      ),
+    ).sort((a, b) => a.localeCompare(b, "ru")),
+  ];
+
+  const trainers = [
+    "all",
+    ...Array.from(
+      new Set(
+        applications
+          .map((app) => app.selectedAbonement?.trainerName)
+          .filter(Boolean) as string[],
+      ),
+    ).sort((a, b) => a.localeCompare(b, "ru")),
+  ];
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) =>
@@ -75,17 +100,45 @@ export function ApplicationsTable({
     );
   };
 
-  const filteredApplications = applications.filter((app) => {
-    const matchesSearch =
-      app.name.toLowerCase().includes(search.toLowerCase()) ||
-      app.phone.includes(search) ||
-      app.sport?.toLowerCase().includes(search.toLowerCase()) ||
-      app.email?.toLowerCase().includes(search.toLowerCase());
+  const filteredApplications = applications
+    .filter((app) => {
+      const sectionValue = app.sectionName || app.sport || "";
+      const trainerValue = app.selectedAbonement?.trainerName || "";
+      const searchValue = search.toLowerCase();
 
-    const matchesStatus = statusFilter === "all" || app.status === statusFilter;
+      const matchesSearch =
+        app.name.toLowerCase().includes(searchValue) ||
+        app.phone.includes(search) ||
+        app.sport?.toLowerCase().includes(searchValue) ||
+        app.email?.toLowerCase().includes(searchValue) ||
+        sectionValue.toLowerCase().includes(searchValue) ||
+        trainerValue.toLowerCase().includes(searchValue);
 
-    return matchesSearch && matchesStatus;
-  });
+      const matchesStatus = statusFilter === "all" || app.status === statusFilter;
+      const matchesSection =
+        sectionFilter === "all" || sectionValue === sectionFilter;
+      const matchesTrainer =
+        trainerFilter === "all" || trainerValue === trainerFilter;
+
+      return matchesSearch && matchesStatus && matchesSection && matchesTrainer;
+    })
+    .sort((a, b) => {
+      if (sortBy === "date") {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      }
+
+      if (sortBy === "section") {
+        const sectionA = a.sectionName || a.sport || "";
+        const sectionB = b.sectionName || b.sport || "";
+        return sectionA.localeCompare(sectionB, "ru");
+      }
+
+      const trainerA = a.selectedAbonement?.trainerName || "";
+      const trainerB = b.selectedAbonement?.trainerName || "";
+      return trainerA.localeCompare(trainerB, "ru");
+    });
 
   const getStatusBadge = (status: ApplicationStatus) => {
     const config = statusConfig[status];
@@ -109,6 +162,34 @@ export function ApplicationsTable({
     );
   };
 
+  const exportCsv = () => {
+    const rows = [
+      ["id", "createdAt", "name", "phone", "email", "sport", "status", "source"],
+      ...filteredApplications.map((app) => [
+        app.id,
+        app.createdAt,
+        app.name,
+        app.phone,
+        app.email || "",
+        app.sport || "",
+        app.status,
+        app.source,
+      ]),
+    ];
+    const csv = rows
+      .map((row) =>
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","),
+      )
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `applications-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="applications-admin">
       {/* Хедер */}
@@ -118,6 +199,9 @@ export function ApplicationsTable({
           <span className="total-count">{applications.length} всего</span>
         </div>
         <div className="header-actions">
+          <button type="button" className="btn-secondary" onClick={exportCsv}>
+            Экспорт CSV
+          </button>
           <Link href="/dashboard/applications/new" className="btn-primary">
             <Plus size={18} />
             Создать заявку
@@ -175,6 +259,48 @@ export function ApplicationsTable({
               <option value="contacted">Связались</option>
               <option value="completed">Завершенные</option>
               <option value="cancelled">Отмененные</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <select
+              value={sectionFilter}
+              onChange={(e) => setSectionFilter(e.target.value)}
+            >
+              <option value="all">Все секции</option>
+              {sections
+                .filter((section) => section !== "all")
+                .map((section) => (
+                  <option key={section} value={section}>
+                    {section}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <select
+              value={trainerFilter}
+              onChange={(e) => setTrainerFilter(e.target.value)}
+            >
+              <option value="all">Все тренеры</option>
+              {trainers
+                .filter((trainer) => trainer !== "all")
+                .map((trainer) => (
+                  <option key={trainer} value={trainer}>
+                    {trainer}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <select
+              value={sortBy}
+              onChange={(e) =>
+                setSortBy(e.target.value as "date" | "section" | "trainer")
+              }
+            >
+              <option value="date">Сортировка: по дате</option>
+              <option value="section">Сортировка: по секции</option>
+              <option value="trainer">Сортировка: по тренеру</option>
             </select>
           </div>
         </div>

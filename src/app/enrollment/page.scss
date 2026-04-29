@@ -360,6 +360,112 @@
   }
 }
 
+.selected-account {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 14px 16px;
+
+  .account-header {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .account-number {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dynamo-blue);
+  }
+
+  .account-missing {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+  }
+}
+
+.payment-instructions {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+  }
+
+  .payment-intro {
+    margin: 0 0 12px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  .payment-title-box {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 85, 183, 0.2);
+    background: rgba(0, 85, 183, 0.07);
+    display: grid;
+    gap: 6px;
+    font-size: 0.94rem;
+    color: var(--text-primary);
+  }
+
+  .payment-steps {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  .payment-highlight {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(0, 85, 183, 0.08);
+    border: 1px solid rgba(0, 85, 183, 0.2);
+    display: grid;
+    gap: 4px;
+  }
+
+  .payment-extra {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border-color);
+    display: grid;
+    gap: 6px;
+
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+    }
+  }
+
+  .payment-pdf-btn {
+    margin-top: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.92rem;
+
+    &:hover {
+      border-color: #0055b7;
+      color: #0055b7;
+    }
+  }
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -403,6 +509,14 @@
       rgba(0, 212, 170, 0.2),
       rgba(0, 85, 183, 0.1)
     );
+  }
+
+  .selected-account {
+    background: var(--bg-card);
+  }
+
+  .payment-instructions {
+    background: var(--bg-card);
   }
 }
 

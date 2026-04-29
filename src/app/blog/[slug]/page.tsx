@@ -4,6 +4,8 @@ import { Calendar, Images } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { blogPosts } from "@/data/blog-posts";
+import { getSeoForPage } from "@/lib/api/seo";
+import { toAbsoluteUrl } from "@/lib/seo/site";
 import styles from "./BlogPost.module.scss";
 
 interface BlogPostPageProps {
@@ -21,11 +23,59 @@ export async function generateMetadata({
 }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = blogPosts.find((p) => p.slug === slug);
+  const seo = await getSeoForPage(`blog-${slug}`);
 
   if (!post) {
     return {
       title: "Статья не найдена",
       description: "Запрошенная статья не существует",
+    };
+  }
+
+  if (seo?.isActive) {
+    const canonical = seo.canonical || `/blog/${slug}`;
+    const ogImageUrl = seo.ogImage
+      ? toAbsoluteUrl(seo.ogImage)
+      : toAbsoluteUrl(post.featuredImage.url);
+
+    return {
+      title: seo.title || post.seo?.metaTitle || post.title,
+      description: seo.description || post.seo?.metaDescription || post.excerpt,
+      keywords: seo.keywords || undefined,
+      alternates: {
+        canonical,
+      },
+      robots: seo.robots || undefined,
+      openGraph: {
+        title: seo.ogTitle || seo.title || post.seo?.metaTitle || post.title,
+        description:
+          seo.ogDescription ||
+          seo.description ||
+          post.seo?.metaDescription ||
+          post.excerpt,
+        type: "article",
+        url: canonical,
+        publishedTime: post.publishedAt,
+        authors: post.author.name ? [post.author.name] : undefined,
+        images: [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: post.featuredImage.alt || post.title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: seo.ogTitle || seo.title || post.seo?.metaTitle || post.title,
+        description:
+          seo.ogDescription ||
+          seo.description ||
+          post.seo?.metaDescription ||
+          post.excerpt,
+        images: [ogImageUrl],
+      },
     };
   }
 

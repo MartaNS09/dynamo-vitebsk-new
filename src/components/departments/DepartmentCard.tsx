@@ -12,7 +12,7 @@ interface DepartmentCardProps {
 export default function DepartmentCard({ department }: DepartmentCardProps) {
   return (
     <Link
-      href={`/departments/${department.seoSlug}`}
+      href={`/departments/${department.seoSlug.toLowerCase()}`}
       className={styles.departmentCard}
       aria-label={`Перейти на страницу отделения ${department.title}`}
     >

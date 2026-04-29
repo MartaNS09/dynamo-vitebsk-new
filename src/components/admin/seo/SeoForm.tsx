@@ -72,6 +72,17 @@ export const SeoForm: React.FC<SeoFormProps> = ({
   const titleLength = formValues.title.length;
   const descLength = formValues.description.length;
 
+  const handleSeoSubmit = async (values: SeoFormData) => {
+    const resolvedPath = pageInfo?.path || initialData?.path || values.path || "/";
+    const resolvedPage = initialData?.page || values.page || "";
+
+    await onSave({
+      ...values,
+      page: resolvedPage,
+      path: resolvedPath,
+    });
+  };
+
   return (
     <div className={styles.seoForm}>
       <div className={styles.formHeader}>
@@ -79,7 +90,9 @@ export const SeoForm: React.FC<SeoFormProps> = ({
         <p className={styles.pagePath}>{pageInfo?.path}</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSave)} className={styles.form}>
+      <form onSubmit={handleSubmit(handleSeoSubmit)} className={styles.form}>
+        <input type="hidden" {...register("page")} />
+        <input type="hidden" {...register("path")} />
         {/* Основные мета-теги */}
         <div className={styles.section}>
           <h3>Основные мета-теги</h3>
@@ -255,6 +268,7 @@ export const SeoForm: React.FC<SeoFormProps> = ({
         ogDescription={formValues.ogDescription}
         ogImage={formValues.ogImage}
         path={pageInfo?.path}
+        pageId={pageInfo?.id}
       />
     </div>
   );

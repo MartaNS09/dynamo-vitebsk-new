@@ -7,6 +7,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useDropzone } from "react-dropzone";
+import { createSection } from "@/lib/api/sections";
 import {
   Save,
   ArrowLeft,
@@ -73,6 +74,31 @@ const CATEGORIES = [
   "Экстрим",
   "Прикладной спорт",
 ];
+
+const getQuickAbonementTemplates = (category?: string) => {
+  const normalized = (category || "").toLowerCase();
+
+  if (normalized.includes("гимнаст")) {
+    return [
+      { sessions: "8 занятий", price: 65 },
+      { sessions: "12 занятий", price: 100 },
+    ];
+  }
+
+  if (normalized.includes("стрельб")) {
+    return [
+      { sessions: "4 занятия", price: 30 },
+      { sessions: "8 занятий", price: 45 },
+    ];
+  }
+
+  return [
+    { sessions: "1 занятие", price: 20 },
+    { sessions: "4 занятия", price: 60 },
+    { sessions: "8 занятий", price: 80 },
+    { sessions: "12 занятий", price: 100 },
+  ];
+};
 
 // =============================================
 // КОМПОНЕНТ ЗАГРУЗКИ ИЗОБРАЖЕНИЙ
@@ -219,17 +245,10 @@ export default function NewSectionPage() {
   const onSubmit = async (data: NewSectionFormData) => {
     setLoading(true);
     try {
-      const newSection = {
-        id: String(Date.now()),
-        ...data,
-      };
-      console.log("Новая секция:", newSection);
-
-      // TODO: Отправить на сервер
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      router.push("/dashboard/sections");
+      const created = await createSection(data);
+      router.push(`/dashboard/sections/edit/${created.id}`);
     } catch (error) {
+      alert("Ошибка создания секции. Проверьте заполнение полей и повторите.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -493,27 +512,60 @@ export default function NewSectionPage() {
                     Добавьте абонементы для этой секции
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="add-btn"
-                  onClick={() => {
-                    const newId = `abonement-${Date.now()}`;
-                    appendAbonement({
-                      id: newId,
-                      name: "АБОНЕМЕНТ",
-                      description: "",
-                      price: 0,
-                      currency: "BYN",
-                      duration: "1 месяц",
-                      features: [],
-                      isPopular: false,
-                    });
-                    setExpandedAbonements((prev) => [...prev, newId]);
-                  }}
-                >
-                  <Plus size={16} />
-                  Добавить абонемент
-                </button>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    className="add-btn"
+                    onClick={() => {
+                      const templates = getQuickAbonementTemplates(watch("category"));
+                      const newIds: string[] = [];
+
+                      templates.forEach((template, idx) => {
+                        const newId = `abonement-${Date.now()}-${idx}`;
+                        newIds.push(newId);
+                        appendAbonement({
+                          id: newId,
+                          name: "АБОНЕМЕНТ",
+                          description: `${template.sessions} в месяц`,
+                          price: template.price,
+                          currency: "BYN",
+                          duration: "1 месяц",
+                          features: [
+                            `${template.sessions} в месяц`,
+                            "Профессиональные тренеры",
+                            "Индивидуальный подход",
+                          ],
+                          isPopular: template.sessions === "8 занятий",
+                        });
+                      });
+
+                      setExpandedAbonements((prev) => [...prev, ...newIds]);
+                    }}
+                  >
+                    Быстро добавить 1/4/8/12
+                  </button>
+                  <button
+                    type="button"
+                    className="add-btn"
+                    onClick={() => {
+                      const newId = `abonement-${Date.now()}`;
+                      appendAbonement({
+                        id: newId,
+                        name: "АБОНЕМЕНТ",
+                        description: "",
+                        price: 0,
+                        currency: "BYN",
+                        duration: "1 месяц",
+                        features: [],
+                        isPopular: false,
+                      });
+                      setExpandedAbonements((prev) => [...prev, newId]);
+                    }}
+                  >
+                    <Plus size={16} />
+                    Добавить абонемент
+                  </button>
+                </div>
               </div>
 
               {abonementFields.length === 0 ? (

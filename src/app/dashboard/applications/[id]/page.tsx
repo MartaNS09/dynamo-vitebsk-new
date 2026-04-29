@@ -17,8 +17,13 @@ import {
   Trash2,
   Download,
 } from "lucide-react";
-import { mockApplications } from "@/data/applications";
 import { Application, ApplicationStatus } from "@/types/application.types";
+import {
+  addApplicationNote,
+  deleteApplication,
+  getApplicationById,
+  updateApplicationStatus,
+} from "@/lib/api/applications";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import "@/styles/admin/application-detail.scss";
@@ -44,51 +49,28 @@ export default function ApplicationDetailPage({
     useState<ApplicationStatus>("new");
 
   useEffect(() => {
-    setTimeout(() => {
-      const app = mockApplications.find((a) => a.id === params.id);
-      if (app) {
+    (async () => {
+      try {
+        const app = await getApplicationById(params.id);
         setApplication(app);
         setSelectedStatus(app.status);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }, 300);
+    })();
   }, [params.id]);
 
-  const handleAddNote = () => {
+  const handleAddNote = async () => {
     if (!newNote.trim() || !application) return;
-
-    const note = {
-      id: `note_${Date.now()}`,
-      text: newNote,
-      createdAt: new Date().toISOString(),
-      createdBy: "current_user",
-      createdByName: "Текущий пользователь",
-    };
-
-    setApplication({
-      ...application,
-      managerNotes: [...(application.managerNotes || []), note],
-    });
+    const updated = await addApplicationNote(application.id, newNote);
+    setApplication(updated);
     setNewNote("");
   };
 
-  const handleStatusChange = () => {
+  const handleStatusChange = async () => {
     if (!application || selectedStatus === application.status) return;
-
-    setApplication({
-      ...application,
-      status: selectedStatus,
-      updatedAt: new Date().toISOString(),
-      statusHistory: [
-        ...application.statusHistory,
-        {
-          status: selectedStatus,
-          changedAt: new Date().toISOString(),
-          changedBy: "current_user",
-          changedByName: "Текущий пользователь",
-        },
-      ],
-    });
+    const updated = await updateApplicationStatus(application.id, selectedStatus);
+    setApplication(updated);
   };
 
   if (loading) {
@@ -123,7 +105,15 @@ export default function ApplicationDetailPage({
             <Download size={18} />
             Экспорт
           </button>
-          <button className="btn-danger">
+          <button
+            className="btn-danger"
+            onClick={async () => {
+              if (confirm("Удалить заявку?")) {
+                await deleteApplication(application.id);
+                router.push("/dashboard/applications");
+              }
+            }}
+          >
             <Trash2 size={18} />
             Удалить
           </button>

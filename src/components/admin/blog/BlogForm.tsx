@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { BlogPost } from "@/types/blog.types";
 import { blogCategories } from "@/data/blog-posts";
+import { createBlogPost, updateBlogPost } from "@/lib/api/blog";
 import "@/styles/admin/blog/blog-edit.scss";
 
 // Схема валидации с галереей (объекты с url)
@@ -109,10 +110,22 @@ export default function BlogForm({ post }: BlogFormProps) {
         ...data,
         tags: tagsArray,
         gallery: data.gallery.map((item) => item.url), // Преобразуем обратно в массив строк для API
+        author: post?.author || { name: "" },
+        category: blogCategories.find((c) => c.id === data.category) || {
+          id: "articles",
+          name: "Статьи",
+          slug: "articles",
+          color: "#06b6d4",
+        },
+        seo: post?.seo,
+        published: true,
       };
 
-      console.log("Сохраняем статью:", postData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (post?.id) {
+        await updateBlogPost(post.id, postData);
+      } else {
+        await createBlogPost(postData);
+      }
       router.push("/dashboard/blog");
     } catch (error) {
       console.error("Ошибка:", error);

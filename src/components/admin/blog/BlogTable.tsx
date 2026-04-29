@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,12 +14,24 @@ import {
   Grid,
   List,
 } from "lucide-react";
-import { sortedBlogPosts } from "@/data/blog-posts";
 import { BlogPost } from "@/types/blog.types";
+import { deleteBlogPost, getBlogPosts } from "@/lib/api/blog";
 import "@/styles/admin/blog/blog-admin.scss";
 
 export default function BlogTable() {
-  const [posts, setPosts] = useState<BlogPost[]>(sortedBlogPosts);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getBlogPosts();
+        setPosts(data);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
@@ -38,8 +50,9 @@ export default function BlogTable() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Вы уверены, что хотите удалить эту статью?")) {
+      await deleteBlogPost(id);
       setPosts(posts.filter((p) => p.id !== id));
     }
   };
@@ -73,6 +86,7 @@ export default function BlogTable() {
 
   return (
     <div className="blog-admin">
+      {loading && <div className="loading-spinner" />}
       {/* Хедер */}
       <div className="blog-header">
         <div className="header-left">

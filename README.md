@@ -48,3 +48,20 @@ npm run dev
 \`\`\`
 
 Откройте [http://localhost:3000](http://localhost:3000) в браузере.
+
+## Analytics (GA4 + Yandex Metrika)
+
+Добавьте в `.env.local`:
+
+```bash
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_YM_COUNTER_ID=12345678
+```
+
+Что настроено:
+- автоматический `page_view`/`hit` при смене маршрута App Router;
+- событие `application_submit` при успешной отправке заявки;
+- событие `phone_click` при клике по ссылке `tel:`.
+- событие `enrollment_cta_click` при переходе на страницу записи;
+- событие `enrollment_page_view` при открытии страницы `/enrollment`;
+- событие `admin_login_submit` при успешном входе в админку.

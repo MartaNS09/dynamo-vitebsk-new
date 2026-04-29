@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginCredentials } from "@/types/auth.types";
+import { trackEvent } from "@/lib/analytics/track";
 import { Mail, Lock, Shield, Eye, EyeOff } from "lucide-react";
 import "@/styles/admin/login.scss";
 
@@ -26,6 +27,7 @@ export default function LoginPage() {
 
     try {
       await login(credentials);
+      trackEvent("admin_login_submit");
       router.push("/dashboard");
     } catch (err) {
       setError("Неверный email или пароль");

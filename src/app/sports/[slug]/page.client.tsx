@@ -314,6 +314,15 @@ export default function SportSectionPageClient({
                         <p className={styles.trainerPosition}>
                           {trainer.position}
                         </p>
+                        <Link
+                          href={`/enrollment?section=${encodeURIComponent(
+                            section.slug,
+                          )}&trainerId=${encodeURIComponent(trainer.id)}`}
+                          className={styles.trainerEnrollLink}
+                          aria-label={`Записаться к тренеру ${trainer.name}`}
+                        >
+                          Записаться к тренеру
+                        </Link>
                       </div>
                     </div>
                   );

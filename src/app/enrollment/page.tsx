@@ -15,7 +15,79 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button/Button";
 import { ALL_SECTIONS } from "@/data/sport-sections";
+import { getSections } from "@/lib/api/sections";
+import { createApplication } from "@/lib/api/applications";
+import { trackEvent } from "@/lib/analytics/track";
+import { SportSection, Trainer } from "@/types/sport-section.types";
 import "./page.scss";
+
+function normalizeSessionsLabel(value: string) {
+  return value.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function extractSessionsCount(value: string) {
+  const match = value.toLowerCase().match(/(\d+)\s*занят/);
+  return match ? Number(match[1]) : null;
+}
+
+function extractSessionsFromAbonement(value: string) {
+  const normalized = value.toLowerCase();
+  if (normalized.includes("индивиду")) {
+    return "индивидуальное";
+  }
+  const match = normalized.match(/(\d+)\s*занят/i);
+  return match ? `${match[1]} занятий` : "";
+}
+
+function findAccountNumberBySessions(
+  trainer: Trainer | undefined,
+  sessionsLabel: string,
+) {
+  if (!trainer?.paymentAccounts?.length || !sessionsLabel) {
+    return "";
+  }
+  const normalizedTarget = normalizeSessionsLabel(sessionsLabel);
+  const exact = trainer.paymentAccounts.find(
+    (item) => normalizeSessionsLabel(item.sessions) === normalizedTarget,
+  );
+  if (exact?.accountNumber) {
+    return exact.accountNumber;
+  }
+
+  const targetCount = extractSessionsCount(sessionsLabel);
+  if (targetCount !== null) {
+    const numericMatch = trainer.paymentAccounts.find(
+      (item) => extractSessionsCount(item.sessions) === targetCount,
+    );
+    if (numericMatch?.accountNumber) {
+      return numericMatch.accountNumber;
+    }
+  }
+
+  const fuzzy = trainer.paymentAccounts.find((item) =>
+    normalizeSessionsLabel(item.sessions).includes(normalizedTarget) ||
+    normalizedTarget.includes(normalizeSessionsLabel(item.sessions)),
+  );
+  return fuzzy?.accountNumber || "";
+}
+
+function trainerSupportsAbonement(trainer: Trainer | undefined, abonementLabel: string) {
+  const sessionsLabel = extractSessionsFromAbonement(abonementLabel);
+  return Boolean(findAccountNumberBySessions(trainer, sessionsLabel));
+}
+
+function resolveSectionFromQuery(
+  sectionQuery: string | null,
+  sections: SportSection[],
+) {
+  if (!sectionQuery) return null;
+  const normalized = sectionQuery.toLowerCase().trim();
+  return (
+    sections.find((section) => section.slug.toLowerCase() === normalized) ||
+    sections.find((section) => section.name.toLowerCase() === normalized) ||
+    null
+  );
+}
 
 // Компонент с формой, использующий useSearchParams
 function EnrollmentForm() {
@@ -23,40 +95,220 @@ function EnrollmentForm() {
 
   // Получаем параметры из URL
   const sportFromUrl = searchParams.get("sport");
+  const sectionFromUrl = searchParams.get("section");
+  const trainerIdFromUrl = searchParams.get("trainerId");
   const abonementId = searchParams.get("abonement");
   const abonementPrice = searchParams.get("price");
   const abonementName = searchParams.get("abonementName");
+  const [availableSections, setAvailableSections] =
+    useState<SportSection[]>(ALL_SECTIONS);
+  const resolvedSection =
+    resolveSectionFromQuery(sectionFromUrl, availableSections) ||
+    resolveSectionFromQuery(sportFromUrl, availableSections);
+  const preselectedTrainer = resolvedSection?.trainers?.find(
+    (trainer) => trainer.id === trainerIdFromUrl,
+  );
+  const preselectedAbonement = resolvedSection?.abonements?.find(
+    (abonement) => abonement.id === abonementId,
+  );
+  const isPaymentOnlyFlow = Boolean(abonementId || abonementName || abonementPrice);
 
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     age: "",
-    sport: sportFromUrl || "",
+    sport: resolvedSection?.name || sportFromUrl || "",
+    trainerId: preselectedTrainer?.id || "",
+    trainerName: preselectedTrainer?.name || "",
     abonementId: abonementId || "",
-    abonementName: abonementName || "",
-    abonementPrice: abonementPrice || "",
+    abonementName: abonementName || preselectedAbonement?.description || "",
+    abonementPrice:
+      abonementPrice || (preselectedAbonement ? String(preselectedAbonement.price) : ""),
+    accountNumber: "",
     message: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedSection, setSelectedSection] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+  const [selectedSection, setSelectedSection] = useState<SportSection | null>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
+  const selectedTrainer = selectedSection?.trainers?.find(
+    (trainer) => trainer.id === formData.trainerId,
+  );
+  const selectedTrainerName = selectedTrainer?.name || formData.trainerName;
+  const trainersByAbonement = selectedSection?.trainers?.filter((trainer) =>
+    formData.abonementName ? trainerSupportsAbonement(trainer, formData.abonementName) : true,
+  );
+  const abonementsByTrainer = selectedSection?.abonements?.filter((abonement) =>
+    formData.trainerId ? trainerSupportsAbonement(selectedTrainer, abonement.description) : true,
+  );
 
   // Находим секцию по названию спорта
   useEffect(() => {
+    trackEvent("enrollment_page_view");
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const sections = await getSections();
+        if (sections.length > 0) {
+          setAvailableSections(sections);
+        }
+      } catch {
+        // Keep static fallback if API is unavailable.
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     if (formData.sport) {
-      const section = ALL_SECTIONS.find((s) => s.name === formData.sport);
+      const section = resolveSectionFromQuery(formData.sport, availableSections);
       setSelectedSection(section || null);
+      if (!section) {
+        setFormData((prev) => ({
+          ...prev,
+          trainerId: "",
+          trainerName: "",
+          accountNumber: "",
+        }));
+      }
+    } else {
+      setSelectedSection(null);
+      setFormData((prev) => ({
+        ...prev,
+        trainerId: "",
+        trainerName: "",
+        accountNumber: "",
+      }));
     }
-  }, [formData.sport]);
+  }, [formData.sport, availableSections]);
+
+  useEffect(() => {
+    if (!selectedSection || !formData.abonementId) return;
+    const matchedAbonement = selectedSection.abonements.find(
+      (item) => item.id === formData.abonementId,
+    );
+    if (!matchedAbonement) return;
+    setFormData((prev) => ({
+      ...prev,
+      abonementName: prev.abonementName || matchedAbonement.description,
+      abonementPrice: prev.abonementPrice || String(matchedAbonement.price),
+    }));
+  }, [formData.abonementId, selectedSection]);
+
+  useEffect(() => {
+    const sessionsLabel = extractSessionsFromAbonement(formData.abonementName);
+    const accountNumber = findAccountNumberBySessions(selectedTrainer, sessionsLabel);
+
+    setFormData((prev) => {
+      if (prev.accountNumber === accountNumber) {
+        return prev;
+      }
+      return {
+        ...prev,
+        accountNumber,
+      };
+    });
+  }, [formData.trainerId, formData.abonementName, selectedSection, selectedTrainer]);
+
+  useEffect(() => {
+    if (
+      formData.abonementId &&
+      selectedTrainer &&
+      !trainerSupportsAbonement(selectedTrainer, formData.abonementName)
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        abonementId: "",
+        abonementName: "",
+        abonementPrice: "",
+        accountNumber: "",
+      }));
+    }
+  }, [
+    formData.abonementId,
+    formData.abonementName,
+    formData.trainerId,
+    selectedTrainer,
+  ]);
+
+  useEffect(() => {
+    if (
+      formData.trainerId &&
+      formData.abonementName &&
+      !trainerSupportsAbonement(selectedTrainer, formData.abonementName)
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        trainerId: "",
+        trainerName: "",
+        accountNumber: "",
+      }));
+    }
+  }, [
+    formData.abonementName,
+    formData.trainerId,
+    selectedTrainer,
+  ]);
 
   // Все доступные виды спорта
-  const sports = ALL_SECTIONS.map((s) => s.name).sort();
+  const sports = availableSections.map((s) => s.name).sort();
+
+  const handleDownloadPaymentPdf = () => {
+    const sectionTitle = formData.sport || "—";
+    const abonementTitle = formData.abonementName || "—";
+    const trainerTitle = selectedTrainerName || "—";
+    const accountTitle = formData.accountNumber || "—";
+
+    const html = `<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Памятка по оплате</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; color: #111; line-height: 1.45; }
+    h1 { font-size: 22px; margin: 0 0 12px; }
+    h2 { font-size: 16px; margin: 0 0 10px; color: #0055b7; }
+    .meta { background: #f3f6fb; border: 1px solid #d8e2f0; border-radius: 8px; padding: 12px; margin-bottom: 14px; }
+    .meta div { margin: 4px 0; }
+    ol { margin: 8px 0 0 18px; }
+    li { margin: 8px 0; }
+    .path { font-weight: 700; }
+    .extra { margin-top: 14px; padding-top: 12px; border-top: 1px dashed #b8c0cc; }
+  </style>
+</head>
+<body>
+  <h1>Памятка по оплате (ЕРИП)</h1>
+  <div class="meta">
+    <div><strong>Секция:</strong> ${sectionTitle}</div>
+    <div><strong>Абонемент:</strong> ${abonementTitle}</div>
+    <div><strong>Тренер:</strong> ${trainerTitle}</div>
+    <div><strong>Номер счета:</strong> ${accountTitle}</div>
+  </div>
+  <h2>Как оплатить по шагам</h2>
+  <ol>
+    <li>В ЕРИП выберите путь:<br /><span class="path">Образование и развитие → Спорт и физическое развитие → Физкультурные центры → Витебская обл. → СДЮШОР БФСО Динамо → Физкультурно-оздоровит. услуги</span></li>
+    <li>Введите номер счета тренера в АИС ЕРИП.</li>
+    <li>Введите свои данные (фамилия, имя, отчество).</li>
+    <li>Проверьте правильность информации и совершите платеж.</li>
+  </ol>
+  <div class="extra">
+    <div><strong>Код услуги в ЕРИП:</strong> 207383</div>
+    <div><strong>Справки по оплате:</strong> 37-36-35</div>
+  </div>
+</body>
+</html>`;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
 
   const formatPhoneNumber = (value: string) => {
     const phoneNumber = value.replace(/[^\d+]/g, "");
@@ -137,20 +389,25 @@ function EnrollmentForm() {
     setIsSubmitting(true);
 
     try {
-      // Формируем данные для отправки
-      const applicationData = {
-        ...formData,
-        createdAt: new Date().toISOString(),
+      await createApplication({
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email || undefined,
+        childAge: formData.age ? Number(formData.age) : undefined,
+        sport: formData.sport || undefined,
+        message: formData.message || undefined,
         source: "enrollment_form",
         sectionId: selectedSection?.id,
         sectionName: selectedSection?.name,
-      };
-
-      // TODO: Отправка на бэкенд
-      console.log("Отправка заявки:", applicationData);
-
-      // Имитация отправки
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+        selectedAbonement: {
+          id: formData.abonementId || undefined,
+          name: formData.abonementName || undefined,
+          price: formData.abonementPrice ? Number(formData.abonementPrice) : undefined,
+          trainerId: formData.trainerId || undefined,
+          trainerName: formData.trainerName || undefined,
+          accountNumber: formData.accountNumber || undefined,
+        },
+      });
 
       alert("Заявка отправлена! Мы свяжемся с вами в течение дня.");
 
@@ -161,9 +418,12 @@ function EnrollmentForm() {
         email: "",
         age: "",
         sport: "",
+        trainerId: "",
+        trainerName: "",
         abonementId: "",
         abonementName: "",
         abonementPrice: "",
+        accountNumber: "",
         message: "",
       });
 
@@ -187,6 +447,53 @@ function EnrollmentForm() {
 
     if (name === "phone") {
       formattedValue = formatPhoneNumber(value);
+    }
+
+    if (name === "sport") {
+      setFormData((prev) => ({
+        ...prev,
+        sport: value,
+        trainerId: "",
+        trainerName: "",
+        abonementId: "",
+        abonementName: "",
+        abonementPrice: "",
+        accountNumber: "",
+      }));
+      return;
+    }
+
+    if (name === "trainerId") {
+      const selectedTrainer = selectedSection?.trainers?.find(
+        (trainer) => trainer.id === value,
+      );
+      const sessionsLabel = extractSessionsFromAbonement(formData.abonementName);
+      const accountNumber = findAccountNumberBySessions(selectedTrainer, sessionsLabel);
+      setFormData((prev) => ({
+        ...prev,
+        trainerId: value,
+        trainerName: selectedTrainer?.name || "",
+        accountNumber,
+      }));
+      return;
+    }
+
+    if (name === "abonementId") {
+      const selectedAbonement = selectedSection?.abonements?.find(
+        (abonement) => abonement.id === value,
+      );
+      const sessionsLabel = extractSessionsFromAbonement(
+        selectedAbonement?.description || "",
+      );
+      const accountNumber = findAccountNumberBySessions(selectedTrainer, sessionsLabel);
+      setFormData((prev) => ({
+        ...prev,
+        abonementId: value,
+        abonementName: selectedAbonement?.description || "",
+        abonementPrice: selectedAbonement ? String(selectedAbonement.price) : "",
+        accountNumber,
+      }));
+      return;
     }
 
     setFormData({
@@ -221,17 +528,30 @@ function EnrollmentForm() {
             <span aria-hidden="true"> / </span>
           </>
         )}
-        <span aria-current="page">Запись в школу</span>
+        <span aria-current="page">
+          {isPaymentOnlyFlow ? "Оплата (ЕРИП)" : "Запись в школу"}
+        </span>
       </nav>
 
       <div className="enrollment-content">
         {/* Левая часть - форма */}
         <div className="form-section">
           <h1>
-            <span className="highlight">Запись</span> в спортивную школу
+            {isPaymentOnlyFlow ? (
+              <>
+                <span className="highlight">Информация</span> для оплаты выбранного
+                абонемента
+              </>
+            ) : (
+              <>
+                <span className="highlight">Запись</span> в спортивную школу
+              </>
+            )}
           </h1>
           <p className="subtitle">
-            {formData.sport
+            {isPaymentOnlyFlow
+              ? "Оплатить через систему «Расчет» (ЕРИП)"
+              : formData.sport
               ? `Запись в секцию "${formData.sport}"`
               : "Заполните форму, и мы подберем для вас подходящую секцию"}
           </p>
@@ -252,12 +572,138 @@ function EnrollmentForm() {
             </div>
           )}
 
-          <form
-            onSubmit={handleSubmit}
-            className="enrollment-form"
-            aria-label="Форма записи в спортивную школу"
-            noValidate
-          >
+          {isPaymentOnlyFlow ? (
+            <div className="enrollment-form" aria-label="Информация для оплаты">
+              {abonementsByTrainer?.length ? (
+                <div className="form-group">
+                  <label htmlFor="abonementId">
+                    <CreditCard size={16} aria-hidden="true" />
+                    Выберите абонемент
+                  </label>
+                  <select
+                    id="abonementId"
+                    name="abonementId"
+                    value={formData.abonementId}
+                    onChange={handleChange}
+                    aria-label="Выберите абонемент"
+                  >
+                    <option value="">Выберите абонемент</option>
+                    {abonementsByTrainer.map((abonement) => (
+                      <option key={abonement.id} value={abonement.id}>
+                        {abonement.description} — {abonement.price} BYN
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
+
+              {trainersByAbonement?.length ? (
+                <div className="form-group">
+                  <label htmlFor="trainerId">
+                    <Users size={16} aria-hidden="true" />
+                    Выберите тренера для оплаты
+                  </label>
+                  <select
+                    id="trainerId"
+                    name="trainerId"
+                    value={formData.trainerId}
+                    onChange={handleChange}
+                    aria-label="Выберите тренера"
+                  >
+                    <option value="">Выберите тренера</option>
+                    {trainersByAbonement.map((trainer) => (
+                      <option key={trainer.id} value={trainer.id}>
+                        {trainer.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
+
+              {formData.abonementId && !trainersByAbonement?.length ? (
+                <div className="payment-instructions">
+                  <p className="payment-intro">
+                    Для выбранного абонемента нет тренеров с указанным номером счета.
+                    Выберите другой абонемент.
+                  </p>
+                </div>
+              ) : null}
+
+              {!formData.trainerId ? (
+                <div className="payment-instructions">
+                  <p className="payment-intro">
+                    Для получения номера счета выберите тренера.
+                  </p>
+                </div>
+              ) : null}
+
+              {formData.trainerId ? (
+                <div className="payment-instructions">
+                  <div className="payment-title-box">
+                    <div>
+                      <strong>Секция:</strong> {formData.sport || "—"}
+                    </div>
+                    <div>
+                      <strong>Абонемент:</strong> {formData.abonementName || "—"}
+                    </div>
+                  </div>
+                  <h3>Как оплатить по шагам (ЕРИП)</h3>
+                  <p className="payment-intro">
+                    Для выбранного тренера и абонемента платеж выполняется через{" "}
+                    <strong>«Расчет» (ЕРИП)</strong>.
+                  </p>
+                  <ol className="payment-steps">
+                    <li>
+                      В ЕРИП выберите путь:
+                      <br />
+                      <strong>
+                        Образование и развитие → Спорт и физическое развитие →
+                        Физкультурные центры → Витебская обл. → СДЮШОР БФСО Динамо
+                        → Физкультурно-оздоровит. услуги
+                      </strong>
+                    </li>
+                    <li>
+                      Введите номер счета тренера в АИС ЕРИП:
+                      <div className="payment-highlight">
+                        <div>
+                          Тренер: <strong>{selectedTrainerName || "не выбран"}</strong>
+                        </div>
+                        <div>
+                          Номер счета:{" "}
+                          <strong>{formData.accountNumber || "не указан"}</strong>
+                        </div>
+                      </div>
+                    </li>
+                    <li>Введите свои данные (фамилия, имя, отчество).</li>
+                    <li>Проверьте правильность информации и совершите платеж.</li>
+                  </ol>
+
+                  <div className="payment-extra">
+                    <p>
+                      Также можно оплатить по коду услуги в ЕРИП:{" "}
+                      <strong>207383</strong>
+                    </p>
+                    <p>
+                      Справки по оплате: <strong>37-36-35</strong>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="payment-pdf-btn"
+                    onClick={handleDownloadPaymentPdf}
+                  >
+                    Скачать PDF памятку
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              className="enrollment-form"
+              aria-label="Форма записи в спортивную школу"
+              noValidate
+            >
             <div className="form-group">
               <label htmlFor="name">
                 <User size={16} aria-hidden="true" />
@@ -386,6 +832,125 @@ function EnrollmentForm() {
               </div>
             </div>
 
+            {selectedSection?.abonements?.length ? (
+              <div className="form-group">
+                <label htmlFor="abonementId">
+                  <CreditCard size={16} aria-hidden="true" />
+                  Абонемент
+                </label>
+                <select
+                  id="abonementId"
+                  name="abonementId"
+                  value={formData.abonementId}
+                  onChange={handleChange}
+                  aria-label="Выберите абонемент"
+                >
+                  <option value="">Выберите абонемент</option>
+                  {selectedSection.abonements.map((abonement) => (
+                    <option key={abonement.id} value={abonement.id}>
+                      {abonement.description} — {abonement.price} BYN
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+
+            {selectedSection?.trainers?.length ? (
+              <div className="form-group">
+                <label htmlFor="trainerId">
+                  <Users size={16} aria-hidden="true" />
+                  Тренер
+                </label>
+                <select
+                  id="trainerId"
+                  name="trainerId"
+                  value={formData.trainerId}
+                  onChange={handleChange}
+                  aria-label="Выберите тренера"
+                >
+                  <option value="">Выберите тренера</option>
+                  {trainersByAbonement.map((trainer) => (
+                    <option key={trainer.id} value={trainer.id}>
+                      {trainer.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+
+            {formData.trainerId && formData.abonementName ? (
+              <div className="selected-account">
+                <div className="account-header">Номер счета тренера</div>
+                {formData.accountNumber ? (
+                  <div className="account-number">{formData.accountNumber}</div>
+                ) : (
+                  <div className="account-missing">
+                    Для выбранного количества занятий счет пока не указан
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {formData.trainerId ? (
+              <div className="payment-instructions">
+                <div className="payment-title-box">
+                  <div>
+                    <strong>Секция:</strong> {formData.sport || "—"}
+                  </div>
+                  <div>
+                    <strong>Абонемент:</strong> {formData.abonementName || "—"}
+                  </div>
+                </div>
+                <h3>Как оплатить по шагам (ЕРИП)</h3>
+                <p className="payment-intro">
+                  После выбора тренера платеж выполняется через систему{" "}
+                  <strong>«Расчет» (ЕРИП)</strong>.
+                </p>
+                <ol className="payment-steps">
+                  <li>
+                    В ЕРИП выберите путь:
+                    <br />
+                    <strong>
+                      Образование и развитие → Спорт и физическое развитие →
+                      Физкультурные центры → Витебская обл. → СДЮШОР БФСО Динамо
+                      → Физкультурно-оздоровит. услуги
+                    </strong>
+                  </li>
+                  <li>
+                    Введите номер счета тренера в АИС ЕРИП:
+                    <div className="payment-highlight">
+                      <div>
+                        Тренер: <strong>{selectedTrainerName || "не выбран"}</strong>
+                      </div>
+                      <div>
+                        Номер счета:{" "}
+                        <strong>{formData.accountNumber || "не указан"}</strong>
+                      </div>
+                    </div>
+                  </li>
+                  <li>Введите свои данные (фамилия, имя, отчество).</li>
+                  <li>Проверьте правильность информации и совершите платеж.</li>
+                </ol>
+
+                <div className="payment-extra">
+                  <p>
+                    Также можно оплатить по коду услуги в ЕРИП:{" "}
+                    <strong>207383</strong>
+                  </p>
+                  <p>
+                    Справки по оплате: <strong>37-36-35</strong>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="payment-pdf-btn"
+                  onClick={handleDownloadPaymentPdf}
+                >
+                  Скачать PDF памятку
+                </button>
+              </div>
+            ) : null}
+
             {/* Скрытые поля для данных абонемента */}
             <input
               type="hidden"
@@ -401,6 +966,12 @@ function EnrollmentForm() {
               type="hidden"
               name="abonementPrice"
               value={formData.abonementPrice}
+            />
+            <input type="hidden" name="trainerName" value={formData.trainerName} />
+            <input
+              type="hidden"
+              name="accountNumber"
+              value={formData.accountNumber}
             />
 
             <div className="form-group">
@@ -444,7 +1015,8 @@ function EnrollmentForm() {
                 </Link>
               </p>
             </div>
-          </form>
+            </form>
+          )}
         </div>
 
         {/* Правая часть - контакты */}

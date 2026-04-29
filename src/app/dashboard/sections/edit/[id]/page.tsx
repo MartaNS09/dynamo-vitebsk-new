@@ -63,11 +63,87 @@ const sectionSchema = z.object({
       name: z.string(),
       position: z.string(),
       photo: z.string().optional(),
+      paymentAccounts: z
+        .array(
+          z.object({
+            sessions: z.string(),
+            accountNumber: z.string(),
+          }),
+        )
+        .optional(),
     }),
   ),
 });
 
 type SectionFormData = z.infer<typeof sectionSchema>;
+
+const getSectionTariffTemplate = (sectionName?: string, category?: string) => {
+  const key = `${sectionName || ""} ${category || ""}`.toLowerCase();
+
+  if (key.includes("гимнаст")) {
+    return [
+      { sessions: "8 занятий", accountNumber: "" },
+      { sessions: "12 занятий", accountNumber: "" },
+      { sessions: "индивидуальное", accountNumber: "" },
+    ];
+  }
+
+  if (key.includes("кикбокс")) {
+    return [
+      { sessions: "1 занятие", accountNumber: "" },
+      { sessions: "4 занятия", accountNumber: "" },
+      { sessions: "8 занятий", accountNumber: "" },
+      { sessions: "12 занятий", accountNumber: "" },
+    ];
+  }
+
+  if (key.includes("стрельб")) {
+    return [
+      { sessions: "4 занятия", accountNumber: "" },
+      { sessions: "8 занятий", accountNumber: "" },
+    ];
+  }
+
+  if (key.includes("дзюдо")) {
+    return [
+      { sessions: "4 занятия", accountNumber: "" },
+      { sessions: "8 занятий", accountNumber: "" },
+      { sessions: "12 занятий", accountNumber: "" },
+    ];
+  }
+
+  return [
+    { sessions: "1 занятие", accountNumber: "" },
+    { sessions: "4 занятия", accountNumber: "" },
+    { sessions: "8 занятий", accountNumber: "" },
+    { sessions: "12 занятий", accountNumber: "" },
+  ];
+};
+
+const buildDraftAccountNumber = (trainerName: string, sessions: string) => {
+  const initials = trainerName
+    .trim()
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 3);
+  const sessionDigits = (sessions.match(/\d+/)?.[0] || "IND").toUpperCase();
+  const safeInitials = initials || "TRN";
+  return `DRAFT-${safeInitials}-${sessionDigits}`;
+};
+
+const buildDraftAccountsForTrainer = (
+  trainerName: string,
+  sectionName?: string,
+  category?: string,
+) => {
+  const template = getSectionTariffTemplate(sectionName, category);
+  return template.map((item) => ({
+    ...item,
+    accountNumber: buildDraftAccountNumber(trainerName, item.sessions),
+  }));
+};
 
 const CATEGORIES = [
   "Гимнастика",
@@ -273,7 +349,11 @@ export default function EditSectionPage({
         coverImage: section.coverImage || "",
         gallery: section.gallery || [],
         abonements: section.abonements || [],
-        trainers: section.trainers || [],
+        trainers:
+          section.trainers?.map((trainer) => ({
+            ...trainer,
+            paymentAccounts: trainer.paymentAccounts || [],
+          })) || [],
       });
     }
   }, [section, reset]);
@@ -312,7 +392,6 @@ export default function EditSectionPage({
       const token = localStorage.getItem("access_token");
       console.log("🔑 Токен:", token ? "есть" : "нет");
 
-      // ИСПОЛЬЗУЕМ ГОТОВУЮ ФУНКЦИЮ ИЗ API
       const result = await updateSection(id!, data);
 
       console.log("✅ Сохранено:", result);
@@ -803,21 +882,44 @@ export default function EditSectionPage({
                     Добавьте тренеров, которые работают в этой секции
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="add-btn"
-                  onClick={() =>
-                    appendTrainer({
-                      id: `trainer-${Date.now()}`,
-                      name: "",
-                      position: "тренер-преподаватель",
-                      photo: "",
-                    })
-                  }
-                >
-                  <Plus size={16} />
-                  Добавить тренера
-                </button>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    className="add-btn"
+                    onClick={() => {
+                      const trainers = watch("trainers") || [];
+                      trainers.forEach((trainer, trainerIndex) => {
+                        const draftAccounts = buildDraftAccountsForTrainer(
+                          trainer.name || `Тренер ${trainerIndex + 1}`,
+                          watch("name"),
+                          watch("category"),
+                        );
+                        setValue(
+                          `trainers.${trainerIndex}.paymentAccounts`,
+                          draftAccounts,
+                        );
+                      });
+                    }}
+                  >
+                    Заполнить все счета (черновик)
+                  </button>
+                  <button
+                    type="button"
+                    className="add-btn"
+                    onClick={() =>
+                      appendTrainer({
+                        id: `trainer-${Date.now()}`,
+                        name: "",
+                        position: "тренер-преподаватель",
+                        photo: "",
+                        paymentAccounts: [],
+                      })
+                    }
+                  >
+                    <Plus size={16} />
+                    Добавить тренера
+                  </button>
+                </div>
               </div>
 
               {trainerFields.length === 0 ? (
@@ -836,6 +938,7 @@ export default function EditSectionPage({
                         name: "",
                         position: "тренер-преподаватель",
                         photo: "",
+                        paymentAccounts: [],
                       })
                     }
                   >
@@ -912,6 +1015,119 @@ export default function EditSectionPage({
                             {...register(`trainers.${index}.photo`)}
                             placeholder="/images/trainers/photo.jpg"
                           />
+                        </div>
+                        <div className="form-group">
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              marginBottom: "8px",
+                              gap: "8px",
+                            }}
+                          >
+                            <label>Счета по абонементам</label>
+                            <div style={{ display: "flex", gap: "8px" }}>
+                              <button
+                                type="button"
+                                className="add-btn"
+                                onClick={() => {
+                                  const trainerName =
+                                    watch(`trainers.${index}.name`) ||
+                                    `Тренер ${index + 1}`;
+                                  const defaultAccounts =
+                                    buildDraftAccountsForTrainer(
+                                      trainerName,
+                                      watch("name"),
+                                      watch("category"),
+                                    );
+                                  setValue(
+                                    `trainers.${index}.paymentAccounts`,
+                                    defaultAccounts,
+                                  );
+                                }}
+                              >
+                                Автозаполнить счета
+                              </button>
+                              <button
+                                type="button"
+                                className="add-btn"
+                                onClick={() => {
+                                  const accounts =
+                                    watch(`trainers.${index}.paymentAccounts`) || [];
+                                  setValue(`trainers.${index}.paymentAccounts`, [
+                                    ...accounts,
+                                    {
+                                      sessions: "",
+                                      accountNumber: "",
+                                    },
+                                  ]);
+                                }}
+                              >
+                                <Plus size={14} />
+                                Добавить тариф
+                              </button>
+                            </div>
+                          </div>
+
+                          {(watch(`trainers.${index}.paymentAccounts`) || []).length ===
+                          0 ? (
+                            <p style={{ color: "#6b7280", fontSize: "13px" }}>
+                              Тарифы не добавлены
+                            </p>
+                          ) : (
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "8px",
+                              }}
+                            >
+                              {(watch(`trainers.${index}.paymentAccounts`) || []).map(
+                                (_account, accountIndex) => (
+                                  <div
+                                    key={`${field.id}-acc-${accountIndex}`}
+                                    style={{
+                                      display: "grid",
+                                      gridTemplateColumns: "1fr 180px 36px",
+                                      gap: "8px",
+                                    }}
+                                  >
+                                    <input
+                                      {...register(
+                                        `trainers.${index}.paymentAccounts.${accountIndex}.sessions`,
+                                      )}
+                                      placeholder="4 занятия"
+                                    />
+                                    <input
+                                      {...register(
+                                        `trainers.${index}.paymentAccounts.${accountIndex}.accountNumber`,
+                                      )}
+                                      placeholder="31-4"
+                                    />
+                                    <button
+                                      type="button"
+                                      className="remove-btn"
+                                      onClick={() => {
+                                        const accounts =
+                                          watch(
+                                            `trainers.${index}.paymentAccounts`,
+                                          ) || [];
+                                        setValue(
+                                          `trainers.${index}.paymentAccounts`,
+                                          accounts.filter(
+                                            (_, i) => i !== accountIndex,
+                                          ),
+                                        );
+                                      }}
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

@@ -64,8 +64,12 @@ export default function AbonementCard({
       <div className={styles.actions}>
         <a
           href={`/enrollment?section=${encodeURIComponent(
-            sectionName
-          )}&abonement=${abonement.id}`}
+            sectionName,
+          )}&abonement=${encodeURIComponent(
+            abonement.id,
+          )}&abonementName=${encodeURIComponent(
+            abonement.description,
+          )}&price=${encodeURIComponent(String(abonement.price))}`}
           className={styles.enrollButton}
           onClick={(e) => {
             e.stopPropagation();
