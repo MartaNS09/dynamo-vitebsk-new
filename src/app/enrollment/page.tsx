@@ -869,7 +869,7 @@ function EnrollmentForm() {
                   aria-label="Выберите тренера"
                 >
                   <option value="">Выберите тренера</option>
-                  {trainersByAbonement.map((trainer) => (
+                  {(trainersByAbonement ?? []).map((trainer) => (
                     <option key={trainer.id} value={trainer.id}>
                       {trainer.name}
                     </option>
