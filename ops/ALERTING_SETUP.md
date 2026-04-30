@@ -12,7 +12,9 @@ Server: 194.62.19.203
 
 Current defaults:
 - `ALERT_EMAIL_TO="karelinseo@gmail.com"`
-- `TG_CHAT_ID="@Apsod_IT"`
+- `TG_CHAT_ID="8637192115"`
+- `PROJECT_NAME="DYNAMO"`
+- `ENV_NAME="PROD"`
 
 ## Required secrets to enable delivery
 ### Telegram
@@ -35,6 +37,11 @@ Edit `/etc/dynamo-alert.env` and fill fields:
 
 Then test:
 - `/usr/local/bin/dynamo-alert.sh "manual test" "INFO"`
+
+## Alert format
+Each alert is prefixed by project and environment:
+- `[PROJECT_NAME][ENV_NAME][SEVERITY] message`
+- Example: `[DYNAMO][PROD][CRIT] backend health failed`
 
 ## Trigger conditions
 Watchdog runs every 2 minutes and:
