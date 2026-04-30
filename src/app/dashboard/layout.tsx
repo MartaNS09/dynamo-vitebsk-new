@@ -28,7 +28,11 @@ export default function DashboardLayout({
 
       // 2. Проверяем, что пользователь - администратор!
       if (user) {
-        const allowedRoles = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
+        const allowedRoles = [
+          UserRole.SUPER_ADMIN,
+          UserRole.ADMIN,
+          UserRole.EDITOR,
+        ];
         if (!allowedRoles.includes(user.role)) {
           router.push("/"); // Если не админ - на главную
           return;
@@ -51,7 +55,11 @@ export default function DashboardLayout({
   }
 
   // Если пользователь не админ - не показываем админку
-  const allowedRoles = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
+  const allowedRoles = [
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.EDITOR,
+  ];
   if (!allowedRoles.includes(user.role)) {
     return null;
   }
