@@ -152,3 +152,12 @@ crontab -l
 - frontend/backend отвечают `200`;
 - алерт-каналы (Telegram/email) получают тестовое сообщение;
 - создана новая точка backup БД после восстановления.
+
+## 9) Журнал restore-тестов
+- **2026-05-01** (тестовый restore в отдельную БД, без влияния на прод):
+  - backup: `postgres_2026-05-01_12-10-01.sql.gz`
+  - результат: `restore:ok`
+  - таблиц в `public`: `9`
+  - ключевые таблицы: `4/4` (`AdminUser`, `Application`, `SeoData`, `SportSection`)
+  - оценка строк: `AdminUser=3`, `Application=0`, `SeoData=40`, `SportSection=11`
+  - cleanup: временная БД удалена после проверки
