@@ -1,22 +1,22 @@
-# Daily Ops Digest (VPS)
+# Ежедневный операционный дайджест (VPS)
 
 Date: 2026-05-01
 Server: 194.62.19.203
 
-## Script
+## Скрипт
 - `/usr/local/bin/dynamo-daily-digest.sh`
 
-## Purpose
-Sends daily summary to existing alert channels (Telegram + email) using `/usr/local/bin/dynamo-alert.sh`.
+## Назначение
+Отправляет ежедневную сводку в текущие каналы оповещений (Telegram + email) через `/usr/local/bin/dynamo-alert.sh`.
 
-Digest includes:
-- health watchdog `OK` count
-- `HEALED` count
-- `FAIL` count
-- nginx `5xx` alert transitions (`CRIT` count)
-- nginx `401/403` alert transitions (`CRIT` count)
+Дайджест содержит:
+- количество `OK` у health watchdog
+- количество `HEALED`
+- количество `FAIL`
+- количество критичных переходов по nginx `5xx` (`CRIT`)
+- количество критичных переходов по nginx `401/403` (`CRIT`)
 
-## Data sources
+## Источники данных
 - `/var/log/dynamo-health.log`
 - `/var/log/dynamo-nginx-5xx.log`
 - `/var/log/dynamo-nginx-401-403.log`
@@ -24,9 +24,9 @@ Digest includes:
 ## Cron
 - `10 8 * * * /usr/local/bin/dynamo-daily-digest.sh >> /var/log/dynamo-digest-cron.log 2>&1`
 
-## Test run
+## Тестовый запуск
 - `SINCE_HOURS=1 /usr/local/bin/dynamo-daily-digest.sh`
 
-## Logs
+## Логи
 - `/var/log/dynamo-digest.log`
 - `/var/log/dynamo-digest-cron.log`
