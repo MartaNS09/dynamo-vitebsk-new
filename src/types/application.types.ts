@@ -40,6 +40,11 @@ export interface Application {
   source: ApplicationSource;
   sectionId?: string;
   sectionName?: string;
+  consentGiven: boolean;
+  consentAt?: string;
+  consentVersion?: string;
+  consentIp?: string;
+  consentUserAgent?: string;
 
   // Статус обработки
   status: ApplicationStatus;

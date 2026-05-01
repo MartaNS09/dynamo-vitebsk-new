@@ -46,6 +46,8 @@ export async function createApplication(payload: {
   sectionId?: string;
   sectionName?: string;
   selectedAbonement?: unknown;
+  consentGiven: boolean;
+  consentVersion?: string;
 }): Promise<Application> {
   const response = await fetch(`${NORMALIZED_API_BASE_URL}/applications`, {
     method: "POST",

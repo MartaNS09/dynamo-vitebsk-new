@@ -85,6 +85,8 @@ export default function NewApplicationPage() {
       sport: formData.sport || undefined,
       message: formData.message || undefined,
       source: "other",
+      consentGiven: true,
+      consentVersion: "admin-manual",
     });
     router.push("/dashboard/applications");
   };

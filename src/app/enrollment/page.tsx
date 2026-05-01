@@ -91,6 +91,7 @@ function resolveSectionFromQuery(
 
 // Компонент с формой, использующий useSearchParams
 function EnrollmentForm() {
+  const CONSENT_VERSION = "2026-05-01";
   const searchParams = useSearchParams();
 
   // Получаем параметры из URL
@@ -127,6 +128,7 @@ function EnrollmentForm() {
       abonementPrice || (preselectedAbonement ? String(preselectedAbonement.price) : ""),
     accountNumber: "",
     message: "",
+    consentGiven: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -369,6 +371,11 @@ function EnrollmentForm() {
       newErrors.email = "Введите корректный email";
     }
 
+    if (!formData.consentGiven) {
+      newErrors.consentGiven =
+        "Необходимо согласие на обработку персональных данных";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -397,6 +404,8 @@ function EnrollmentForm() {
         sport: formData.sport || undefined,
         message: formData.message || undefined,
         source: "enrollment_form",
+        consentGiven: formData.consentGiven,
+        consentVersion: CONSENT_VERSION,
         sectionId: selectedSection?.id,
         sectionName: selectedSection?.name,
         selectedAbonement: {
@@ -425,6 +434,7 @@ function EnrollmentForm() {
         abonementPrice: "",
         accountNumber: "",
         message: "",
+        consentGiven: false,
       });
 
       // Перенаправляем на страницу успеха или главную
@@ -493,6 +503,17 @@ function EnrollmentForm() {
         abonementPrice: selectedAbonement ? String(selectedAbonement.price) : "",
         accountNumber,
       }));
+      return;
+    }
+
+    if (name === "consentGiven" && e.target instanceof HTMLInputElement) {
+      setFormData({
+        ...formData,
+        consentGiven: e.target.checked,
+      });
+      if (errors.consentGiven) {
+        setErrors((prev) => ({ ...prev, consentGiven: "" }));
+      }
       return;
     }
 
@@ -985,6 +1006,32 @@ function EnrollmentForm() {
                 onChange={handleChange}
                 aria-label="Дополнительная информация"
               />
+            </div>
+
+            <div className="consent-box">
+              <label htmlFor="consentGiven" className="consent-label">
+                <input
+                  id="consentGiven"
+                  type="checkbox"
+                  name="consentGiven"
+                  checked={formData.consentGiven}
+                  onChange={handleChange}
+                  aria-invalid={!!errors.consentGiven}
+                  aria-describedby={
+                    errors.consentGiven ? "consent-error" : undefined
+                  }
+                />
+                <span>
+                  Я даю согласие на обработку персональных данных согласно{" "}
+                  <Link href="/privacy">политике обработки персональных данных</Link>
+                  .
+                </span>
+              </label>
+              {errors.consentGiven && (
+                <span id="consent-error" className="error-message" role="alert">
+                  {errors.consentGiven}
+                </span>
+              )}
             </div>
 
             <div className="form-footer">

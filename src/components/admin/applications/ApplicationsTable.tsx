@@ -164,7 +164,19 @@ export function ApplicationsTable({
 
   const exportCsv = () => {
     const rows = [
-      ["id", "createdAt", "name", "phone", "email", "sport", "status", "source"],
+      [
+        "id",
+        "createdAt",
+        "name",
+        "phone",
+        "email",
+        "sport",
+        "status",
+        "source",
+        "consentGiven",
+        "consentAt",
+        "consentVersion",
+      ],
       ...filteredApplications.map((app) => [
         app.id,
         app.createdAt,
@@ -174,6 +186,9 @@ export function ApplicationsTable({
         app.sport || "",
         app.status,
         app.source,
+        app.consentGiven ? "true" : "false",
+        app.consentAt || "",
+        app.consentVersion || "",
       ]),
     ];
     const csv = rows
@@ -460,6 +475,11 @@ export function ApplicationsTable({
                     <div className="expanded-grid">
                       <div className="expanded-section">
                         <h4>Дополнительная информация</h4>
+                        <p className="client-message">
+                          Согласие на обработку ПДн:{" "}
+                          <strong>{app.consentGiven ? "Да" : "Нет"}</strong>
+                          {app.consentAt ? ` (${format(new Date(app.consentAt), "dd.MM.yyyy HH:mm")})` : ""}
+                        </p>
                         {app.message ? (
                           <p className="client-message">{app.message}</p>
                         ) : (
