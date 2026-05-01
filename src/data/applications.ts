@@ -97,6 +97,9 @@ export const mockApplications: Application[] = Array.from(
       source,
       sectionId: `section_${sportIndex + 1}`,
       sectionName: sport,
+      consentGiven: true,
+      consentAt: createdAt,
+      consentVersion: "2026-05-01",
       status: finalStatus,
       // ИСПРАВЛЕНО: явно указываем тип
       statusHistory: [
