@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { HeaderTop } from "./HeaderTop/HeaderTop";
 import { Logo } from "./Logo/Logo";
 import { DesktopNav } from "./DesktopNav/DesktopNav";
@@ -9,6 +10,7 @@ import { SearchIcon } from "@/components/icons";
 import "./Header.scss";
 
 export const Header = () => {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -34,20 +36,28 @@ export const Header = () => {
     };
   }, []);
 
-  const handleSearch = useCallback((value: string) => {
-    console.log("Search:", value);
-    if (window.innerWidth <= 768) {
-      setIsSearchOpen(false);
-    }
-  }, []);
+  const handleSearch = useCallback(
+    (value: string) => {
+      const query = value.trim();
+      if (query.length >= 2) {
+        router.push(`/search?q=${encodeURIComponent(query)}`);
+      }
+      if (window.innerWidth <= 768) {
+        setIsSearchOpen(false);
+      }
+    },
+    [router],
+  );
 
   const handleMenuToggle = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
-  }, []);
+    if (isSearchOpen) setIsSearchOpen(false);
+  }, [isSearchOpen]);
 
   const handleSearchToggle = useCallback(() => {
     setIsSearchOpen((prev) => !prev);
-  }, []);
+    if (isMenuOpen) setIsMenuOpen(false);
+  }, [isMenuOpen]);
 
   const handleNavClick = useCallback(() => {
     requestAnimationFrame(() => {
