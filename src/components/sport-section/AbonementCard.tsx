@@ -3,6 +3,7 @@
 import React from "react";
 import { Abonement } from "@/types/sport-section.types";
 import { Check } from "@/components/icons";
+import { normalizeAbonementFeatures } from "@/lib/abonement";
 import styles from "./AbonementCard.module.scss";
 
 interface AbonementCardProps {
@@ -16,6 +17,8 @@ export default function AbonementCard({
   sectionName,
   index = 0,
 }: AbonementCardProps) {
+  const features = normalizeAbonementFeatures(abonement.features);
+
   return (
     <div
       className={`${styles.card} ${abonement.isPopular ? styles.popular : ""}`}
@@ -48,7 +51,7 @@ export default function AbonementCard({
       {/* Особенности */}
       <div className={styles.features}>
         <ul className={styles.featuresList}>
-          {abonement.features.map((feature, idx) => (
+          {features.map((feature, idx) => (
             <li key={idx} className={styles.feature}>
               <Check
                 style={{ width: 14, height: 14 }}

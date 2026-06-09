@@ -4,6 +4,7 @@ import SportSectionPageClient from "./page.client";
 import { SportSection, Abonement, Trainer } from "@/types/sport-section.types";
 import { getSectionBySlug } from "@/lib/api/sections";
 import { getSeoForPage } from "@/lib/api/seo";
+import { normalizeAbonementFeatures } from "@/lib/abonement";
 
 // Экспортируем тип для использования в клиентском компоненте
 export interface SectionWithData extends SportSection {
@@ -111,7 +112,7 @@ async function getSectionData(slug: string): Promise<SectionWithData | null> {
     return {
       ...section,
       heroImages,
-      abonements:
+      abonements: (
         section.abonements && section.abonements.length > 0
           ? section.abonements
           : [
@@ -125,7 +126,11 @@ async function getSectionData(slug: string): Promise<SectionWithData | null> {
                 features: ["Группа до 15 человек", "Профессиональный тренер"],
                 isPopular: true,
               } as Abonement,
-            ],
+            ]
+      ).map((abonement) => ({
+        ...abonement,
+        features: normalizeAbonementFeatures(abonement.features),
+      })),
       trainers:
         section.trainers && section.trainers.length > 0
           ? section.trainers
